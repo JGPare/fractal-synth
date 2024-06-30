@@ -1,0 +1,140 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+.inconsolata-main {
+  font-family: "Inconsolata", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+.container {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: #66666677;
+}
+
+.lowerRow {
+    bottom: 0;
+}
+
+.upperRow {
+    margin-bottom: 63px;
+    bottom: 0;
+}
+
+.flashContainer {
+    position: fixed;
+    width: 100%;
+    padding: 6px 20px; 
+    text-align: center;
+    background-color: #66666677;
+}
+
+.column3 {
+    flex: 0 0 28%;
+    border: 0px solid #ccc; /* Optional: Add border for visualization */
+    padding: 3px 15px; 
+    text-align: center;
+}
+
+.column2 {
+    flex: 0 0 40%;
+    border: 0px solid #ccc; /* Optional: Add border for visualization */
+    padding: 3px 15px; 
+    text-align: center;
+}
+
+.column-select {
+    flex: 0 0 10%;
+    height: 100%;
+    border: 0px solid #ccc; /* Optional: Add border for visualization */
+    padding: auto auto; 
+    text-align: center;
+    align-content: center;
+}
+
+.mySelect{
+    width: 100%;
+    height: 50%;
+    padding: 0px 6px;
+    margin: 15% 10px;
+    border-radius: 0.5rem;
+    background-color: #d3d3d3cc;
+    color: #17385e;
+}
+
+.slider-container {
+    width: 100%;
+    height: 100%; 
+    position: relative;
+    margin: 5px;
+}
+
+.mySlider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;  
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+
+.mySlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    background: #91a8c0;
+    cursor: pointer;
+}
+
+.mySlider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.normal {
+    font-size: large;
+    color: #97bada;
+    padding-bottom: 0.5rem;
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-weight: 500;
+}
+
+.flashText {
+    font-size: x-large;
+    padding-bottom: 0rem;
+}
+
+.normal::selection {
+    color: #91a8c0;
+  }
