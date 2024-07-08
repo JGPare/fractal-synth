@@ -52,10 +52,13 @@ export default class Render
         uFocusY: { value: 0 },
         uZoom: { value: this.zoom },
         uIterVar: { value: 1.0 },
+        uIterRate: { value: 1.0},
         uIterBase: { value: 1.0 },
         uAspect: { value: this.sizes.aspect },
         uCx : {value : this.c.x},
         uCy : {value : this.c.y},
+        uCRadius : {value : 0.0},
+        uCRate : {value : 1.0},
         uJulia : {value : this.drawJulia},
         uPower : {value : 2.0}
       }
@@ -92,6 +95,10 @@ export default class Render
       const uIter = event.target.value / event.target.max
       this.material.uniforms.uIterVar.value = uIter
     })
+    
+    document.getElementById('variableRateSlider').addEventListener('input', (event) => {
+      this.material.uniforms.uIterRate.value = event.target.value
+    })
 
     document.getElementById('constantSlider').addEventListener('input', (event) => {
       const uBase = event.target.value / event.target.max
@@ -102,12 +109,20 @@ export default class Render
       this.material.uniforms.uPower.value = event.target.value
     })
 
-    document.getElementById('constantXSlider').addEventListener('input', (event) => {
+    document.getElementById('positionXSlider').addEventListener('input', (event) => {
       this.material.uniforms.uCx.value = event.target.value
     })
     
-    document.getElementById('constantYSlider').addEventListener('input', (event) => {
+    document.getElementById('positionYSlider').addEventListener('input', (event) => {
       this.material.uniforms.uCy.value = event.target.value
+    })
+
+    document.getElementById('positionVariation').addEventListener('input', (event) => {
+      this.material.uniforms.uCRadius.value = event.target.value
+    })
+
+    document.getElementById('positionRate').addEventListener('input', (event) => {
+      this.material.uniforms.uCRate.value = event.target.value
     })
     
     document.getElementById('fractalSelect').addEventListener('change', (event) => {
@@ -115,11 +130,17 @@ export default class Render
       this.material.uniforms.uJulia.value = this.drawJulia
       if (this.drawJulia) 
       {
-        document.getElementById('upperSliders').style.display = ""
+        const juliaSliders = document.querySelectorAll('[data-julia]');
+        for (const element of juliaSliders) {
+          element.style.display = ""
+        }
       }
       else
       {
-        document.getElementById('upperSliders').style.display = "none"
+        const juliaSliders = document.querySelectorAll('[data-julia]');
+        for (const element of juliaSliders) {
+          element.style.display = "none"
+        }
       }
     })
     

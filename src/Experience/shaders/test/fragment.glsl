@@ -7,12 +7,15 @@ uniform float uFocusY;
 uniform float uTime;
 uniform float uZoom;
 uniform float uIterVar;
+uniform float uIterRate;
 uniform float uIterBase;
 uniform float uPower;
 uniform bool uJulia;
 
 uniform float uCx;
 uniform float uCy;
+uniform float uCRadius;
+uniform float uCRate;
 
 varying vec2 vUv;
 
@@ -59,7 +62,7 @@ float julia(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
     vec2 scale = vec2(inputScale);
     vec2 scaledUv = centerUv*scale + focus;
 
-    vec2 c = vec2(uCx, uCy); 
+    vec2 c = vec2(uCx, uCy) + pow(uCRadius,3.0)*vec2(cos(uTime*uCRate),sin(uTime*uCRate));
 
     int i;
 
@@ -77,8 +80,7 @@ float julia(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
 
 void main()
 {
-    // int iterations = int((exp(6.8*abs(sin(uTime/5.0))*uIterVar+1.0)+15.0*uIterBase));
-    int iterations = int(exp(6.8*uIterBase - abs(uIterVar*3.5*cos(uTime/5.0))));
+    int iterations = int(exp(6.8*uIterBase - abs(uIterVar*3.5*cos(uTime/5.0*uIterRate))));
 
     vec2 focus = vec2(uFocusX,uFocusY);
     vec2 rUv = vUv;

@@ -1,62 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Shader patterns</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-    <canvas class="webgl"></canvas>
-    <script type="module" src="./script.js"></script>
 
-    <div class="flashContainer" id="flash">
-        <p class="flashText normal"> DOUBLE CLICK TO ENTER/LEAVE FULLSCREEN </p>
-        <p class="flashText normal"> USE ARROW KEYS FOR FIND ADJUSTMENTS </p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Shader patterns</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <script type="module" src="./script.js"></script>
+  
+  <div class="flashContainer" id="flash">
+    <p class="flashText normal-text"> DOUBLE CLICK TO ENTER/LEAVE FULLSCREEN </p>
+    <p class="flashText normal-text"> USE ARROW KEYS FOR FIND ADJUSTMENTS </p>
+  </div>
+  <div id="main-grid">
+    <div class="webgl-container">
+      <canvas class="webgl"></canvas>
     </div>
-    <div class="container lowerRow">
-        <div class="select-column">
-            <select class="mySelect" id="fractalSelect">
-                <option value="mandle">Mandlebrot</option>
-                <option value="julia">Julia</option>
-            </select>
-        </div>
-        <div class="column3">
-            <div class="slider-container">
-                <p class="normal inconsolata-main"> Variable Detail </p>
-                <input type="range" min="1" max="100" value="100" class="mySlider" id="variableSlider"> 
+    <div id="ui-grid">
+      <div class="logo-container container">
+        <h2 class="inconsolata-main header-text">Fractal Synth</h2>
+        <div class="btm-outline"></div>
+      </div>
+      <div class="select-container container">
+        <select class="mySelect inconsolata-main" id="fractalSelect">
+          <option value="mandle">Mandlebrot</option>
+          <option value="julia">Julia</option>
+        </select>
+      </div>      
+      <div class="main-controls-container container">
+        <div id="controls-grid">
+          <div class="slider-container container ctrl">
+            <div class="btm-outline"></div>
+            <p class="slider-text inconsolata-main"> Constant Detail </p>
+            <div class="dual-input-grid">
+              <input type="range" min="10" max="100" value="100" class="control-slider" id="constantSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main" id="constantValue">
             </div>
-        </div>
-        <div class="column3">
-            <div class="slider-container">
-                <p class="normal inconsolata-main"> Power </p>
-                <input type="range" min="-30" max="30" value="2" step="1" class="mySlider" id="powerSlider"> 
+          </div>
+          <div class="slider-container container ctrl">
+            <p class="slider-text inconsolata-main"> Power </p>
+            <div class="dual-input-grid">
+              <input type="range" min="-30" max="30" value="2" step="1" class="control-slider" id="powerSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">              
             </div>
-        </div>
-        <div class="column3 right-align">
-            <div class="slider-container">
-                <p class="normal inconsolata-main"> Constant Detail </p>
-                <input type="range" min="10" max="100" value="100" class="mySlider" id="constantSlider"> 
+            <div class="btm-outline"></div>
+          </div>
+          <div class="slider-container container ctrl">
+            <p class="slider-text inconsolata-main"> Variable Detail </p>
+            <div class="dual-input-grid">
+              <input type="range" min="1" max="100" value="100" class="control-slider" id="variableSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
             </div>
+          </div>
+          <div class="slider-container container ctrl">
+            <p class="slider-text inconsolata-main"> Variable Rate </p>
+            <div class="dual-input-grid">
+              <input type="range" min="0.1" max="5" value="1" step="0.01" class="control-slider" id="variableRateSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
+            </div>
+            <div class="btm-outline"></div>
+          </div>
+          <div class="slider-container container ctrl" style="display: none;" data-julia>
+            <p class="slider-text inconsolata-main"> Position X </p>
+            <div class="dual-input-grid">
+              <input type="range" min="-2" max="2" value="1" step="0.0005" class="control-slider" id="positionXSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
+            </div>
+          </div>
+          <div class="slider-container container ctrl" style="display: none;" data-julia>
+            <p class="slider-text inconsolata-main"> Position Y </p>
+            <div class="dual-input-grid">
+              <input type="range" min="-2" max="2" value="0.5" step="0.0005" class="control-slider" id="positionYSlider">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
+            </div>
+            <div class="btm-outline"></div>
+          </div>
+          <div class="slider-container container ctrl" style="display: none;" data-julia>
+            <p class="slider-text inconsolata-main"> Position Variation </p>
+            <div class="dual-input-grid">
+              <input type="range" min="0" max="0.1" value="0" step="0.00001" class="control-slider" id="positionVariation">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
+            </div>
+          </div>
+          <div class="slider-container container ctrl" style="display: none;" data-julia>
+            <p class="slider-text inconsolata-main"> Variation Rate  </p>
+            <div class="dual-input-grid">
+              <input type="range" min="0" max="2" value="1" step="0.01" class="control-slider" id="positionRate">
+              <input type="number" min="10" max="100" value="100" class="control-number inconsolata-main">
+            </div>
+            <div class="btm-outline"></div>
+          </div>
         </div>
+      </div>
+      <div class="">
+
+      </div>
     </div>
-    <div class="upperRow container" id="upperSliders" style="display: none">
-        <div class="column2">
-            <div class="slider-container">
-                <p class="normal inconsolata-main"> Constant X </p>
-                <input type="range" min="-2" max="2" value="1" step="0.0005" class="mySlider" id="constantXSlider"> 
-            </div>
-        </div>
-        <div class="column2 right-align">
-            <div class="slider-container">
-                <p class="normal inconsolata-main"> Constant Y </p>
-                <input type="range" min="-2" max="2" value="0.5" step="0.0005" class="mySlider" id="constantYSlider"> 
-            </div>
-        </div>
-    </div>
-   
+  </div>
+
 </body>
+
 </html>
