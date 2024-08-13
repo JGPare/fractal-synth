@@ -100,12 +100,12 @@ void main()
 
     float arraySize =  float(uPaletteLen);
     float fMaxIters = float(iterations);
-    float escapeSquish = escape/fMaxIters*(arraySize);
+    float escapeSquish = escape/fMaxIters*(arraySize-1.0);
     int clrIndex1 = int(escapeSquish);
-    int clrIndex2 = int(mod(escapeSquish+1.0,arraySize));
+    int clrIndex2 = clrIndex1 + 1;
     vec3 color1 = uPalette[clrIndex1]; 
     vec3 color2 = uPalette[clrIndex2]; 
-    float mixAmount = fract(escapeSquish) + 0.01;
+    float mixAmount = fract(escapeSquish);
     vec3 mixedColor = mix(color1,color2,mixAmount); 
 
     gl_FragColor = vec4(mixedColor,1.0);
