@@ -3,6 +3,22 @@ import Experience from "./Experience"
 import testVertexShader from './shaders/test/vertex.glsl'
 import testFragmentShader from './shaders/test/fragment.glsl'
 
+const palette = [
+  new THREE.Color(0.1,0.1,0.35), 
+  new THREE.Color(0.7,0.2,0.3),
+  new THREE.Color(0.3,0.4,0.9),
+  new THREE.Color(0.7,0.4,0.7),
+  new THREE.Color(0.2,0.7,0.6),
+  new THREE.Color(0.6,0.4,0.8),
+  new THREE.Color(0.1,0.1,0.35),
+  new THREE.Color(0.8,0.2,0.3),
+  new THREE.Color(0.5,0.6,0.7),
+  new THREE.Color(0.5,0.6,0.7),
+  new THREE.Color(0.1,0.1,0.35)
+]
+
+const paletteElements = []
+
 export default class Render 
 {
   constructor() 
@@ -27,6 +43,8 @@ export default class Render
       y : 0.5
     }
 
+    this.numberOfColors = 6
+
     // Debug
     if (this.debug.active)
     {
@@ -35,6 +53,7 @@ export default class Render
     }
 
     this.setInstance()
+    this.createColorElements()
     this.linkUI()
   }
 
@@ -60,7 +79,12 @@ export default class Render
         uCRadius : {value : 0.0},
         uCRate : {value : 1.0},
         uJulia : {value : this.drawJulia},
-        uPower : {value : 2.0}
+        uPower : {value : 2.0},
+        uPalette : { 
+          type : "v3v",
+          value : palette
+        },
+        uPaletteLen : {value : this.numberOfColors}
       }
       // wireframe: true,
     })
@@ -90,7 +114,8 @@ export default class Render
     this.scene.add(this.instance)
   }
 
-  linkUI() {
+  linkUI() 
+  {
     document.getElementById('variableSlider').addEventListener('input', (event) => {
       const uIter = event.target.value / event.target.max
       this.material.uniforms.uIterVar.value = uIter
@@ -143,7 +168,58 @@ export default class Render
         }
       }
     })
+
+    document.getElementById('number-of-colors').addEventListener('change', (event) =>
+    {
+      this.numberOfColors = event.target.value
+      this.material.uniforms.uPaletteLen.value = this.numberOfColors
+      this.removeColorElements()
+      this.createColorElements()
+    })
+  }
+
+  createColorElements()
+  {
+    const colorGrid = document.getElementById('colors-container')
+    for (let i = 0; i < this.numberOfColors; i++) {
+      let colorElement = document.createElement("input")
+      let color = palette[i].clone()
+      color.convertSRGBToLinear()
+      colorElement.setAttribute("type", "color")
+      colorElement.setAttribute("class", "colorpicker")
+      colorElement.setAttribute("data", i)
+      colorElement.setAttribute("value", "#" + color.getHexString()) 
+      colorElement.addEventListener('input', (event) =>
+      {
+        this.setColorFromElement(event.target,i)
+      })
+      colorGrid.appendChild(colorElement)
+      if (i == 0)
+      {
+        this.setColorFromElement(colorElement,0)
+      }
+    }
     
+  }
+
+  removeColorElements()
+  {
+    const colorGrid = document.getElementById('colors-container')
+    while (colorGrid.firstChild) {
+      colorGrid.removeChild(colorGrid.lastChild);
+    }
+  }
+
+  setColorFromElement(element,i)
+  {
+    const color = new THREE.Color(element.value)
+    color.convertLinearToSRGB()
+    if (i == 0)
+    {
+      this.material.uniforms.uPalette.value[this.numberOfColors] = color
+    }
+    palette[i] = color
+    this.material.uniforms.uPalette.value[i] = color
   }
 
   resize()

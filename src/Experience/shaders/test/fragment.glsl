@@ -17,6 +17,9 @@ uniform float uCy;
 uniform float uCRadius;
 uniform float uCRate;
 
+uniform vec3 uPalette[11];
+uniform int uPaletteLen;
+
 varying vec2 vUv;
 
 float random(vec2 st)
@@ -93,39 +96,16 @@ void main()
     else
     {
         escape = mandle(rUv, iterations, scale, focus);
-    }                        
+    }
 
-    const float arraySize = 12.0;
-    vec3 colors[int(arraySize)] = vec3[int(arraySize)](
-        vec3(0.1,0.1,0.35),
-        vec3(0.7,0.2,0.3),
-        vec3(0.3,0.4,0.9),
-        vec3(0.7,0.4,0.7),
-        vec3(0.2,0.7,0.6),
-        vec3(0.6,0.4,0.8),
-        vec3(0.8,0.2,0.3),
-        vec3(0.8,0.6,0.6),
-        vec3(0.5,0.6,0.7),
-        vec3(0.2,0.6,0.9),
-        vec3(0.7,0.7,0.9),
-        vec3(0.1,0.1,0.35) // 10
-        );
-    
-    // const float arraySize = 4.0;
-    // vec3 colors[int(arraySize)] = vec3[int(arraySize)](
-    //     vec3(0.0,0.0,0.0),
-    //     vec3(0.4,0.4,0.4),
-    //     vec3(0.9,0.9,0.9),
-    //     vec3(0.0,0.0,0.0) // 4
-    //     );
-
+    float arraySize =  float(uPaletteLen);
     float fMaxIters = float(iterations);
     float escapeSquish = escape/fMaxIters*(arraySize);
     int clrIndex1 = int(escapeSquish);
     int clrIndex2 = int(mod(escapeSquish+1.0,arraySize));
-    vec3 color1 = colors[clrIndex1]; 
-    vec3 color2 = colors[clrIndex2]; 
-    float mixAmount = fract(escapeSquish);
+    vec3 color1 = uPalette[clrIndex1]; 
+    vec3 color2 = uPalette[clrIndex2]; 
+    float mixAmount = fract(escapeSquish) + 0.01;
     vec3 mixedColor = mix(color1,color2,mixAmount); 
 
     gl_FragColor = vec4(mixedColor,1.0);

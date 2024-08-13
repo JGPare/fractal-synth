@@ -7,6 +7,8 @@ import Mouse from './Utils/Mouse.js'
 import Render from './Render.js'
 import Screen from './Screen.js'
 
+THREE.ColorManagement.enabled = true;
+
 let instance = null
 
 export default class Experience
@@ -85,9 +87,9 @@ export default class Experience
     this.screen.update()
     if (!this.flashMessaged && this.time.elapsed > 5000 )
     {
-      const flash = document.getElementById('flash')
-      flash.style.display = 'none';
-      this.flashMessaged = true
+      // const flash = document.getElementById('flash')
+      // flash.style.display = 'none';
+      // this.flashMessaged = true
     }
   }
 
