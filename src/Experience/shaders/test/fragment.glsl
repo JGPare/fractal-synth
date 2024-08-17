@@ -53,9 +53,11 @@ float mandle(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
     vec2 zn = vec2(scaledUv.x,scaledUv.y);
     vec2 z0 = zn;
     float mZ = dot(zn,zn);
+    float mZprev;
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
         zn = complexPow(zn,uPower) + z0;
+        mZprev = mZ;
         mZ = dot(zn,zn);
     }
     return float(i) 
