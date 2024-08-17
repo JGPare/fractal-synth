@@ -13,11 +13,8 @@ const palette = [
   new THREE.Color(0.1,0.1,0.35),
   new THREE.Color(0.8,0.2,0.3),
   new THREE.Color(0.5,0.6,0.7),
-  new THREE.Color(0.5,0.6,0.7),
-  new THREE.Color(0.1,0.1,0.35)
+  new THREE.Color(0.5,0.6,0.7)
 ]
-
-const paletteElements = []
 
 export default class Render 
 {
@@ -84,7 +81,9 @@ export default class Render
           type : "v3v",
           value : palette
         },
-        uPaletteLen : {value : this.numberOfColors}
+        uPaletteLen : {value : this.numberOfColors},
+        uVelocityDistortionDirection : {value : 0},
+        uVelocityDistortionAmount : {value: 0.5}
       }
       // wireframe: true,
     })
@@ -176,6 +175,26 @@ export default class Render
       this.removeColorElements()
       this.createColorElements()
     })
+
+    document.getElementById('velocity-distortion-direction').addEventListener('input', (event) => {
+      this.material.uniforms.uVelocityDistortionDirection.value = event.target.value
+    })
+    document.getElementById('velocity-distortion-amount').addEventListener('input', (event) => {
+      this.material.uniforms.uVelocityDistortionAmount.value = event.target.value
+    })
+
+    const dualInputs = document.getElementsByClassName('dual-input-grid')
+    for (const element of dualInputs) {
+      const range = element.children[0]
+      const number = element.children[1]
+      range.addEventListener('input',(event) =>{
+        number.value = range.value
+      })
+      number.addEventListener('input',(event) =>{
+        range.value = number.value
+      })
+    }
+
   }
 
   createColorElements()
@@ -214,10 +233,6 @@ export default class Render
   {
     const color = new THREE.Color(element.value)
     color.convertLinearToSRGB()
-    if (i == 0)
-    {
-      this.material.uniforms.uPalette.value[this.numberOfColors] = color
-    }
     palette[i] = color
     this.material.uniforms.uPalette.value[i] = color
   }

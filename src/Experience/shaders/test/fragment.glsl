@@ -16,8 +16,10 @@ uniform float uCx;
 uniform float uCy;
 uniform float uCRadius;
 uniform float uCRate;
+uniform float uVelocityDistortionDirection;
+uniform float uVelocityDistortionAmount;
 
-uniform vec3 uPalette[11];
+uniform vec3 uPalette[10]; // note that 10 is the max number of colors
 uniform int uPaletteLen;
 
 varying vec2 vUv;
@@ -56,7 +58,8 @@ float mandle(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
         zn = complexPow(zn,uPower) + z0;
         mZ = dot(zn,zn);
     }
-    return float(i);
+    return float(i) 
+      + (mZ-4.0)*uVelocityDistortionDirection*uVelocityDistortionAmount;
 }
 
 float julia(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
@@ -78,7 +81,8 @@ float julia(vec2 uv, int maxIters, vec2 inputScale, vec2 focus)
         zn = complexPow(zn,uPower) + c;
         mZ = dot(zn,zn);
     }
-    return float(i);
+    return float(i) 
+      + (mZ-4.0)*uVelocityDistortionDirection*uVelocityDistortionAmount;
 }
 
 void main()
@@ -101,8 +105,8 @@ void main()
     float arraySize =  float(uPaletteLen);
     float fMaxIters = float(iterations);
     float escapeSquish = escape/fMaxIters*(arraySize-1.0);
-    int clrIndex1 = int(escapeSquish);
-    int clrIndex2 = clrIndex1 + 1;
+    int clrIndex1 = int(escapeSquish)%uPaletteLen;
+    int clrIndex2 = (clrIndex1+1)%uPaletteLen;
     vec3 color1 = uPalette[clrIndex1]; 
     vec3 color2 = uPalette[clrIndex2]; 
     float mixAmount = fract(escapeSquish);
