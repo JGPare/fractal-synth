@@ -2,21 +2,18 @@ import * as THREE from 'three'
 import Experience from "./Experience"
 import testVertexShader from './shaders/test/vertex.glsl'
 import testFragmentShader from './shaders/test/fragment.glsl'
+import { log } from 'three/examples/jsm/nodes/Nodes.js'
+import Palette from './Utils/Palette'
 
-const palette = [
-  new THREE.Color(0.1,0.1,0.35), 
-  new THREE.Color(0.7,0.2,0.3),
-  new THREE.Color(0.3,0.4,0.9),
-  new THREE.Color(0.7,0.4,0.7),
-  new THREE.Color(0.2,0.7,0.6),
-  new THREE.Color(0.6,0.4,0.8),
-  new THREE.Color(0.1,0.1,0.35),
-  new THREE.Color(0.8,0.2,0.3),
-  new THREE.Color(0.5,0.6,0.7),
-  new THREE.Color(0.5,0.6,0.7)
-]
+const modes = 
+{
+  mandle : 0,
+  julia : 1,
+  sinJulia : 2
+}
 
-export default class Render 
+
+export default class Screen 
 {
   constructor() 
   {
@@ -27,6 +24,10 @@ export default class Render
     this.time = this.experience.time
     this.mouse = this.experience.mouse
     this.scene = this.experience.scene
+    this.palettes = this.experience.palettes
+    this.palette = this.palettes.getPaletteByIndex(0)
+
+    this.mode = 0
 
     // Mandle
     this.zoom = 2.47
@@ -34,7 +35,6 @@ export default class Render
     this.y = 0
 
     // Julia
-    this.drawJulia = false
     this.c = {
       x : 0.3,
       y : 0.5
@@ -67,7 +67,7 @@ export default class Render
         uFocusX: { value: this.x},
         uFocusY: { value: 0 },
         uZoom: { value: this.zoom },
-        uIterVar: { value: 1.0 },
+        uIterVar: { value: 0.0 },
         uIterRate: { value: 1.0},
         uIterBase: { value: 1.0 },
         uAspect: { value: this.sizes.aspect },
@@ -75,15 +75,17 @@ export default class Render
         uCy : {value : this.c.y},
         uCRadius : {value : 0.0},
         uCRate : {value : 1.0},
-        uJulia : {value : this.drawJulia},
+        uMode : {value : this.mode},
         uPower : {value : 2.0},
         uPalette : { 
           type : "v3v",
-          value : palette
+          value : this.palette.palette
         },
         uPaletteLen : {value : this.numberOfColors},
         uVelocityDistortionDirection : {value : 0},
-        uVelocityDistortionAmount : {value: 0.5}
+        uVelocityDistortionAmount : {value: 0.5},
+        uSinJuliaXCoeff : {value : 1},
+        uSinJuliaYCoeff : {value : 1}
       }
       // wireframe: true,
     })
@@ -150,21 +152,23 @@ export default class Render
     })
     
     document.getElementById('fractalSelect').addEventListener('change', (event) => {
-      this.drawJulia = event.target.value == "julia"
-      this.material.uniforms.uJulia.value = this.drawJulia
-      if (this.drawJulia) 
-      {
-        const juliaSliders = document.querySelectorAll('[data-julia]');
-        for (const element of juliaSliders) {
-          element.style.display = ""
-        }
-      }
-      else
-      {
-        const juliaSliders = document.querySelectorAll('[data-julia]');
-        for (const element of juliaSliders) {
-          element.style.display = "none"
-        }
+      this.mode = event.target.selectedIndex
+      this.material.uniforms.uMode.value = this.mode
+      switch (this.mode) {
+        case modes.mandle:
+          this.hideElements("julia")
+          this.hideElements("sinJulia")
+          break;
+        case modes.julia:
+          this.showElements("julia")
+          this.hideElements("sinJulia")
+          break;
+        case modes.sinJulia:
+          this.showElements("julia")
+          this.showElements("sinJulia")
+          break;
+        default:
+          break;
       }
     })
 
@@ -174,6 +178,7 @@ export default class Render
       this.material.uniforms.uPaletteLen.value = this.numberOfColors
       this.removeColorElements()
       this.createColorElements()
+      this.palette.displayLength = this.numberOfColors
     })
 
     document.getElementById('velocity-distortion-direction').addEventListener('input', (event) => {
@@ -182,7 +187,14 @@ export default class Render
     document.getElementById('velocity-distortion-amount').addEventListener('input', (event) => {
       this.material.uniforms.uVelocityDistortionAmount.value = event.target.value
     })
+    document.getElementById('sinJuliaXCoeff').addEventListener('input', (event) => {
+      this.material.uniforms.uSinJuliaXCoeff.value = event.target.value
+    })
+    document.getElementById('sinJuliaYCoeff').addEventListener('input', (event) => {
+      this.material.uniforms.uSinJuliaYCoeff.value = event.target.value
+    })
 
+    // set it so sliders change numbers
     const dualInputs = document.getElementsByClassName('dual-input-grid')
     for (const element of dualInputs) {
       const range = element.children[0]
@@ -195,14 +207,152 @@ export default class Render
       })
     }
 
+    this.linkPaletteSelect()
+    this.linkPaletteInput()
+    this.setPaletteInputFromSelect()
+    this.linkNewPaletteButton()
+    this.linkRandomPaletteButton()
+    this.linkDeletePaletteButton()
+  }
+
+  hideElements(dataString)
+  {
+    const elements = document.querySelectorAll(`[data-${dataString}]`);
+    for (const element of elements) {
+      element.style.display = "none"
+    }
+  }
+
+  showElements(dataString)
+  {
+    const elements = document.querySelectorAll(`[data-${dataString}]`);
+    for (const element of elements) {
+      element.style.display = ""
+    }
+  }
+
+  linkPaletteSelect()
+  {
+    this.setPaletteSelectOptions()
+
+    const paletteSelect = document.getElementById('palette-select')
+    paletteSelect.addEventListener('change', () =>
+    {
+      this.setPaletteInputFromSelect()
+      const palette = this.palettes.getPaletteByName(paletteSelect.value)
+      this.setPalette(palette)
+      if (palette.locked)
+      {
+        this.lockPaletteInput()
+      }
+      else
+      {
+        this.unlockPaletteInput()
+      }
+    })
+  }
+
+  lockPaletteInput()
+  {
+    const paletteInput = document.getElementById('palette-input')
+    paletteInput.readOnly = true
+  }
+
+  unlockPaletteInput()
+  {
+    const paletteInput = document.getElementById('palette-input')
+    paletteInput.readOnly = false
+  }
+
+  linkPaletteInput()
+  {
+    const paletteInput = document.getElementById('palette-input')
+    paletteInput.addEventListener('change', () =>
+    {
+      const paletteSelect = document.getElementById('palette-select')
+      const paletteOption = paletteSelect.options[ paletteSelect.selectedIndex ]
+      paletteOption.value = paletteInput.value
+      paletteOption.innerHTML = paletteInput.value
+      this.palette.name = paletteInput.value
+    })
+  }
+
+  setPaletteInputFromSelect()
+  {
+    const paletteInput = document.getElementById('palette-input')
+    const paletteSelect = document.getElementById('palette-select')
+    paletteInput.value = paletteSelect.value
+  }
+
+  linkNewPaletteButton()
+  {
+    const newPaletteButton = document.getElementById('new-palette-button')
+    newPaletteButton.addEventListener('click', () =>
+    {
+      const palette = this.palette.clone()
+      palette.setDefaultName()
+      this.palettes.addPalette(palette)
+      this.setPalette(palette)
+      this.setPaletteSelectOptions()
+      this.setPaletteInputFromSelect()
+      this.unlockPaletteInput()
+    })
+  }
+  
+  linkRandomPaletteButton()
+  {
+    const newPaletteButton = document.getElementById('random-palette-button')
+    newPaletteButton.addEventListener('click', () =>
+    {
+      if (this.palette.locked){
+        const palette = this.palettes.addPalette()
+        this.setPalette(palette)
+      }
+      else {
+        this.palette.randomize()
+        this.updatePalette()
+      }
+      this.setPaletteSelectOptions()
+      this.setPaletteInputFromSelect()
+      this.unlockPaletteInput()
+    })
+  }
+
+  linkDeletePaletteButton()
+  {
+    const deletePaletteButton = document.getElementById('delete-palette-button')
+    deletePaletteButton.addEventListener('click', () =>
+    {
+      if (!this.palette.locked){
+        const palette = this.palettes.deletePalette(this.palette)
+        this.setPalette(palette)
+        this.setPaletteSelectOptions()
+        this.setPaletteInputFromSelect()
+      }
+    })
+  }
+
+  setPaletteSelectOptions()
+  {
+    const paletteSelect = document.getElementById('palette-select')
+    paletteSelect.innerHTML = ''
+    for (const palette of this.palettes) {
+      const paletteOption = document.createElement("option")
+      paletteOption.setAttribute("value",palette.name)
+      paletteOption.innerHTML = palette.name
+      paletteSelect.appendChild(paletteOption)
+    }
+    paletteSelect.selectedIndex=this.palettes.getPaletteIndex(this.palette)
   }
 
   createColorElements()
   {
     const colorGrid = document.getElementById('colors-container')
+    let colorElement
+    let color
     for (let i = 0; i < this.numberOfColors; i++) {
-      let colorElement = document.createElement("input")
-      let color = palette[i].clone()
+      colorElement = document.createElement("input")
+      color = this.palette.getColor(i).clone()
       color.convertSRGBToLinear()
       colorElement.setAttribute("type", "color")
       colorElement.setAttribute("class", "colorpicker")
@@ -218,7 +368,19 @@ export default class Render
         this.setColorFromElement(colorElement,0)
       }
     }
-    
+  }
+
+  setPalette(palette)
+  {
+    this.palette = palette
+    this.updatePalette()
+  }
+
+  updatePalette()
+  {
+    this.material.uniforms.uPalette.value = this.palette.palette
+    this.removeColorElements()
+    this.createColorElements()
   }
 
   removeColorElements()
@@ -233,7 +395,8 @@ export default class Render
   {
     const color = new THREE.Color(element.value)
     color.convertLinearToSRGB()
-    palette[i] = color
+    //console.log(color.r.toFixed(4) + "," + color.g.toFixed(4) + "," + color.b.toFixed(4))
+    this.palette.setColor(i, color)
     this.material.uniforms.uPalette.value[i] = color
   }
 

@@ -17,9 +17,10 @@ export default class Mouse extends EventEmitter {
     this.target = null
 
     this.touchOnly = false
+    const canvas = document.getElementById('main-canvas')
 
     // mouse events
-    document.addEventListener('mousedown', (event) => 
+    canvas.addEventListener('mousedown', (event) => 
     {
       this.target = event.target
       if (event.button === 0) 
@@ -35,7 +36,7 @@ export default class Mouse extends EventEmitter {
       this.lastClick = clickTime
     })
 
-    document.addEventListener('mouseup', (event) => 
+    canvas.addEventListener('mouseup', (event) => 
     {
       this.target = event.target
       if (event.button === 0) 
@@ -44,7 +45,7 @@ export default class Mouse extends EventEmitter {
       }
     })
 
-    window.addEventListener('mousemove', (event) => 
+    canvas.addEventListener('mousemove', (event) => 
     {
       if (!this.touchOnly)
       {
@@ -56,7 +57,7 @@ export default class Mouse extends EventEmitter {
       }
     })
     
-    window.addEventListener('wheel', (event) => 
+    canvas.addEventListener('wheel', (event) => 
     {
       this.scrollDeltaY = event.deltaY
       this.trigger('scroll')
@@ -64,7 +65,7 @@ export default class Mouse extends EventEmitter {
 
     // touch events
 
-    window.addEventListener('touchstart', (event) =>
+    canvas.addEventListener('touchstart', (event) =>
     {
       this.touchOnly = true
       this.clickHeld = true
@@ -76,13 +77,13 @@ export default class Mouse extends EventEmitter {
       }
     })
     
-    window.addEventListener('touchend', (event) =>
+    canvas.addEventListener('touchend', (event) =>
     {
       this.clickHeld = false
       this.touchPointDistance = null
     })
 
-    window.addEventListener('touchmove',(event) =>
+    canvas.addEventListener('touchmove',(event) =>
     {
       if (event.touches.length > 1)
       {

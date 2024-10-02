@@ -14,7 +14,7 @@
 <body>
   <script type="module" src="./script.js"></script>
   <div class="webgl-container">
-    <canvas class="webgl"></canvas>
+    <canvas class="webgl" id="main-canvas"></canvas>
   </div>
   <div id="main-grid">
     <div id="ui-grid-l">
@@ -31,6 +31,21 @@
           <div class="dual-input-grid">
             <input type="range" min="0" max="5" step="0.1" value="0.5" class="control-slider" id="velocity-distortion-amount">
             <input type="number" min="0" max="5" step="0.1" value="0.5" class="control-number inconsolata-main">
+          </div>
+        </div>
+        <div class="slider-container ctrl">
+          <label for="paletteName" class="slider-text inconsolata-main">Palette Name</label>
+          <div>
+            <input class="control-text inconsolata-input" id="palette-input" type="text" id="name" name="paletteName" required minlength="4" maxlength="20" size="20" />
+            <button class="control-button inconsolata-main" id="new-palette-button">New</button>
+            <button class="control-button inconsolata-main" id="random-palette-button">Random</button>
+          </div>
+        </div>
+        <div class="slider-container ctrl">
+          <label for="paletteSelect" class="slider-text inconsolata-main">Select Palette</label>
+          <div>
+            <select class="control-select inconsolata-main w-75" id="palette-select"></select>
+            <button class="control-button inconsolata-main" id="delete-palette-button">Delete</button>
           </div>
         </div>
         <div class="slider-container ctrl">
@@ -53,9 +68,10 @@
       </div>
       <div id="controls-grid">
         <div class="slider-container ctrl">
-          <select class="mySelect inconsolata-main" id="fractalSelect">
+          <select class="control-select inconsolata-main w-100" id="fractalSelect">
             <option value="mandle">Mandlebrot</option>
             <option value="julia">Julia</option>
+            <option value="sinJulia">Sin Julia</option>
           </select>
         </div>      
         <div class="slider-container ctrl">
@@ -77,8 +93,8 @@
         <div class="slider-container ctrl">
           <p class="slider-text inconsolata-main"> Variable Detail </p>
           <div class="dual-input-grid">
-            <input type="range" min="1" max="100" value="100" class="control-slider" id="variableSlider">
-            <input type="number" min="1" max="100" value="100" class="control-number inconsolata-main" readonly>
+            <input type="range" min="0" max="100" value="50" class="control-slider" id="variableSlider">
+            <input type="number" min="0" max="100" value="50" class="control-number inconsolata-main" readonly>
           </div>
         </div>
         <div class="slider-container ctrl">
@@ -114,8 +130,23 @@
         <div class="slider-container ctrl" style="display: none;" data-julia>
           <p class="slider-text inconsolata-main"> Variation Rate  </p>
           <div class="dual-input-grid">
-            <input type="range" min="0" max="2" value="1" step="0.01" class="control-slider" id="positionRate">
-            <input type="number" min="0" max="2" value="1" step="0.01" class="control-number inconsolata-main" readonly>
+            <input type="range" min="0" max="2" value="0" step="0.01" class="control-slider" id="positionRate">
+            <input type="number" min="0" max="2" value="0" step="0.01" class="control-number inconsolata-main" readonly>
+          </div>
+          <div class="btm-outline"></div>
+        </div>
+        <div class="slider-container ctrl" style="display: none;" data-sinJulia>
+          <p class="slider-text inconsolata-main"> Sin X Amount </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="5" value="0" step="0.001" class="control-slider" id="sinJuliaXCoeff">
+            <input type="number" min="0" max="5" value="0" step="0.001" class="control-number inconsolata-main" readonly>
+          </div>
+        </div>
+        <div class="slider-container ctrl" style="display: none;" data-sinJulia>
+          <p class="slider-text inconsolata-main"> Sin y Amount  </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="5" value="0" step="0.01" class="control-slider" id="sinJuliaYCoeff">
+            <input type="number" min="0" max="5" value="0" step="0.01" class="control-number inconsolata-main" readonly>
           </div>
           <div class="btm-outline"></div>
         </div>

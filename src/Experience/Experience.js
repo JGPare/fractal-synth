@@ -6,6 +6,9 @@ import Debug from './Utils/Debug.js'
 import Mouse from './Utils/Mouse.js'
 import Render from './Render.js'
 import Screen from './Screen.js'
+import Cookies from './Utils/Cookies.js'
+import Palettes from './Utils/Palettes.js'
+import defaultPalettes from './defaultPalettes.js'
 
 THREE.ColorManagement.enabled = true;
 
@@ -32,6 +35,8 @@ export default class Experience
     this.sizes = new Sizes()
     this.time = new Time()
     this.scene = new THREE.Scene() 
+    this.palettes = new Palettes(defaultPalettes)
+    this.cookies = new Cookies()
     this.camera = new Camera()
     this.renderer = new Render()
     this.mouse = new Mouse()
@@ -119,5 +124,10 @@ export default class Experience
     this.renderer.onLoad()
     // set default target
     this.mouse.target = this.canvas
+  }
+
+  onBeforeUnload()
+  {
+    this.palettes.updateCookie()
   }
 }
