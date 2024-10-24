@@ -30,6 +30,7 @@ export default class Experience
 
     // Options
     this.canvas = canvas
+
     // Setup
     this.debug = new Debug()
     this.sizes = new Sizes()
@@ -42,15 +43,11 @@ export default class Experience
     this.mouse = new Mouse()
     this.screen = new Screen()
 
-    this.flashMessaged = false
-
-    // Resize
     this.sizes.on('resize', () =>
     {
       this.resize()
     })
 
-    // Update
     this.time.on('tick', () =>
     {
       this.update()
@@ -90,12 +87,6 @@ export default class Experience
   {
     this.renderer.update()
     this.screen.update()
-    if (!this.flashMessaged && this.time.elapsed > 5000 )
-    {
-      // const flash = document.getElementById('flash')
-      // flash.style.display = 'none';
-      // this.flashMessaged = true
-    }
   }
 
   mousemove()
@@ -110,7 +101,6 @@ export default class Experience
 
   doubleClick()
   {
-    console.log('double click');
     this.renderer.doubleClick()
   }
 
@@ -122,8 +112,6 @@ export default class Experience
   onLoad()
   {
     this.renderer.onLoad()
-    // set default target
-    this.mouse.target = this.canvas
   }
 
   onBeforeUnload()

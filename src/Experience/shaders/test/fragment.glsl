@@ -11,6 +11,7 @@ uniform float uIterRate;
 uniform float uIterBase;
 uniform float uPower;
 uniform int uMode;
+uniform bool uAreaModOn;
 
 uniform float uCx;
 uniform float uCy;
@@ -21,6 +22,11 @@ uniform float uVelocityDistortionAmount;
 
 uniform float uSinJuliaXCoeff;
 uniform float uSinJuliaYCoeff;
+
+uniform float uAreaModX;
+uniform float uAreaModY;
+uniform float uAreaModXOffset;
+uniform float uAreaModYOffset;
 
 uniform vec3 uPalette[10]; // note that 10 is the max number of colors
 uniform int uPaletteLen;
@@ -49,6 +55,12 @@ vec2 complexPow(vec2 z, float n){
     return pow(r, n) * vec2(cos(theta * n), sin(theta * n));
 }
 
+float velocityDistort(float velocity)
+{
+  velocity = min(velocity,float(uPaletteLen*10));
+  return velocity*uVelocityDistortionDirection*uVelocityDistortionAmount;
+}
+
 float mandle(vec2 uv, int maxIters)
 {   
     int i;
@@ -62,8 +74,7 @@ float mandle(vec2 uv, int maxIters)
         mZprev = mZ;
         mZ = dot(zn,zn);
     }
-    return float(i) 
-      + (mZ-4.0)*uVelocityDistortionDirection*uVelocityDistortionAmount;
+    return float(i) + velocityDistort(mZ-4.0);
 }
 
 float julia(vec2 uv, int maxIters)
@@ -81,8 +92,7 @@ float julia(vec2 uv, int maxIters)
         zn = complexPow(zn,uPower) + c;
         mZ = dot(zn,zn);
     }
-    return float(i) 
-      + (mZ-4.0)*uVelocityDistortionDirection*uVelocityDistortionAmount*sin(zn.y)*cos(zn.y);
+    return float(i) + velocityDistort(mZ-4.0);
 }
 
 float sinJulia(vec2 uv, int maxIters)
@@ -97,13 +107,23 @@ float sinJulia(vec2 uv, int maxIters)
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
-        zn.x = sin(uSinJuliaXCoeff*zn.x);
-        zn.y = sin(uSinJuliaYCoeff*zn.y);
+        zn.x = sin(3.0*uSinJuliaXCoeff*zn.x) + (1.0-uSinJuliaXCoeff)*zn.x;
+        zn.y = sin(3.0*uSinJuliaYCoeff*zn.y) + (1.0-uSinJuliaYCoeff)*zn.y;
         zn = complexPow(zn,uPower) + c;
         mZ = dot(zn,zn);
     }
-    return float(i) 
-      + (mZ-4.0)*uVelocityDistortionDirection*uVelocityDistortionAmount;
+    return float(i) + velocityDistort(mZ-4.0);
+}
+
+vec2 areaModUv(vec2 uv)
+{
+  float xOffsetDir = float(1 - 2*(int(floor(uv.x/(1.0/uAreaModX*uAspect)))%2));
+  float yOffsetDir = float(1 - 2*(int(floor(uv.y/(1.0/uAreaModY)))%2));
+  uv.x = mod(uv.x,1.0/uAreaModX*uAspect);
+  uv.y = mod(uv.y,1.0/uAreaModY);
+  uv.y += uAreaModYOffset*xOffsetDir;
+  uv.x += uAreaModXOffset*yOffsetDir;
+  return uv;
 }
 
 void main()
@@ -114,7 +134,13 @@ void main()
     vec2 scale = vec2(uZoom); 
     float escape;   
 
-    vec2 centerUv = vUv - vec2(0.5)*vec2(uAspect,1.0);
+    vec2 uv = vUv;
+
+    if (uAreaModOn)
+    {
+      uv = areaModUv(uv);
+    }
+    vec2 centerUv = uv - vec2(0.5)*vec2(uAspect,1.0);
     vec2 scaledUv = centerUv*scale + focus;
 
     switch (uMode) 
@@ -129,6 +155,7 @@ void main()
       escape = sinJulia(scaledUv, iterations);
       break;
     }
+
     float arraySize =  float(uPaletteLen);
     float fMaxIters = float(iterations);
     float escapeSquish = escape/fMaxIters*(arraySize-1.0);

@@ -11,7 +11,7 @@ export default class Render
     this.sizes = this.experience.sizes
     this.scene = this.experience.scene
     this.camera = this.experience.camera
-    this.mouse = null
+    this.mouse = this.experience.mouse
 
     // Debug
     if (this.debug.active)
@@ -48,8 +48,7 @@ export default class Render
   }
 
   doubleClick() {
-    console.log("trig");
-    if (!document.fullscreenElement && this.mouse.target == this.canvas) 
+    if (!document.fullscreenElement) 
     {
       this.instance.domElement.requestFullscreen()
     } 
