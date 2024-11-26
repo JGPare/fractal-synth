@@ -60,6 +60,10 @@ export default class Screen
       side: THREE.DoubleSide,
       uniforms:
       {
+        uPalette : { 
+          type : "v3v",
+          value : this.palette.palette
+        },
         uTime: { value: 0 },
         uFocusX: { value: this.x},
         uFocusY: { value: 0 },
@@ -74,10 +78,6 @@ export default class Screen
         uCRate : {value : 1.0},
         uMode : {value : this.mode},
         uPower : {value : 2.0},
-        uPalette : { 
-          type : "v3v",
-          value : this.palette.palette
-        },
         uPaletteLen : {value : this.numberOfColors},
         uVelocityDistortionDirection : {value : 0},
         uVelocityDistortionAmount : {value: 0.5},
@@ -426,7 +426,7 @@ export default class Screen
   {
     const deltaX = -this.mouse.deltaX/this.sizes.width * 2
     const deltaY = this.mouse.deltaY/this.sizes.height * 2
-    if (this.mouse.clickHeld )//&& this.mouse.target == this.canvas)
+    if (this.mouse.clickHeld )
     {
       this.material.uniforms.uFocusX.value -= deltaX*this.zoom/2*this.sizes.aspect
       this.material.uniforms.uFocusY.value -= deltaY*this.zoom/2
@@ -439,7 +439,7 @@ export default class Screen
   {
     const newX = -this.mouse.x/this.sizes.width * 2 + 1
     const newY = this.mouse.y/this.sizes.height * 2 - 1
-    if (this.mouse.clickHeld )//&& this.mouse.target == this.canvas)
+    if (this.mouse.clickHeld )
     {
       const deltaX = this.x - newX
       const deltaY = this.y - newY

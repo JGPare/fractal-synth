@@ -182,6 +182,7 @@ input[type=number] {
   grid-area: buttons;
   margin-top: auto;
   margin-bottom: auto;
+  padding: 0.2rem;
 }
 
 .colorpicker {
@@ -249,6 +250,18 @@ input[type="color"]::-webkit-color-swatch {
   /* align-items: end; */
 }
 
+.slider-container {
+  position: relative;
+  margin: var(--input-margin);
+}
+
+.btm-outline {
+  height: 0.3rem;
+  margin-top: 0.1rem;
+  border-bottom: solid 0.15rem #5c6d84cc;
+  margin-bottom: 0px;
+}
+
 .control-button {
   width: 31%;
   padding: 0.2rem;
@@ -263,24 +276,27 @@ input[type="color"]::-webkit-color-swatch {
   background-color: #d3d3d399;
 }
 
+.timeline-button {
+  width: 30%;
+  padding: 0.05rem;
+  margin: 0.05rem;
+  border-radius: 0.2rem;
+  border-width: 0;
+  background-color: #d3d3d3cc;
+  color: #17385e !important;
+  cursor: pointer;
+}
+
+.timeline-button:hover {
+  background-color: #d3d3d399;
+}
+
 .control-select {
   padding: 0.25rem;
   margin-top: auto;
   border-radius: 0.5rem;
   background-color: #d3d3d3cc;
   color: #17385e;
-}
-
-.slider-container {
-  position: relative;
-  margin: var(--input-margin);
-}
-
-.btm-outline {
-  height: 0.3rem;
-  margin-top: 0.1rem;
-  border-bottom: solid 0.15rem #5c6d84cc;
-  margin-bottom: 0px;
 }
 
 .control-number {
