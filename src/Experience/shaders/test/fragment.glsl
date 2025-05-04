@@ -6,17 +6,12 @@ uniform float uFocusX;
 uniform float uFocusY;
 uniform float uTime;
 uniform float uZoom;
-uniform float uIterVar;
-uniform float uIterRate;
 uniform float uIterBase;
 uniform float uPower;
-uniform int uMode;
-uniform bool uAreaModOn;
+uniform float uRotation;
 
 uniform float uCx;
 uniform float uCy;
-uniform float uCRadius;
-uniform float uCRate;
 uniform float uVelocityDistortionDirection;
 uniform float uVelocityDistortionAmount;
 
@@ -27,6 +22,10 @@ uniform float uAreaModX;
 uniform float uAreaModY;
 uniform float uAreaModXOffset;
 uniform float uAreaModYOffset;
+
+uniform int uMode;
+
+uniform bool uAreaModOn;
 
 uniform vec3 uPalette[10]; // note that 10 is the max number of colors
 uniform int uPaletteLen;
@@ -79,7 +78,7 @@ float mandle(vec2 uv, int maxIters)
 
 float julia(vec2 uv, int maxIters)
 {
-    vec2 c = vec2(uCx, uCy) + pow(uCRadius,3.0)*vec2(cos(uTime*uCRate),sin(uTime*uCRate));
+    vec2 c = vec2(uCx, uCy);
 
     int i;
 
@@ -97,7 +96,7 @@ float julia(vec2 uv, int maxIters)
 
 float sinJulia(vec2 uv, int maxIters)
 {
-    vec2 c = vec2(uCx, uCy) + pow(uCRadius,3.0)*vec2(cos(uTime*uCRate),sin(uTime*uCRate));
+    vec2 c = vec2(uCx, uCy);
 
     int i;
 
@@ -126,9 +125,22 @@ vec2 areaModUv(vec2 uv)
   return uv;
 }
 
+vec2 rotate(vec2 uv)
+{
+  uv.x /= uAspect; // normalize
+  float s = sin(PI * uRotation);
+  float c = cos(PI * uRotation);
+  uv = vec2(
+      uv.x * c - uv.y * s,
+      uv.x * s + uv.y * c
+  );
+  uv.x *= uAspect; // de-normalize
+  return uv;
+}
+
 void main()
 {
-    int iterations = int(exp(6.8*uIterBase - abs(uIterVar*3.5*cos(uTime/5.0*uIterRate))));
+    int iterations = int(exp(6.8*uIterBase));
 
     vec2 focus = vec2(uFocusX,uFocusY);
     vec2 scale = vec2(uZoom); 
@@ -142,6 +154,8 @@ void main()
     }
     vec2 centerUv = uv - vec2(0.5)*vec2(uAspect,1.0);
     vec2 scaledUv = centerUv*scale + focus;
+
+    scaledUv = rotate(scaledUv);
 
     switch (uMode) 
     {

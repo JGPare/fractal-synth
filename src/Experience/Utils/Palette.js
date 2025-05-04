@@ -1,6 +1,4 @@
 import * as THREE from 'three'
-import Cookies from './Cookies'
-import { randFloat } from 'three/src/math/MathUtils.js'
 
 // this must be coordinate with shader
 const defaultPaletteLength = 10

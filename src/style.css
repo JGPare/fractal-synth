@@ -128,10 +128,11 @@ input[type=number] {
 #center {
   z-index: 0;
   display: grid;
-  grid-template-rows: 8fr 40px;
+  grid-template-rows: 1fr auto;
   grid-template-areas: 
     "viewer"
     "timeline";
+  height: 100vh;
 }
 
 #ui-grid-r {
@@ -168,6 +169,7 @@ input[type=number] {
   grid-template-columns: 1fr 6fr;;
   grid-template-areas: 
     "buttons timeline";
+  min-height: 40px;
 }
 
 #colors-container {
@@ -268,8 +270,12 @@ input[type="color"]::-webkit-color-swatch {
   border-radius: 0.2rem;
   border-width: 0;
   background-color: #d3d3d3cc;
-  color: #17385e !important;
+  color: #17385e;
   cursor: pointer;
+}
+
+.selected-button {
+  background-color: #e89c45dd !important;
 }
 
 .control-button:hover {

@@ -1,18 +1,16 @@
 import * as THREE from 'three'
 import Palette from './Palette'
-import Cookies from './Cookies'
-import CookieCutter from './CookieCutter'
+import Storage from './Storage'
+import defaultPalettes from './defaultPalettes.js'
 
 export default class Palettes
 {
   constructor(defaultPalettes) 
   {
-    //Cookies.removeAllCookies()
-    this.palettes = this.readDefaultPalettes(defaultPalettes)
-    this.loadAllPalettes()
+    this.load()
   }
 
-  readDefaultPalettes(defaultPalettes)
+  readDefaultPalettes()
   {
     let palettes = []
     for (const paletteData of defaultPalettes) {
@@ -51,9 +49,19 @@ export default class Palettes
     return null
   }
   
-  loadAllPalettes()
+  load()
   {
-    CookieCutter.loadCookie(this)
+    this.palettes = this.readDefaultPalettes(defaultPalettes)
+    const palettes = Storage.getPalettes()
+    
+    palettes.forEach(palette => {
+      this.addPalette(palette)
+    });
+  }
+
+  save()
+  {
+    Storage.setPalettes(this.palettes)
   }
   
   addPalette(palette = new Palette())
@@ -68,11 +76,6 @@ export default class Palettes
     const i = this.getPaletteIndex(paletteToDelete)
     this.palettes.splice(i)
     return this.palettes[i < this.palettes.length ? i : this.palettes.length-1]
-  }
-
-  updateCookie()
-  {
-    CookieCutter.updateCookie(this)
   }
   
   // allow for indexing

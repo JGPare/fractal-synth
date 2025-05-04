@@ -30,7 +30,6 @@ export default class Mouse extends EventEmitter {
     // mouse events
     element.addEventListener('mousedown', (event) => 
       {
-        console.log(event);
         this.target = event.target
         if (event.button === 0) 
         {
