@@ -80,6 +80,14 @@
           <div class="btm-outline"></div>
         </div>
         <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Duration </p>
+          <div class="dual-input-grid">
+            <input type="range" min="1" max="60" step="1" value="15" class="control-slider" id="duration">
+            <input type="number" min="1" max="60" step="1" value="15" class="control-number inconsolata-main">
+          </div>
+          <div class="btm-outline"></div>
+        </div>
+        <div class="slider-container ctrl">
           <label for="paletteName" class="slider-text inconsolata-main"> Palette Name </label>
             <input class="control-text inconsolata-input" id="palette-input" type="text" id="name" name="paletteName" required minlength="4" maxlength="20" size="20" />            
         </div>
@@ -102,6 +110,13 @@
             <input type="number" min="2" max="10" step="1" value="6" class="control-number inconsolata-main">
           </div>
         </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Color Offset </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="10" step="0.01" value="0" class="control-slider" id="color-offset">
+            <input type="number" min="0" max="10" step="0.01" value="0" class="control-number inconsolata-main">
+          </div>
+        </div>
         <div id="colors-container">
           <!-- inserted via JS here -->
         </div>
@@ -121,7 +136,8 @@
         <div id="timeline-button-container">
           <button class="timeline-button inconsolata-main" id="play-timeline-button"> >> </button>
           <button class="timeline-button inconsolata-main" id="pause-timeline-button"> || </button>
-          <button class="timeline-button inconsolata-main" id="set-timeline-button"> ^ </button>
+          <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
+          <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
         </div>
         <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
       </div>
@@ -187,6 +203,21 @@
           <div class="dual-input-grid">
             <input type="range" min="0.001" max="1" value="0" step="0.001" class="control-slider" id="sin-julia-y-coeff">
             <input type="number" value="0" class="control-number inconsolata-main" readonly>
+          </div>
+          <div class="btm-outline"></div>
+        </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Segment Count </p>
+          <div class="dual-input-grid">
+            <input type="range" min="1" max="6" step="1" value="3" class="control-slider" id="segments-count-slider">
+            <input type="number" min="1" max="6" step="1" value="3" class="control-number inconsolata-main">
+          </div>
+        </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Segment </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="5" step="1" value="0" class="control-slider" id="segment-slider">
+            <input type="number" min="0" max="5" step="1" value="0" class="control-number inconsolata-main">
           </div>
           <div class="btm-outline"></div>
         </div>

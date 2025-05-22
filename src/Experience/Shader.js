@@ -61,7 +61,8 @@ export default class Shader
         uAreaModXOffset : {value : 0},
         uAreaModYOffset : {value : 0},
         uAreaModX : {value : 2},
-        uAreaModY : {value : 2}
+        uAreaModY : {value : 2},
+        uColorOffset : {value : 0},
       }
     })
   }

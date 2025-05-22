@@ -21,6 +21,8 @@ export default class Controls
     this.mouse = this.experience.mouse
     this.shader = this.experience.shader
     this.timeline = this.experience.timeline
+    this.keyboard = this.experience.keyboard
+
     this.shaderUniforms = this.shader.getUniforms()
     this.palettes = this.experience.palettes
     this.palette = this.palettes.getPaletteByIndex(0)
@@ -28,8 +30,13 @@ export default class Controls
     this.numberOfColors = 6
 
     this.modeIndex = 0
+    this.paletteIndex = 0
 
-    this.animateSet = false
+    this.settingStart = false
+    this.settingFinal = false
+
+    this.initialValues = {}
+    this.finalValues = {}
 
     // Debug
     if (this.debug.active)
@@ -44,13 +51,17 @@ export default class Controls
 
   getElements()
   {
+
+    this.sceneName = document.getElementById('scene-name')
+
     this.constantSlider = document.getElementById('constant-slider')
     this.powerSlider = document.getElementById('power-slider')
     this.rotationSlider = document.getElementById('rotation-slider')
     this.positionXSlider = document.getElementById('position-x-slider')
     this.positionYSlider = document.getElementById('position-y-slider')
     this.modeSelect = document.getElementById('mode-select')
-    this.numberOfColors = document.getElementById('number-of-colors')
+    this.paletteSelect = document.getElementById('palette-select')
+    this.numberOfColorsSlider = document.getElementById('number-of-colors')
     this.velocityDistortionDirection = document.getElementById('velocity-distortion-direction')
     this.velocityDistortionAmount = document.getElementById('velocity-distortion-amount')
     this.sinJuliaXcoeff = document.getElementById('sin-julia-x-coeff')
@@ -66,11 +77,19 @@ export default class Controls
     this.timelineSlider = document.getElementById('timeline-slider')
     this.playTimelineButton = document.getElementById('play-timeline-button')
     this.pauseTimelineButton = document.getElementById('pause-timeline-button')
-    this.setTimelineButton = document.getElementById('set-timeline-button')
+    this.setStartTimelineButton = document.getElementById('set-start-timeline-button')
+    this.setEndTimelineButton = document.getElementById('set-end-timeline-button')
+    this.durationSlider = document.getElementById('duration')
+    this.colorOffsetSlider = document.getElementById('color-offset')
+    this.segmentCountSlider = document.getElementById('segments-count-slider')
+    this.segmentSlider = document.getElementById('segment-slider')
+    this.colorsContainer = document.getElementById('colors-container')
   }
 
   setUIfromShader()
   {
+    console.log("setting ui from shader");
+    
     const uniforms = this.shaderUniforms
     this.constantSlider.value = this.shaderUniforms.uIterBase.value
     this.powerSlider.value = this.shaderUniforms.uPower.value
@@ -88,6 +107,7 @@ export default class Controls
     this.areaModY.value = this.shaderUniforms.uAreaModY.value
     this.modeIndex = this.shaderUniforms.uMode.value
     this.numberOfColors = this.shaderUniforms.uPaletteLen.value
+    this.numberOfColorsSlider.value = this.shaderUniforms.uPaletteLen.value
 
     this.setDisplayedInputs()
     this.setModeFromIndex()
@@ -122,7 +142,7 @@ export default class Controls
       this.setDisplayedInputs()
     })
 
-    this.numberOfColors.addEventListener('change', (event) =>
+    this.numberOfColorsSlider.addEventListener('change', (event) =>
     {
       this.numberOfColors = event.target.value
       this.setNumberOfColors()
@@ -164,18 +184,62 @@ export default class Controls
       this.shaderUniforms.uAreaModY.value = event.target.value
     })
 
+    this.durationSlider.addEventListener('input', (event) => {      
+      this.timeline.setDuration(event.target.value)
+    })
+
+    this.colorOffsetSlider.addEventListener('input', (event) => {      
+      this.shaderUniforms.uColorOffset.value = event.target.value
+    })
+
+    this.segmentCountSlider.addEventListener('input', (event) => {
+      this.timeline.setSegmentCount(event.target.value)
+      this.segmentSlider.max = event.target.value
+      if (this.segmentSlider.value > event.target.value){
+        this.segmentSlider.value = event.target.value - 1
+      }
+    })
+
+    this.segmentSlider.addEventListener('input', (event) => {
+      if (event.target.value){
+        this.timeline.goToSegment(event.target.value)
+      }
+    })
+
     this.deleteSceneButton.addEventListener('click', (event) => {
       // add delete scene option
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {
       console.log("save scene");
-      ExperienceRepo.saveExperience(document.getElementById('scene-name').value, this.experience)
+      ExperienceRepo.saveExperience(this.sceneName.value, this.experience)
     })
     
     this.loadSceneButton.addEventListener('click', (event) => {
       console.log("load scene");
-      ExperienceRepo.loadExperience(document.getElementById('scene-name').value, this.experience)
+      ExperienceRepo.loadExperience(this.sceneName.value, this.experience)
+    })
+
+    this.keyboard.on('togglePlay', () => {
+      this.timeline.togglePlay()
+    })
+    this.keyboard.on('seekStart', () => {
+      this.timeline.seekStart()
+      this.setTimelineSlider(0)
+      this.setUIfromShader()
+    })
+    this.keyboard.on('seekEnd', () => {
+      this.timeline.seekEnd()
+      this.setUIfromShader()
+    })
+
+    this.timeline.on('setSegment', () => {
+      this.segmentSlider.value = this.timeline.segmentIndex
+      var event = new Event('input', {
+        bubbles: true,
+        value: null
+      });
+      //this.segmentSlider.dispatchEvent(event);
     })
 
     this.linkTimeline()
@@ -192,52 +256,80 @@ export default class Controls
   {
     this.timelineSlider.addEventListener('input', (event) => {
       this.timeline.progress(event.target.value)
+      this.setUIfromShader()
     })
+
     this.playTimelineButton.addEventListener('click', (event) => {
       this.timeline.play()
     })
+
     this.pauseTimelineButton.addEventListener('click', (event) => {
       this.timeline.pause()
     })
-    this.setTimelineButton.addEventListener('click', (event) => {      
-      this.setTimelineButton.classList.toggle('selected-button');
-      if (this.animateSet){
-        for (const [key, value] of Object.entries(this.shaderUniforms)) {
-          if (value.value != this.initialValues[key].value){
-            switch (key){
-              case "uZoom": case "uFocusX": case "uFocusY":
-                this.timeline.fromTo(this.shaderUniforms,
-                  {"value" : this.initialValues[key].value},
-                  {"value" : this.shaderUniforms[key].value, ease: "expo.out"},
-                  0,
-                  [key],
-                )
-                break;
-              default:              
-                if (!isNaN(value.value)){
-                  this.timeline.fromTo(this.shaderUniforms,
-                    {"value" : this.initialValues[key].value},
-                    {"value" : this.shaderUniforms[key].value},
-                    0,
-                    [key],
-                  )
-                }
-                break;
-            }
-          }
-        }
-        this.animateSet = false
-        this.timeline.pause()
-      }
-      else{
+
+    this.setStartTimelineButton.addEventListener('click', (event) => {
+      this.setStartTimelineButton.classList.toggle('selected-button');
+      if (this.settingStart)
+      {
         this.initialValues = this.getUniformValues()
-        this.timeline.renew()
-        this.setUniformValues(this.initialValues)
-        this.timeline.fromTo(this, {value : 0}, {value : 1}, 0,  ["timelineSlider"])
-        this.animateSet = true
+        this.setTimeline()
         this.timeline.pause()
+        this.settingStart = false
+      }
+      else {
+        // this.timeline.seekStart()
+        this.timeline.pause()
+        this.settingStart = true
       }
     })
+
+    this.setEndTimelineButton.addEventListener('click', (event) => {      
+      this.setEndTimelineButton.classList.toggle('selected-button');
+      if (this.settingFinal){
+        this.finalValues = this.getUniformValues()
+        this.setTimeline()
+        this.timeline.pause()
+        this.settingFinal = false
+      }
+      else{
+        // this.timeline.seekEnd()
+        this.timeline.pause()
+        this.settingFinal = true
+      }
+    })
+  }
+
+  setTimeline()
+  {
+    if (!this.finalValues || !this.initialValues){
+      return
+    }
+    this.timeline.renew()
+    this.timeline.fromTo(this, {value : 0}, {value : 1}, 0,  ["timelineSlider"])
+    for (const [key, value] of Object.entries(this.finalValues)) {
+      if (this.initialValues[key]){
+        switch (key){
+          case "uZoom": case "uFocusX": case "uFocusY":
+            this.timeline.fromTo(this.shaderUniforms,
+              {"value" : this.initialValues[key].value},
+              {"value" : this.finalValues[key].value},
+              0,
+              [key],
+            )
+            break;
+          default:              
+            if (!isNaN(value.value)){
+              this.timeline.fromTo(this.shaderUniforms,
+                {"value" : this.initialValues[key].value},
+                {"value" : this.finalValues[key].value},
+                0,
+                [key],
+              )
+            }
+            break;
+        }
+      }
+    }
   }
 
   getUniformValues()
@@ -251,7 +343,9 @@ export default class Controls
 
   setUniformValues(input)
   {
+    
     if (!input) return
+    console.log("set uniforms with",input.uZoom);
     for (const [key, value] of Object.entries(input)) {     
       if (typeof value == Object) {
         this.shaderUniforms[key].value = value.value
@@ -296,9 +390,11 @@ export default class Controls
       const number = element.children[1]
       range.addEventListener('input',(event) =>{
         number.value = range.value
+        console.log("slider input");
       })
       number.addEventListener('input',(event) =>{
         range.value = number.value
+        
       })
     }
   }
@@ -306,11 +402,10 @@ export default class Controls
   linkPaletteSelect()
   {
     this.setPaletteSelectOptions()
-    const paletteSelect = document.getElementById('palette-select')
-    paletteSelect.addEventListener('change', () =>
+    this.paletteSelect.addEventListener('change', () =>
     {
       this.setPaletteInputFromSelect()
-      const palette = this.palettes.getPaletteByName(paletteSelect.value)
+      const palette = this.palettes.getPaletteByName(this.paletteSelect.value)
       this.setPalette(palette)
       if (palette.locked)
       {
@@ -330,6 +425,7 @@ export default class Controls
     {
       const paletteSelect = document.getElementById('palette-select')
       const paletteOption = paletteSelect.options[ paletteSelect.selectedIndex ]
+      this.paletteIndex = paletteSelect.selectedIndex
       paletteOption.value = paletteInput.value
       paletteOption.innerHTML = paletteInput.value
       this.palette.name = paletteInput.value
@@ -341,6 +437,9 @@ export default class Controls
     const paletteSelect = document.getElementById('palette-select')
     const paletteOption = paletteSelect.options[ index ]
     paletteSelect.value = paletteOption.value
+    const palette = this.palettes.getPaletteByName(this.paletteSelect.value)
+    this.setPalette(palette)
+    this.setPaletteInputFromSelect()
   }
 
   setModeFromIndex()
@@ -354,8 +453,7 @@ export default class Controls
   {
     const paletteInput = document.getElementById('palette-input')
     const paletteSelect = document.getElementById('palette-select')
-    console.log(paletteSelect);
-    
+    this.paletteIndex = paletteSelect.selectedIndex
     paletteInput.value = paletteSelect.value
   }
 
@@ -489,7 +587,7 @@ export default class Controls
 
   removeColorElements()
   {
-    const colorGrid = document.getElementById('colors-container')
+    const colorGrid = this.colorsContainer
     while (colorGrid.firstChild) {
       colorGrid.removeChild(colorGrid.lastChild);
     }
@@ -501,5 +599,20 @@ export default class Controls
     color.convertLinearToSRGB()
     this.palette.setColor(i, color)
     this.shaderUniforms.uPalette.value[i] = color
+  }
+
+  setName(name)
+  {
+    this.sceneName.value = name
+  }
+
+  getName()
+  {
+    return this.sceneName.value
+  }
+
+  setTimelineSlider(value)
+  {
+    this.timelineSlider.value = value
   }
 }

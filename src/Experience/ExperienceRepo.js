@@ -20,6 +20,7 @@ export default class ExperienceRepo
    console.log("snapshot", experienceSnapshot);
    
    localStorage.setItem(name,JSON.stringify(experienceSnapshot))
+   localStorage.setItem("lastExperience",name)
   }
 
 
@@ -34,13 +35,27 @@ export default class ExperienceRepo
     this.setControls(experience.controls, experienceSnapshot.controls)
   }
 
+  static loadLast(experience)
+  {
+    const name = localStorage.getItem("lastExperience")
+    if (name)
+    {
+      this.loadExperience(name, experience)
+    }
+  }
+
   /**
    * Get controls snapshot
    * @param {Controls} controls
    */
   static getControlsSnapshot(controls)
   {
-    const snapshot = {}
+    const snapshot = {
+      name : controls.getName(),
+      paletteIndex : controls.paletteIndex,
+      initialValues : controls.initialValues,
+      finalValues : controls.finalValues
+    }
     
     return snapshot
   }
@@ -53,7 +68,7 @@ export default class ExperienceRepo
   {
     const snapshot = {}
     const uniformSnapshot = {}
-    const shaderUniforms = shader.getUniforms()
+    const shaderUniforms = {...shader.getUniforms()}
 
     for (const [key, value] of Object.entries(shaderUniforms)) {
       uniformSnapshot[key] = value
@@ -82,6 +97,11 @@ export default class ExperienceRepo
   static setControls(controls, controlsSnapshot)
   {
     controls.setUIfromShader()
+    controls.setTimelineSlider(0)
+    controls.setName(controlsSnapshot.name)
+    controls.setPaletteFromIndex(controlsSnapshot.paletteIndex)
+    controls.initialValues = controlsSnapshot.initialValues ?? {}
+    controls.finalValues = controlsSnapshot.finalValues ?? {}
   }
 
   /**

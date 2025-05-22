@@ -99,6 +99,7 @@ export default class Screen
     const prevzoom = this.zoom
     const adjDeltaY = Math.exp(this.mouse.scrollDeltaY/2000)
     this.zoom *= adjDeltaY
+    
     const zoomMag = prevzoom - this.zoom
     this.shaderUniforms.uZoom.value = this.zoom
     this.shaderUniforms.uFocusX.value -= this.x*zoomMag*this.sizes.aspect/2

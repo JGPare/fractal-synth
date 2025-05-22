@@ -10,6 +10,9 @@ import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
 import Shader from './Shader.js'
 import Timeline from './Utils/Timeline.js'
+import ExperienceRepo from './ExperienceRepo.js'
+import StatsPanel from './Utils/StatsPanel.js'
+import Keyboard from './Utils/Keyboard.js'
 
 THREE.ColorManagement.enabled = true;
 
@@ -33,6 +36,7 @@ export default class Experience
     this.canvas = canvas
 
     // Setup
+    this.keyboard = new Keyboard()
     this.timeline = new Timeline(this)
     this.debug = new Debug()
     this.sizes = new Sizes()
@@ -45,8 +49,10 @@ export default class Experience
     this.shader = new Shader()
     this.screen = new Screen()
     this.controls = new Controls()
+    this.stats = new StatsPanel()
 
     this.setItemIds()
+    this.setKeyMappings()
 
     this.sizes.on('resize', () =>
     {
@@ -55,6 +61,7 @@ export default class Experience
 
     this.time.on('tick', () =>
     {
+      this.stats.update()
       this.update()
     })
 
@@ -78,6 +85,13 @@ export default class Experience
       this.scroll()
     })
     this.onLoad()
+  }
+
+  setKeyMappings()
+  {
+    this.keyboard.addMapping("Space", "togglePlay")
+    this.keyboard.addMapping("Comma", "seekStart")
+    this.keyboard.addMapping("Period", "seekEnd")
   }
 
   setItemIds()
@@ -111,6 +125,7 @@ export default class Experience
   {
     this.renderer.update()
     this.screen.update()
+    this.stats.update()
   }
 
   mousemove()
@@ -136,6 +151,7 @@ export default class Experience
   onLoad()
   {
     this.renderer.onLoad()
+    ExperienceRepo.loadLast(this)
   }
 
   onBeforeUnload()

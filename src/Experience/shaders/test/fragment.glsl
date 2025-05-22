@@ -9,6 +9,7 @@ uniform float uZoom;
 uniform float uIterBase;
 uniform float uPower;
 uniform float uRotation;
+uniform float uColorOffset;
 
 uniform float uCx;
 uniform float uCy;
@@ -48,6 +49,9 @@ vec2 rotate(vec2 uv, float rotation, vec2 mid)
     );
 }
 
+//https://cdn.jsdelivr.net/npm/three@<version>/build/three.module.js
+//https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js
+
 vec2 complexPow(vec2 z, float n){
     float theta = atan(z.y, z.x);
     float r = length( z );
@@ -73,6 +77,7 @@ float mandle(vec2 uv, int maxIters)
         mZprev = mZ;
         mZ = dot(zn,zn);
     }
+    
     return float(i) + velocityDistort(mZ-4.0);
 }
 
@@ -138,13 +143,53 @@ vec2 rotate(vec2 uv)
   return uv;
 }
 
+float getEscape(vec2 uv, int iterations)
+{
+  float escape;
+  switch (uMode) 
+    {
+    case 0:
+      escape = mandle(uv, iterations);
+      break;
+    case 1:
+      escape = julia(uv, iterations);
+      break;
+    case 2:
+      escape = sinJulia(uv, iterations);
+      break;
+    }
+  return escape;
+}
+
+vec3 getColor(float escape, int iterations)
+{
+  float arraySize =  float(uPaletteLen);
+  float fMaxIters = float(iterations);
+  float squishNorm = escape / fMaxIters;
+  float escapeNorm = squishNorm * (arraySize - 1.0);
+  int clrIndex1 = int(escapeNorm+uColorOffset)%uPaletteLen;
+  int clrIndex2 = (clrIndex1+1)%uPaletteLen;
+  int clrIndexPrev = (clrIndex1-1)%uPaletteLen;
+  vec3 color1 = uPalette[clrIndex1]; 
+  vec3 color2 = uPalette[clrIndex2]; 
+  vec3 colorPrev = uPalette[clrIndexPrev]; 
+  float mixAmount = fract(escapeNorm);
+  vec3 mixedColor = mix(color1,color2,mixAmount);
+  return mixedColor;
+}
+
 void main()
 {
-    int iterations = int(exp(6.8*uIterBase));
+    float iterFloat = exp(6.8*uIterBase);
+    int iterations = int(iterFloat);
 
-    vec2 focus = vec2(uFocusX,uFocusY);
+    int iterFloor = int(iterFloat);
+    float iterFrac = fract(iterFloat);
+
+// was having issues with jerky animation in gsap when uFocusX 
+// was very small, scaling larger on the JS side seems to help
+    vec2 focus = vec2(uFocusX, uFocusY);
     vec2 scale = vec2(uZoom); 
-    float escape;   
 
     vec2 uv = vUv;
 
@@ -157,28 +202,16 @@ void main()
 
     scaledUv = rotate(scaledUv);
 
-    switch (uMode) 
+    float escape = getEscape(scaledUv, iterations);
+    vec3 mixedColor = getColor(escape, iterations);
+
+    if (iterations < 50)
     {
-    case 0:
-      escape = mandle(scaledUv, iterations);
-      break;
-    case 1:
-      escape = julia(scaledUv, iterations);
-      break;
-    case 2:
-      escape = sinJulia(scaledUv, iterations);
-      break;
+      float escapeCeil = getEscape(scaledUv, iterations+1);
+      vec3 mixedColorCeil = getColor(escapeCeil, iterations+1);
+      mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);
     }
 
-    float arraySize =  float(uPaletteLen);
-    float fMaxIters = float(iterations);
-    float escapeSquish = escape/fMaxIters*(arraySize-1.0);
-    int clrIndex1 = int(escapeSquish)%uPaletteLen;
-    int clrIndex2 = (clrIndex1+1)%uPaletteLen;
-    vec3 color1 = uPalette[clrIndex1]; 
-    vec3 color2 = uPalette[clrIndex2]; 
-    float mixAmount = fract(escapeSquish);
-    vec3 mixedColor = mix(color1,color2,mixAmount); 
 
     gl_FragColor = vec4(mixedColor,1.0);
 
