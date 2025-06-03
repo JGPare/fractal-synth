@@ -84,6 +84,7 @@ export default class Controls
     this.segmentCountSlider = document.getElementById('segments-count-slider')
     this.segmentSlider = document.getElementById('segment-slider')
     this.colorsContainer = document.getElementById('colors-container')
+    this.clearTlButton = document.getElementById('clear-tl-button')
   }
 
   setUIfromShader()
@@ -207,7 +208,7 @@ export default class Controls
     })
 
     this.deleteSceneButton.addEventListener('click', (event) => {
-      // add delete scene option
+      this.timeline.clearAll()
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {
@@ -221,6 +222,8 @@ export default class Controls
     })
 
     this.keyboard.on('togglePlay', () => {
+      console.log("toggled play");
+      
       this.timeline.togglePlay()
     })
     this.keyboard.on('seekStart', () => {
@@ -297,6 +300,9 @@ export default class Controls
         this.settingFinal = true
       }
     })
+    this.clearTlButton.addEventListener('click', (event) => {
+      this.timeline.renew()
+    })
   }
 
   setTimeline()
@@ -330,6 +336,7 @@ export default class Controls
         }
       }
     }
+    this.timeline.setDuration(this.durationSlider.value)
   }
 
   getUniformValues()
@@ -390,7 +397,6 @@ export default class Controls
       const number = element.children[1]
       range.addEventListener('input',(event) =>{
         number.value = range.value
-        console.log("slider input");
       })
       number.addEventListener('input',(event) =>{
         range.value = number.value

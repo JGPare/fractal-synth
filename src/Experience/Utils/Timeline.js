@@ -21,7 +21,7 @@ export default class Timeline extends EventEmitter {
       duration: 0, 
       defaults: { 
         duration: 15, 
-        ease: "power1.inOut"
+        ease: "power1.inOut",
       }
     }
     this.snapshot = this.getBlankSnapshot()
@@ -29,10 +29,12 @@ export default class Timeline extends EventEmitter {
     this.proxyCounter = 0
     this.proxy = {}
 
-    this.segmentCount
+    this.segmentCount = 6
     this.segmentIndex = 0
 
     this.currentProgress = 0
+
+    this.playing = false
 
     /** 
      * @type {Array<gsap.core.Timeline>} 
@@ -63,7 +65,7 @@ export default class Timeline extends EventEmitter {
   setTimelines()
   {
     const currInd = this.segmentIndex
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < this.segmentCount; i++) {
       if (this.segmentTLs[i]) this.segmentTLs[i].kill()
       this.addTimeline(i)
     }
@@ -85,6 +87,7 @@ export default class Timeline extends EventEmitter {
       }
     }})
     this.segmentTLs[index] = tl
+    
     console.log("added tl", tl);
     
     this.snapshot.segments[index] = {
@@ -100,6 +103,20 @@ export default class Timeline extends EventEmitter {
     
     const tl = this.segmentTLs[index]
     tl.kill()
+    this.segmentTLs[index] = null
+  }
+
+  removeAllTimelines()
+  {
+    for (let i = 0; i < this.segmentCount; i++) {
+      this.removeTimeline(i)
+    }
+  }
+
+  clearAll()
+  {
+    this.removeAllTimelines()
+    this.setTimelines()
   }
 
   setDuration(duration)
@@ -110,9 +127,10 @@ export default class Timeline extends EventEmitter {
 
   progress(value = null)
   {
+    console.log("init prog",this.tl.progress());
+    
     if (value){
-      this.masterTL.progress(value)
-      this.currentProgress = value
+      this.seekFromChild(value)
     }
     else
     {
@@ -201,26 +219,46 @@ export default class Timeline extends EventEmitter {
   pause()
   {
     if (this.masterTL){
+      this.playing = false
       this.masterTL.pause()
       this.currentProgress = this.masterTL.progress()
     }
+    else {
+      console.log("no master can't pause");
+    }
+  }
+
+  canPlay()
+  {
+    let canPlay = false
+    for (let i = 0; i < this.segmentCount; i++) {
+      const seg = this.segmentTLs[i]
+      if (seg.duration() > 0){
+        canPlay = true
+      }
+    }
+    return canPlay
   }
 
   play()
   {
-    console.log("playing timeline", this.tl);
-    
-    this.buildMaster()
-    this.setMasterTime()
-    this.masterTL.play()
-    this.masterTL.progress(this.currentProgress)
-    console.log("playing at master progress: ",this.masterTL.progress());
-    
+    if (this.canPlay()){
+      console.log("playing timeline", this.tl);
+      this.playing = true
+      this.buildMaster()
+      this.setMasterTime()
+      this.masterTL.play()
+      this.masterTL.progress(this.currentProgress)
+      console.log("playing at master progress: ",this.masterTL.progress());
+    }
+    else {
+      console.log("timeline master duration 0")
+    }
   }
 
   togglePlay()
   {
-    if (this.tl.isActive()){
+    if (this.masterTL.isActive()){
       this.pause()
     }
     else {
@@ -228,15 +266,17 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-  clear()
+  clear(tl)
   {
-    this.tl.clear()
-    //this.proxyCounter = 0
+    if (tl){
+      tl.clear()
+    }
   }
 
   renew()
   {
-    this.clear()
+    this.clear(this.tl)
+    this.tl.pause()
     this.snapshot.segments[this.segmentIndex].to.length = 0
     this.snapshot.segments[this.segmentIndex].fromTo.length = 0
   }
@@ -259,13 +299,18 @@ export default class Timeline extends EventEmitter {
       if (i == this.segmentIndex)
       {
         time += element.duration()*seekAmount
+        console.log(this.segmentIndex,seekAmount,time);
+        
       }
       else
       {
         time += element.duration()
       }
     }
+    console.log(this.tl.progress());
+    
     this.masterTL.time(time)
+    console.log(this.tl.progress());
   }
 
   getSnapshot()
@@ -352,15 +397,23 @@ export default class Timeline extends EventEmitter {
     }
     this.masterTL = gsap.timeline({
       paused: true,
+      smoothChildTiming: true 
     });
 
     let position = 0;
     for (let i = 0; i < this.segmentTLs.length; i++) {
       const seg = this.segmentTLs[i]
-      seg.paused(false)
-      this.masterTL.add(seg, position)
-      position += seg.duration()
+      if (seg && seg.duration() > 0){
+        console.log("added seg", seg, position);
+        seg.paused(false)
+        seg.totalTime(0, false); // Reset playhead to 0
+        this.masterTL.add(seg, position)
+        position += seg.duration()
+      }
     }
+    console.log("master", this.masterTL);
+    console.log("master duration", this.masterTL.duration());
+    
     this.trigger("masterBuilt");
   }
 
@@ -373,15 +426,11 @@ export default class Timeline extends EventEmitter {
         elapsed += this.segmentTLs[i].duration();
       }
     }
-    console.log("tl", this.tl.data, "progress:", this.tl.progress());
+    //console.log("tl", this.tl.data, "progress:", this.tl.progress());
     console.log("setting master time to: ", elapsed);
     console.log("master duration", this.masterTL.duration())
     
     this.masterTL.time(elapsed);
   }
 
-  addOnUpdate(callback)
-  {
-    this.tl.onUpdate = callback
-  }
 }
