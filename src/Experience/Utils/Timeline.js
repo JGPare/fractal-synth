@@ -79,10 +79,14 @@ export default class Timeline extends EventEmitter {
 
   addTimeline(index)
   {
-    const tl = this.getNewTimeline({...this.tlParams, data : "sec-" + index, onComplete: () => {
+    const tl = this.getNewTimeline(
+      {...this.tlParams, 
+      ata : "sec-" + index, 
+      onComplete: () => {
       const newInd = index + 1
       if (this.segmentTLs.length > newInd && this.segmentTLs[newInd].duration() > 0){
         this.segmentIndex = index + 1
+        this.tl = this.segmentTLs[index]
         this.trigger('setSegment')
       }
     }})
@@ -308,9 +312,9 @@ export default class Timeline extends EventEmitter {
       }
     }
     console.log(this.tl.progress());
+    console.log("seeking form child");
     
     this.masterTL.time(time)
-    console.log(this.tl.progress());
   }
 
   getSnapshot()
@@ -385,7 +389,6 @@ export default class Timeline extends EventEmitter {
     this.masterTL.time(time)
     this.currentProgress = this.masterTL.progress()
     console.log(this.currentProgress);
-    
   }
 
   buildMaster()
