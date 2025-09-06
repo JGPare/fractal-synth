@@ -20,7 +20,7 @@ export default class Timeline extends EventEmitter {
       paused: true,
       duration: 0, 
       defaults: { 
-        duration: 15, 
+        duration: 15,
         ease: "power1.inOut",
       }
     }
@@ -81,7 +81,7 @@ export default class Timeline extends EventEmitter {
   {
     const tl = this.getNewTimeline(
       {...this.tlParams, 
-      ata : "sec-" + index, 
+      data : "sec-" + index, 
       onComplete: () => {
       const newInd = index + 1
       if (this.segmentTLs.length > newInd && this.segmentTLs[newInd].duration() > 0){
@@ -127,6 +127,8 @@ export default class Timeline extends EventEmitter {
   {
     this.tl.duration(duration)
     this.snapshot.segments[this.segmentIndex].duration = duration
+    console.log(this.snapshot);
+    
   }
 
   progress(value = null)
@@ -150,7 +152,7 @@ export default class Timeline extends EventEmitter {
     let target = item
     access.forEach(elem => {
       target = target[elem]
-    });    
+    })
     this.tl.to(target, params, start)
 
     if (item.localId)
@@ -171,7 +173,7 @@ export default class Timeline extends EventEmitter {
     const newFromPars = {...fromPars}
     const newToPars = {...toPars, 
       immediateRender: false,
-      data: access, 
+      data: access,
       onUpdate: () => {
         target.value = this.proxy[proxyName].value/scaleFactor
     }}
@@ -343,7 +345,7 @@ export default class Timeline extends EventEmitter {
         this.fromTo(item, ...tweenSnapshot.pars) 
       })
       const duration = segment.duration ?? this.tlParams.defaults.duration
-      console.log(segment);
+      console.log("set from snap seg and dur", segment, duration);
       
       this.tl.duration(duration)
       this.tl.paused(false)

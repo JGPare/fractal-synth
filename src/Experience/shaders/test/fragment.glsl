@@ -88,7 +88,6 @@ float julia(vec2 uv, int maxIters)
     int i;
 
     vec2 zn = vec2(uv.x,uv.y);
-    vec2 z0 = zn;
     float mZ = dot(zn,zn);
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
@@ -102,8 +101,41 @@ float julia(vec2 uv, int maxIters)
 float sinJulia(vec2 uv, int maxIters)
 {
     vec2 c = vec2(uCx, uCy);
-
     int i;
+    vec2 zn = vec2(uv.x,uv.y);
+    vec2 z0 = zn;
+    float mZ = dot(zn,zn);
+
+    for (i = 0; mZ < 4.0 && i<maxIters; i++)
+    {
+        zn.x = sin(zn.x + uSinJuliaXCoeff);
+        zn.y = cos(zn.y + uSinJuliaYCoeff);
+        zn = complexPow(zn,uPower) + c;
+        mZ = dot(zn,zn);
+    }
+    return float(i) + velocityDistort(mZ-4.0);
+}
+
+float burningShip(vec2 uv, int maxIters)
+{   
+    int i;
+    vec2 zn = vec2(uv.x,uv.y);
+    vec2 z0 = zn;
+    float mZ = dot(zn,zn);
+    float mZprev;
+    for (i = 0; mZ < 4.0 && i<maxIters; i++)
+    {
+        zn = complexPow(abs(vec2(zn.x, -zn.y)), uPower) + z0;
+        mZprev = mZ;
+        mZ = dot(zn,zn);
+    }
+    return float(i) + velocityDistort(mZ-4.0);
+}
+
+float newton(vec2 uv, int maxIters)
+{
+    int i;
+    vec2 c = vec2(uCx, uCy);
 
     vec2 zn = vec2(uv.x,uv.y);
     vec2 z0 = zn;
@@ -111,9 +143,26 @@ float sinJulia(vec2 uv, int maxIters)
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
-        zn.x = sin(3.0*uSinJuliaXCoeff*zn.x) + (1.0-uSinJuliaXCoeff)*zn.x;
-        zn.y = sin(3.0*uSinJuliaYCoeff*zn.y) + (1.0-uSinJuliaYCoeff)*zn.y;
-        zn = complexPow(zn,uPower) + c;
+        zn = zn - (complexPow(zn, uPower) - vec2(1.0, 0.0)) / (3.0 * complexPow(zn, uPower - 1.0)) + c;
+        mZ = dot(zn,zn);
+    }
+    return float(i) + velocityDistort(mZ-4.0);
+}
+
+float phoenix(vec2 uv, int maxIters)
+{
+    vec2 c = vec2(uCx, uCy);
+    vec2 p = vec2(uSinJuliaXCoeff, uSinJuliaYCoeff);
+    int i;
+    vec2 zn = vec2(uv.x,uv.y);
+    vec2 z1 = vec2(0.0, 0.0);
+    vec2 z0 = zn;
+    float mZ = dot(zn,zn);
+
+    for (i = 0; mZ < 4.0 && i<maxIters; i++)
+    {
+        zn = complexPow(zn,uPower) + c + p*z1;
+        z1 = zn;
         mZ = dot(zn,zn);
     }
     return float(i) + velocityDistort(mZ-4.0);
@@ -146,8 +195,8 @@ vec2 rotate(vec2 uv)
 float getEscape(vec2 uv, int iterations)
 {
   float escape;
-  switch (uMode) 
-    {
+  switch (5) 
+  {
     case 0:
       escape = mandle(uv, iterations);
       break;
@@ -157,7 +206,16 @@ float getEscape(vec2 uv, int iterations)
     case 2:
       escape = sinJulia(uv, iterations);
       break;
-    }
+    case 3:
+      escape = burningShip(uv, iterations);
+      break;
+    case 4:
+      escape = newton(uv, iterations);
+      break;
+    case 5:
+      escape = phoenix(uv, iterations);
+      break;
+  }
   return escape;
 }
 
