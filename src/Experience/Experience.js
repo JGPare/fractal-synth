@@ -13,6 +13,7 @@ import Timeline from './Utils/Timeline.js'
 import ExperienceRepo from './ExperienceRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
+import CurveEditor from './CurveEditor.js'
 
 THREE.ColorManagement.enabled = true;
 
@@ -50,6 +51,7 @@ export default class Experience
     this.screen = new Screen()
     this.controls = new Controls()
     this.stats = new StatsPanel()
+    this.curveEditor = new CurveEditor("paper-canvas", "paper-output")
 
     this.setItemIds()
     this.setKeyMappings()

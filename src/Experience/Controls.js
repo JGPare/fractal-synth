@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
 import ExperienceRepo from './ExperienceRepo'
+import ProjectList from './ProjectList'
+import Project from './Project'
 
 const modes = 
 {
@@ -26,6 +28,7 @@ export default class Controls
     this.shaderUniforms = this.shader.getUniforms()
     this.palettes = this.experience.palettes
     this.palette = this.palettes.getPaletteByIndex(0)
+    this.projectList = new ProjectList("project-list",[])
 
     this.numberOfColors = 6
 

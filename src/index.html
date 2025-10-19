@@ -26,6 +26,7 @@
       <div id="colors-grid">
         <div class="slider-container ctrl">
           <label for="sceneName" class="slider-text inconsolata-main"> Scene Name </label>
+            <ul id="project-list"></ul>
             <input class="control-text inconsolata-input" id="scene-name" type="text" id="name" name="sceneName" value="MyScene" minlength="4" maxlength="20" size="20" />            
         </div>
         <div class="slider-container ctrl">
@@ -139,7 +140,10 @@
           <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
           <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
         </div>
-        <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
+        <div>
+          <canvas id="paper-canvas" width="400" height="300"></canvas>
+          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
+        </div>
       </div>
     </div>
     <!-- RIGHT GRID -->
@@ -228,5 +232,4 @@
     </div>
   </div>
 </body>
-
 </html>
