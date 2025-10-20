@@ -12,12 +12,11 @@
 </head>
 
 <body>
-  <script type="module" src="./script.js"></script>
   <div class="webgl-container">
     <canvas class="webgl" id="main-canvas"></canvas>
   </div>
   <div id="main-grid">
-<!-- LEFT GRID -->
+    <!-- LEFT GRID -->
     <div id="ui-grid-l">
       <div class="logo-container container">
         <h2 class="inconsolata-main header-text"> Fractal Synth </h2>
@@ -25,21 +24,42 @@
       </div>
       <div id="colors-grid">
         <div class="slider-container ctrl">
-          <label for="sceneName" class="slider-text inconsolata-main"> Scene Name </label>
-            <ul id="project-list"></ul>
-            <input class="control-text inconsolata-input" id="scene-name" type="text" id="name" name="sceneName" value="MyScene" minlength="4" maxlength="20" size="20" />            
+          <label for="scene-name" class="slider-text inconsolata-main"> Scene Name </label>
+          <ul id="project-list"></ul>
+          <input class="control-text inconsolata-input" id="scene-name" type="text" name="sceneName" value="MyScene"
+            minlength="4" maxlength="20" size="20" />
+        </div>
+        <!-- PROJECT CONTROLS -->
+        <div class="button-container ctrl">
+          <button class="control-button inconsolata-main" id="delete-scene-button">Delete</button>
+          <button class="control-button inconsolata-main" id="save-scene-button">Save</button>
+          <button class="control-button inconsolata-main" id="load-scene-button">Load</button>
+        </div>
+        <div class="btm-outline"></div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Fractal </p>
+          <select class="control-select inconsolata-main w-100" id="mode-select">
+            <option value="mandle">Mandlebrot</option>
+            <option value="julia">Julia</option>
+            <option value="sinJulia">Sin Julia</option>
+            <option value="burningShip">Burning Ship</option>
+            <option value="neuton">Neuton</option>
+            <option value="phoenix">Phoenix</option>
+          </select>
         </div>
         <div class="slider-container ctrl">
           <p class="slider-text inconsolata-main"> Velocity Distortion Direction </p>
           <div class="dual-input-grid">
-            <input type="range" min="-1" max="1" step="1" value="0" class="control-slider" id="velocity-distortion-direction">
+            <input type="range" min="-1" max="1" step="1" value="0" class="control-slider"
+              id="velocity-distortion-direction">
             <input type="number" min="-1" max="1" step="1" value="0" class="control-number inconsolata-main">
           </div>
         </div>
         <div class="slider-container ctrl">
           <p class="slider-text inconsolata-main"> Velocity Distortion Amount </p>
           <div class="dual-input-grid">
-            <input type="range" min="0" max="5" step="0.001" value="0.5" class="control-slider" id="velocity-distortion-amount">
+            <input type="range" min="0" max="5" step="0.001" value="0.5" class="control-slider"
+              id="velocity-distortion-amount">
             <input type="number" min="0" max="5" step="0.001" value="0.5" class="control-number inconsolata-main">
           </div>
           <div class="btm-outline"></div>
@@ -86,76 +106,7 @@
             <input type="range" min="1" max="60" step="1" value="15" class="control-slider" id="duration">
             <input type="number" min="1" max="60" step="1" value="15" class="control-number inconsolata-main">
           </div>
-          <div class="btm-outline"></div>
         </div>
-        <div class="slider-container ctrl">
-          <label for="paletteName" class="slider-text inconsolata-main"> Palette Name </label>
-            <input class="control-text inconsolata-input" id="palette-input" type="text" id="name" name="paletteName" required minlength="4" maxlength="20" size="20" />            
-        </div>
-        <div class="slider-container ctrl">
-          <label for="paletteSelect" class="slider-text inconsolata-main"> Select Palette </label>
-          <div>
-            <select class="control-select inconsolata-main w-75" id="palette-select"></select>            
-          </div>
-        </div>
-        <div class="button-container ctrl">
-            <button class="control-button inconsolata-main" id="delete-palette-button">Delete</button>
-            <button class="control-button inconsolata-main" id="new-palette-button">New</button>
-            <button class="control-button inconsolata-main" id="random-palette-button">Random</button>
-        </div>
-        <div class="btm-outline"></div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Number of Colors </p>
-          <div class="dual-input-grid">
-            <input type="range" min="2" max="10" step="1" value="6" class="control-slider" id="number-of-colors">
-            <input type="number" min="2" max="10" step="1" value="6" class="control-number inconsolata-main">
-          </div>
-        </div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Color Offset </p>
-          <div class="dual-input-grid">
-            <input type="range" min="0" max="10" step="0.01" value="0" class="control-slider" id="color-offset">
-            <input type="number" min="0" max="10" step="0.01" value="0" class="control-number inconsolata-main">
-          </div>
-        </div>
-        <div id="colors-container">
-          <!-- inserted via JS here -->
-        </div>
-        <div class="btm-outline"></div>
-        <div class="button-container ctrl">
-          <button class="control-button inconsolata-main" id="delete-scene-button">Delete</button>
-          <button class="control-button inconsolata-main" id="save-scene-button">Save</button>
-          <button class="control-button inconsolata-main" id="load-scene-button">Load</button>
-      </div>
-      </div>
-    </div>
-<!-- CENTER -->
-    <div id="center">
-      <div id="viewer">
-      </div>
-      <div id="timeline">
-        <div id="timeline-button-container">
-          <button class="timeline-button inconsolata-main" id="play-timeline-button"> >> </button>
-          <button class="timeline-button inconsolata-main" id="pause-timeline-button"> || </button>
-          <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
-          <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
-        </div>
-        <div>
-          <canvas id="paper-canvas" width="400" height="300"></canvas>
-          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
-        </div>
-      </div>
-    </div>
-    <!-- RIGHT GRID -->
-    <div id="ui-grid-r">
-      <div id="controls-grid">
-        <div class="slider-container ctrl">
-          <select class="control-select inconsolata-main w-100" id="mode-select">
-            <option value="mandle">Mandlebrot</option>
-            <option value="julia">Julia</option>
-            <option value="sinJulia">Sin Julia</option>
-          </select>
-        </div>      
         <div class="slider-container ctrl">
           <div class="btm-outline"></div>
           <p class="slider-text inconsolata-main"> Constant Detail </p>
@@ -168,7 +119,7 @@
           <p class="slider-text inconsolata-main"> Power </p>
           <div class="dual-input-grid">
             <input type="range" min="-30" max="30" value="2" step="1" class="control-slider" id="power-slider">
-            <input type="number" value="2" class="control-number inconsolata-main" readonly>              
+            <input type="number" value="2" class="control-number inconsolata-main" readonly>
           </div>
           <div class="btm-outline"></div>
         </div>
@@ -176,7 +127,7 @@
           <p class="slider-text inconsolata-main"> Rotation </p>
           <div class="dual-input-grid">
             <input type="range" min="-1" max="1" value="0" step="0.0001" class="control-slider" id="rotation-slider">
-            <input type="number" value="0" class="control-number inconsolata-main" readonly>              
+            <input type="number" value="0" class="control-number inconsolata-main" readonly>
           </div>
           <div class="btm-outline"></div>
         </div>
@@ -190,7 +141,8 @@
         <div class="slider-container ctrl" style="display: none;" data-julia>
           <p class="slider-text inconsolata-main"> Position Y </p>
           <div class="dual-input-grid">
-            <input type="range" min="-2" max="2" value="0.5" step="0.0001" class="control-slider" id="position-y-slider">
+            <input type="range" min="-2" max="2" value="0.5" step="0.0001" class="control-slider"
+              id="position-y-slider">
             <input type="number" value="0.5" class="control-number inconsolata-main" readonly>
           </div>
           <div class="btm-outline"></div>
@@ -205,7 +157,8 @@
         <div class="slider-container ctrl" style="display: none;" data-sinJulia>
           <p class="slider-text inconsolata-main"> Sin y Amount </p>
           <div class="dual-input-grid">
-            <input type="range" min="0.001" max="1" value="0" step="0.001" class="control-slider" id="sin-julia-y-coeff">
+            <input type="range" min="0.001" max="1" value="0" step="0.001" class="control-slider"
+              id="sin-julia-y-coeff">
             <input type="number" value="0" class="control-number inconsolata-main" readonly>
           </div>
           <div class="btm-outline"></div>
@@ -225,11 +178,70 @@
           </div>
           <div class="btm-outline"></div>
         </div>
+        <!-- COLORS -->
+        <div class="slider-container ctrl">
+          <label for="paletteName" class="slider-text inconsolata-main"> Palette Name </label>
+          <input class="control-text inconsolata-input" id="palette-input" type="text" id="name" required minlength="4"
+            maxlength="20" size="20" />
+        </div>
+        <div class="slider-container ctrl">
+          <label for="paletteSelect" class="slider-text inconsolata-main"> Select Palette </label>
+          <div>
+            <select class="control-select inconsolata-main w-75" id="palette-select"></select>
+          </div>
+        </div>
         <div class="button-container ctrl">
-            <button class="control-button inconsolata-main" id="clear-tl-button">Clear</button>
+          <button class="control-button inconsolata-main" id="delete-palette-button">Delete</button>
+          <button class="control-button inconsolata-main" id="new-palette-button">New</button>
+          <button class="control-button inconsolata-main" id="random-palette-button">Random</button>
+        </div>
+        <div class="btm-outline"></div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Number of Colors </p>
+          <div class="dual-input-grid">
+            <input type="range" min="2" max="10" step="1" value="6" class="control-slider" id="number-of-colors">
+            <input type="number" min="2" max="10" step="1" value="6" class="control-number inconsolata-main">
+          </div>
+        </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Color Offset </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="10" step="0.01" value="0" class="control-slider" id="color-offset">
+            <input type="number" min="0" max="10" step="0.01" value="0" class="control-number inconsolata-main">
+          </div>
+        </div>
+        <div id="colors-container">
+          <!-- inserted via JS here -->
+        </div>
+      </div>
+    </div>
+    <!-- CENTER -->
+    <div id="center">
+      <div id="viewer"></div>
+    </div>
+    <!-- RIGHT GRID -->
+    <div id="ui-grid-r">
+      <div id="controls-grid">
+        <div>
+          <canvas id="paper-canvas"></canvas>
+          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
+        </div>
+        <div id="timeline">
+          <div id="timeline-button-container">
+            <button class="timeline-button inconsolata-main" id="play-timeline-button"> >> </button>
+            <button class="timeline-button inconsolata-main" id="pause-timeline-button"> || </button>
+            <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
+            <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
+            <button class="timeline-button inconsolata-main" id="loop-timeline-button"> O </button>
+          </div>
+        </div>
+        <div class="button-container ctrl">
+          <button class="control-button inconsolata-main" id="clear-tl-button">Clear</button>
         </div>
       </div>
     </div>
   </div>
+  <script type="module" src="./script.js"></script>
 </body>
+
 </html>

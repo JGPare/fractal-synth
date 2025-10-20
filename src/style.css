@@ -3,8 +3,9 @@
   --slider-height: 0.9rem;
   --font-height1: 1rem;
   --font-height2: 28px;
-  --view-grid: 64%;
-  --ui-grid: 18%;
+  --view-grid: 57%;
+  --ui-grid-l: 18%;
+  --ui-grid-r: 25%;
   --slider-grid: 80%;
   --number-grid: 20%;
   --input-margin: 0.1rem;
@@ -20,7 +21,8 @@
     --font-height1: 0.7rem;
     --font-height2: 16px;
     --view-grid: 40%;
-    --ui-grid: 30%;
+    --ui-grid-l: 30%;
+    --ui-grid-r: 30%;
     --slider-grid: 75%;
     --number-grid: 25%;
     --input-margin: 0.03rem;
@@ -104,25 +106,45 @@ input[type=number] {
 #main-grid {
   order: 2;
   display: grid;
-  grid-template-columns: var(--ui-grid) var(--view-grid) var(--ui-grid);
+  grid-template-columns: var(--ui-grid-l) var(--view-grid) var(--ui-grid-r);
   grid-template-areas:
     "ui-l center ui-r"
   ;
   width: 100%;
   height: 100%;
 }
-
 #ui-grid-l {
   position: relative;
   grid-area: ui-l;
   background-color: var(--background-menu-color);
   padding: 1rem;
   display: grid;
-  grid-template-rows: calc(var(--font-height2)*2) 8fr 1fr;/*7% 80% 5%; */
+  grid-template-rows: calc(var(--font-height2)*2) 8fr 1fr;
   grid-template-areas:
     "header"
     "controls"
     "footer";
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Optional: Style the scrollbar for better aesthetics */
+#ui-grid-l::-webkit-scrollbar {
+  width: 8px;
+}
+
+#ui-grid-l::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+#ui-grid-l::-webkit-scrollbar-thumb {
+  background: #5c6d84cc;
+  border-radius: 4px;
+}
+
+#ui-grid-l::-webkit-scrollbar-thumb:hover {
+  background: #768daa;
 }
 
 #center {
@@ -139,7 +161,7 @@ input[type=number] {
   position: relative;
   grid-area: ui-r;
   background-color: var(--background-menu-color);
-  padding: 1rem;
+  padding: 0.5rem;
   display: grid;
   grid-template-rows: 2% 8fr 1fr;
   grid-template-areas:
@@ -162,13 +184,7 @@ input[type=number] {
 }
 
 #timeline {
-  grid-area: timeline;
   background-color: var(--background-menu-color);
-  /* padding-top: 0.4rem; */
-  display: grid;
-  grid-template-columns: 1fr 6fr;;
-  grid-template-areas: 
-    "buttons timeline";
   min-height: 40px;
 }
 

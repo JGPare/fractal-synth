@@ -3,6 +3,8 @@ import Experience from "./Experience.js"
 import Shader from "./Shader.js"
 import Timeline from "./Utils/Timeline.js"
 
+const debug = false
+
 export default class ExperienceRepo
 {
   /**
@@ -17,8 +19,10 @@ export default class ExperienceRepo
    experienceSnapshot.shader = this.getShaderSnapshot(experience.shader)
    experienceSnapshot.timeline = this.getTimelineSnapshot(experience.timeline)
 
-   console.log("snapshot", experienceSnapshot);
-   
+    if (debug) {
+      console.log("snapshot", experienceSnapshot)
+    }
+
    localStorage.setItem(name,JSON.stringify(experienceSnapshot))
    localStorage.setItem("lastExperience",name)
   }
@@ -56,7 +60,6 @@ export default class ExperienceRepo
       initialValues : controls.initialValues,
       finalValues : controls.finalValues
     }
-    
     return snapshot
   }
 
@@ -125,6 +128,6 @@ export default class ExperienceRepo
    */
   static setTimeline(timeline, timelineSnapshot)
   {
-    timeline.setFromSnapshot(timelineSnapshot)
+    //timeline.setFromSnapshot(timelineSnapshot)
   }
 }

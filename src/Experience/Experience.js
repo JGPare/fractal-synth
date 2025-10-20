@@ -51,7 +51,7 @@ export default class Experience
     this.screen = new Screen()
     this.controls = new Controls()
     this.stats = new StatsPanel()
-    this.curveEditor = new CurveEditor("paper-canvas", "paper-output")
+    this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
 
     this.setItemIds()
     this.setKeyMappings()

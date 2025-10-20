@@ -195,7 +195,7 @@ vec2 rotate(vec2 uv)
 float getEscape(vec2 uv, int iterations)
 {
   float escape;
-  switch (5) 
+  switch (uMode) 
   {
     case 0:
       escape = mandle(uv, iterations);

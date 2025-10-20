@@ -8,7 +8,10 @@ const modes =
 {
   mandle : 0,
   julia : 1,
-  sinJulia : 2
+  sinJulia : 2,
+  burningShip : 3,
+  neuton : 4,
+  phoenix : 5
 }
 
 export default class Controls 
@@ -37,6 +40,8 @@ export default class Controls
 
     this.settingStart = false
     this.settingFinal = false
+
+    this.loopTimeline = false
 
     this.initialValues = {}
     this.finalValues = {}
@@ -82,6 +87,7 @@ export default class Controls
     this.pauseTimelineButton = document.getElementById('pause-timeline-button')
     this.setStartTimelineButton = document.getElementById('set-start-timeline-button')
     this.setEndTimelineButton = document.getElementById('set-end-timeline-button')
+    this.loopTimelineButton = document.getElementById('loop-timeline-button')
     this.durationSlider = document.getElementById('duration')
     this.colorOffsetSlider = document.getElementById('color-offset')
     this.segmentCountSlider = document.getElementById('segments-count-slider')
@@ -303,6 +309,13 @@ export default class Controls
         this.settingFinal = true
       }
     })
+
+    this.loopTimelineButton.addEventListener('click', (event) => {
+      this.loopTimelineButton.classList.toggle('selected-button');
+      this.loopTimeline = this.loopTimeline ? false : true      
+      this.timeline.setRepeat(this.loopTimeline)
+    })
+
     this.clearTlButton.addEventListener('click', (event) => {
       this.timeline.renew()
     })
@@ -375,6 +388,15 @@ export default class Controls
         this.hideElements("sinJulia")
         break;
       case modes.sinJulia:
+        this.showElements("julia")
+        this.showElements("sinJulia")
+      case modes.burningShip:
+        this.showElements("julia")
+        this.showElements("sinJulia")
+      case modes.neuton:
+        this.showElements("julia")
+        this.showElements("sinJulia")
+      case modes.phoenix:
         this.showElements("julia")
         this.showElements("sinJulia")
         break;
