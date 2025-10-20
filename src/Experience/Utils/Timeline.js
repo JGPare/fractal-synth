@@ -43,17 +43,19 @@ export default class Timeline extends EventEmitter {
     /** 
      * @type {Array<gsap.core.Timeline>} 
     */
-    this.segmentTLs = []
+    this.tlList = [
+      this.getNewTimeline(this.tlParams),
+      this.getNewTimeline(this.tlParams)
+    ]
 
-    this.setTimelines()
+    this.currInd = 0
 
     console.log("init snapshot",this.snapshot);
 
     /**
      * @type {gsap.core.Timeline}
      */
-    this.tl = this.getNewTimeline(this.tlParams)
-
+    this.tl = this.tlList[0]
   }
 
   setEase(easeString)
@@ -94,6 +96,24 @@ export default class Timeline extends EventEmitter {
   getNewTimeline(params)
   {
     return gsap.timeline(params)
+  }
+
+  setTimeline(index)
+  {
+    console.log("tl index: ", index);
+    
+    if (index < this.tlList.length){
+      this.tl = this.tlList[index]
+      this.currInd = index
+    }
+    else {
+      console.log("tl index error");
+    }
+  }
+
+  setTimelineCount(count)
+  {
+
   }
 
  
@@ -152,16 +172,16 @@ export default class Timeline extends EventEmitter {
     newFromPars.value *= scaleFactor
     newToPars.value *= scaleFactor
     
-    if (item.localId)
-    {
-      this.snapshot.segments[this.segmentIndex].fromTo.push({
-        localId : item.localId,
-        pars : [{...fromPars}, {...toPars}, start, access],
-      })
-    }
-    else {
-      console.log("error: No Local Id", item);
-    }
+    // if (item.localId)
+    // {
+    //   this.snapshot.segments[this.segmentIndex].fromTo.push({
+    //     localId : item.localId,
+    //     pars : [{...fromPars}, {...toPars}, start, access],
+    //   })
+    // }
+    // else {
+    //   console.log("error: No Local Id", item);
+    // }
     
     this.tl.fromTo(this.proxy[proxyName], 
       newFromPars, 

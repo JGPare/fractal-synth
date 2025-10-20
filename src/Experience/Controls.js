@@ -90,8 +90,8 @@ export default class Controls
     this.loopTimelineButton = document.getElementById('loop-timeline-button')
     this.durationSlider = document.getElementById('duration')
     this.colorOffsetSlider = document.getElementById('color-offset')
-    this.segmentCountSlider = document.getElementById('segments-count-slider')
-    this.segmentSlider = document.getElementById('segment-slider')
+    this.timelineCountSlider = document.getElementById('timeline-count-slider')
+    this.timelineSelectSlider = document.getElementById('timeline-select-slider')
     this.colorsContainer = document.getElementById('colors-container')
     this.clearTlButton = document.getElementById('clear-tl-button')
   }
@@ -202,17 +202,17 @@ export default class Controls
       this.shaderUniforms.uColorOffset.value = event.target.value
     })
 
-    this.segmentCountSlider.addEventListener('input', (event) => {
-      this.timeline.setSegmentCount(event.target.value)
-      this.segmentSlider.max = event.target.value
-      if (this.segmentSlider.value > event.target.value){
-        this.segmentSlider.value = event.target.value - 1
+    this.timelineCountSlider.addEventListener('input', (event) => {
+      this.timeline.setTimelineCount(event.target.value)
+      this.timelineSelectSlider.max = event.target.value
+      if (this.timelineSelectSlider.value > event.target.value){
+        this.timelineSelectSlider.value = event.target.value - 1
       }
     })
 
-    this.segmentSlider.addEventListener('input', (event) => {
+    this.timelineSelectSlider.addEventListener('input', (event) => {
       if (event.target.value){
-        this.timeline.goToSegment(event.target.value)
+        this.timeline.setTimeline(event.target.value)
       }
     })
 
@@ -327,28 +327,30 @@ export default class Controls
       return
     }
     this.timeline.renew()
-    this.timeline.fromTo(this, {value : 0}, {value : 1}, 0,  ["timelineSlider"])
+    // this.timeline.fromTo(this, {value : 0}, {value : 1}, 0,  ["timelineSlider"])
     for (const [key, value] of Object.entries(this.finalValues)) {
       if (this.initialValues[key]){
-        switch (key){
-          case "uZoom": case "uFocusX": case "uFocusY":
-            this.timeline.fromTo(this.shaderUniforms,
-              {"value" : this.initialValues[key].value},
-              {"value" : this.finalValues[key].value},
-              0,
-              [key],
-            )
-            break;
-          default:              
-            if (!isNaN(value.value)){
+        if (this.initialValues[key] != this.finalValues[key]){
+          switch (key){
+            case "uZoom": case "uFocusX": case "uFocusY":
               this.timeline.fromTo(this.shaderUniforms,
                 {"value" : this.initialValues[key].value},
                 {"value" : this.finalValues[key].value},
                 0,
                 [key],
               )
-            }
-            break;
+              break;
+            default:              
+              if (!isNaN(value.value)){
+                this.timeline.fromTo(this.shaderUniforms,
+                  {"value" : this.initialValues[key].value},
+                  {"value" : this.finalValues[key].value},
+                  0,
+                  [key],
+                )
+              }
+              break;
+          }
         }
       }
     }
