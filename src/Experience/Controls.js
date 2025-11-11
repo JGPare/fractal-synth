@@ -27,6 +27,7 @@ export default class Controls
     this.shader = this.experience.shader
     this.timeline = this.experience.timeline
     this.keyboard = this.experience.keyboard
+    this.curveEditor = this.experience.curveEditor
 
     this.shaderUniforms = this.shader.getUniforms()
     this.palettes = this.experience.palettes
@@ -37,6 +38,7 @@ export default class Controls
 
     this.modeIndex = 0
     this.paletteIndex = 0
+    this.easeIndex = 0
 
     this.settingStart = false
     this.settingFinal = false
@@ -94,6 +96,9 @@ export default class Controls
     this.timelineSelectSlider = document.getElementById('timeline-select-slider')
     this.colorsContainer = document.getElementById('colors-container')
     this.clearTlButton = document.getElementById('clear-tl-button')
+    this.easeSelect = document.getElementById('ease-select')
+    this.paperCanvas = document.getElementById('paper-canvas')
+    
   }
 
   setUIfromShader()
@@ -218,6 +223,20 @@ export default class Controls
 
     this.deleteSceneButton.addEventListener('click', (event) => {
       this.timeline.clearAll()
+    })
+
+    this.easeSelect.addEventListener('change', (event) => {
+      this.currentEase = event.target.value
+      switch (this.currentEase) {
+        case "custom":
+          this.paperCanvas.hidden = false;
+          this.curveEditor.updateCurve()
+          break;
+        default:
+          this.paperCanvas.hidden = true;
+          this.timeline.setEase(this.currentEase, "inOut")
+          break;
+      }
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {

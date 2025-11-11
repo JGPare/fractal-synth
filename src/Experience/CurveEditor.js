@@ -185,7 +185,7 @@ export default class CurveEditor {
     // Draw control lines
     this.drawControlLines()
 
-    this.timeline.setEase(this.getPathData())
+    this.timeline.setEase("custom", this.getPathData())
 
     // Update output
     //this.updateOutput()

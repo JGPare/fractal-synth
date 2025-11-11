@@ -58,9 +58,16 @@ export default class Timeline extends EventEmitter {
     this.tl = this.tlList[0]
   }
 
-  setEase(easeString)
+  setEase(easeType, easeString)
   {
-    const ease = CustomEase.create("custom", easeString)
+    let ease;
+    switch (easeType){
+      case "custom":
+        ease = CustomEase.create("custom", easeString)
+        break;
+      default:
+        ease = easeType + "." + easeString
+    }
     this.tlParams.defaults.ease = ease
     // Change ease for all tweens in the timeline
     this.tl.getChildren().forEach(tween => {

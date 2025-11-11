@@ -200,29 +200,6 @@
     <!-- RIGHT GRID -->
     <div id="ui-grid-r">
       <div id="controls-grid">
-        <div>
-          <canvas id="paper-canvas"></canvas>
-          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
-        </div>
-        <div id="timeline">
-          <div id="timeline-button-container">
-            <button class="timeline-button inconsolata-main" id="play-timeline-button"> >> </button>
-            <button class="timeline-button inconsolata-main" id="pause-timeline-button"> || </button>
-            <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
-            <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
-            <button class="timeline-button inconsolata-main" id="loop-timeline-button"> O </button>
-          </div>
-        </div>
-        <div class="button-container ctrl">
-          <button class="control-button inconsolata-main" id="clear-tl-button">Clear</button>
-        </div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Duration </p>
-          <div class="dual-input-grid">
-            <input type="range" min="1" max="60" step="1" value="15" class="control-slider" id="duration">
-            <input type="number" min="1" max="60" step="1" value="15" class="control-number inconsolata-main">
-          </div>
-        </div>
         <div class="slider-container ctrl">
           <p class="slider-text inconsolata-main"> Timeline Count </p>
           <div class="dual-input-grid">
@@ -237,6 +214,41 @@
             <input type="number" min="0" max="5" step="1" value="0" class="control-number inconsolata-main">
           </div>
           <div class="btm-outline"></div>
+        </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Ease </p>
+          <select class="control-select inconsolata-main w-100" id="ease-select">
+            <option value="sine.inOut">Sin</option>
+            <option value="none">Linear</option>
+            <option value="power1">Power1</option>
+            <option value="power2">Power2</option>
+            <option value="power3">Power3</option>
+            <option value="circ">Circ</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div>
+          <canvas id="paper-canvas"></canvas>
+          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
+        </div>
+        <div id="timeline">
+          <div id="timeline-button-container">
+            <button class="timeline-button inconsolata-main" id="play-timeline-button"> ▶ </button>
+            <button class="timeline-button inconsolata-main" id="pause-timeline-button"> ⏸︎ </button>
+            <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
+            <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
+            <button class="timeline-button inconsolata-main" id="loop-timeline-button"> ∞ </button>
+          </div>
+        </div>
+        <div class="button-container ctrl">
+          <button class="control-button inconsolata-main" id="clear-tl-button">Clear</button>
+        </div>
+        <div class="slider-container ctrl">
+          <p class="slider-text inconsolata-main"> Duration </p>
+          <div class="dual-input-grid">
+            <input type="range" min="1" max="60" step="1" value="15" class="control-slider" id="duration">
+            <input type="number" min="1" max="60" step="1" value="15" class="control-number inconsolata-main">
+          </div>
         </div>
       </div>
     </div>

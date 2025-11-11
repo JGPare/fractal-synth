@@ -200,7 +200,9 @@ input[type=number] {
   grid-area: buttons;
   margin-top: auto;
   margin-bottom: auto;
-  padding: 0.2rem;
+  justify-content: space-between;
+  display: flex;
+  padding: 0.25rem 0rem;
 }
 
 .colorpicker {
@@ -299,7 +301,9 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .timeline-button {
-  width: 20%;
+  width: 19%;
+  display: flex;
+  justify-content: center;
   padding: 0.05rem;
   margin: 0.05rem;
   border-radius: 0.2rem;
@@ -384,7 +388,7 @@ input[type="color"]::-webkit-color-swatch {
 .timeline-slider {
   grid-area: timeline;
   display: grid;
-  margin-top: auto;
+  margin-top: 0.5rem;
   margin-bottom: auto;
   width: 100%;
   -webkit-appearance: none;

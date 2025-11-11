@@ -49,9 +49,9 @@ export default class Experience
     this.mouse = new Mouse()
     this.shader = new Shader()
     this.screen = new Screen()
+    this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
     this.controls = new Controls()
     this.stats = new StatsPanel()
-    this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
 
     this.setItemIds()
     this.setKeyMappings()
