@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
-import Shader from './Shader'
+import ShaderMaterial from './ShaderMaterial'
 
 
 export default class Screen 

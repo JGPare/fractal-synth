@@ -6,12 +6,17 @@
   --view-grid: 57%;
   --ui-grid-l: 18%;
   --ui-grid-r: 25%;
+  --ease-channel-grid: 13%;
+  --number-slider-grid: 72%;
+  --number-value-grid: 15%;
   --slider-grid: 80%;
   --number-grid: 20%;
   --input-margin: 0.1rem;
   --input-text-top-padding: 0.2rem;
   --input-text-btm-padding: 0.15rem;
   --number-box-width: 3.5rem;
+  --number-ease-box-width: 2.5rem;
+  --ease-box-width: 2rem;
   --background-menu-color: #2f2f2f;
 }
 
@@ -248,6 +253,13 @@ input[type="color"]::-webkit-color-swatch {
     "slider number";
 }
 
+.number-input-grid {
+  grid-template-columns: var(--ease-channel-grid) var(--number-slider-grid) var(--number-value-grid);
+  display: grid;
+  grid-template-areas:
+    "easeArea slider number";
+}
+
 .ctrl {
   justify-self: stretch;
 }
@@ -336,6 +348,14 @@ input[type="color"]::-webkit-color-swatch {
   background-color: #d3d3d355;
 }
 
+.control-number-dual {
+  width: var(--number-box-width);
+}
+
+.control-number-ease {
+  width: var(--number-ease-box-width);
+}
+
 .control-text {
   border-radius: 5px;
   border-width: 0;
@@ -354,6 +374,17 @@ input[type="color"]::-webkit-color-swatch {
   outline-width: 1px;
   outline-color: #e4e1e1cc;
   outline-style: groove;
+}
+
+.control-ease {
+  grid-area: easeArea;
+  width: var(--ease-box-width);
+  height: var(--slider-height);
+  border-radius: 5px;
+  border-width: 0;
+  text-align: center;
+  margin: 0 0 0 0;
+  background-color: #d3d3d355;
 }
 
 .control-slider {

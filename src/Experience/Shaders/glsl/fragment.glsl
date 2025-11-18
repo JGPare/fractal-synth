@@ -1,6 +1,7 @@
 
 #define PI 3.1415926535897932384626433832795
 
+uniform float uFloatPars[30];
 uniform float uAspect;
 uniform float uFocusX;
 uniform float uFocusY;

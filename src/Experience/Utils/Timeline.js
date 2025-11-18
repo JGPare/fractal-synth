@@ -24,7 +24,7 @@ export default class Timeline extends EventEmitter {
       paused: true,
       defaults: { 
         duration: 5, 
-        ease: CustomEase.create("custom", "M0,0 C0.126,0.382 0.375,0.064 0.554,0.189 0.766,0.337 0.818,1.001 1,1 "),
+        ease: "sine.inOut",
       }
     }
 
@@ -243,7 +243,7 @@ export default class Timeline extends EventEmitter {
     if (this.canPlay()){
       console.log("playing timeline", this.tl);
       this.playing = true
-      this.tl.play()
+      this.tl.play(0)
     }
   }
 

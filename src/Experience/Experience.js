@@ -8,7 +8,7 @@ import Render from './Render.js'
 import Controls from './Controls.js'
 import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
-import Shader from './Shader.js'
+import ShaderMaterial from './ShaderMaterial.js'
 import Timeline from './Utils/Timeline.js'
 import ExperienceRepo from './ExperienceRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
@@ -47,7 +47,7 @@ export default class Experience
     this.camera = new Camera()
     this.renderer = new Render()
     this.mouse = new Mouse()
-    this.shader = new Shader()
+    this.shader = new ShaderMaterial()
     this.screen = new Screen()
     this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
     this.controls = new Controls()

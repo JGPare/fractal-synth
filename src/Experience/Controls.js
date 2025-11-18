@@ -3,6 +3,7 @@ import Experience from "./Experience"
 import ExperienceRepo from './ExperienceRepo'
 import ProjectList from './ProjectList'
 import Project from './Project'
+import NumberInput from './Inputs/NumberInput'
 
 const modes = 
 {
@@ -12,6 +13,32 @@ const modes =
   burningShip : 3,
   neuton : 4,
   phoenix : 5
+}
+
+const ui2ShaderMap = {
+    constantSlider : "uIterBase",
+    powerSlider : "uPower",
+    rotationSlider : "uRotation",
+    positionXSlider : "uCx",
+    positionYSlider : "uCy",
+    velocityDistortionDirection : "uVelocityDistortionDirection",
+    velocityDistortionAmount : "uVelocityDistortionAmount",
+    sinJuliaXcoeff : "uSinJuliaXCoeff",
+    sinJuliaYcoeff : "uSinJuliaYCoeff",
+    areaModOn : "uAreaModOn",
+    areaModXoffset : "uAreaModXOffset",
+    areaModYoffset : "uAreaModYOffset",
+    areaModX : "uAreaModX",
+    areaModY : "uAreaModY",
+    modeIndex : "uMode",
+    numberOfColors : "uPaletteLen",
+    numberOfColorsSlider : "uPaletteLen",
+}
+
+const shader2UImap = {}
+// create an inverted map
+for (const [key, value] of Object.entries(ui2ShaderMap)) {
+  shader2UImap[value] = key
 }
 
 export default class Controls 
@@ -38,15 +65,15 @@ export default class Controls
 
     this.modeIndex = 0
     this.paletteIndex = 0
-    this.easeIndex = 0
+    this.timelineIndex = 0
 
     this.settingStart = false
     this.settingFinal = false
 
     this.loopTimeline = false
 
-    this.initialValues = {}
-    this.finalValues = {}
+    this.initialValues = [{},{}]
+    this.finalValues = [{},{}]
 
     // Debug
     if (this.debug.active)
@@ -57,6 +84,10 @@ export default class Controls
     this.createColorElements()
     this.getElements()
     this.linkUI()
+
+    this.test()
+
+    this.setEase("sine")
   }
 
   getElements()
@@ -99,6 +130,93 @@ export default class Controls
     this.easeSelect = document.getElementById('ease-select')
     this.paperCanvas = document.getElementById('paper-canvas')
     
+  }
+  // temp testing function remove %JPA
+  test()
+  {
+    const iters = new NumberInput({
+      name : "Iterations", 
+      value : 0.75, 
+      min : 0.1, 
+      max : 1, 
+      step : 0.001, 
+      channel : 0
+    })
+
+    const parent = document.getElementById('ui-grid-l')
+
+    this.addNumberControl(iters, parent)
+
+  }
+
+  addControls()
+  {
+
+  }
+
+  addControl(input, parentElement)
+  {
+
+  }
+
+  /**
+   * 
+   * @param {NumberInput} input 
+   */
+  addNumberControl(input, parentElement)
+  {
+    const inputId = input.getId()
+
+    const container = document.createElement("div")
+    container.setAttribute("class","slider-text inconsolata-main")
+
+    const label = document.createElement("label")
+    label.textContent = input.name
+    label.setAttribute("class", "slider-text inconsolata-main")
+    label.setAttribute("for", inputId)
+
+    const grid = document.createElement("div")
+    grid.setAttribute("class", "number-input-grid")
+
+    const easeChannel = document.createElement("input")
+    easeChannel.setAttribute("type", "number")
+    easeChannel.setAttribute("min", "0")
+    easeChannel.setAttribute("max", "5")
+    easeChannel.setAttribute("step", "1")
+    easeChannel.setAttribute("value", "0")
+    easeChannel.setAttribute("class", "control-ease inconsolata-main")
+    easeChannel.setAttribute("id", inputId + "-ease-channel")
+
+    const slider = document.createElement("input")
+    slider.setAttribute("type", "range")
+    slider.setAttribute("min", input.min)
+    slider.setAttribute("max", input.max)
+    slider.setAttribute("step", input.step)
+    slider.setAttribute("value", input.value)
+    slider.setAttribute("class", "control-slider")
+    slider.setAttribute("id", inputId + "-slider")
+
+    const value = document.createElement("input")
+    value.setAttribute("type", "number" )
+    value.setAttribute("class", "control-number control-number-ease inconsolata-main")
+    value.setAttribute("id", inputId + "-value")
+
+    slider.addEventListener('input',(event) =>{
+        value.value = slider.value
+    })
+    value.addEventListener('change',(event) =>{
+      if (value.value > slider.max) value.value = slider.max
+      if (value.value < slider.min) value.value = slider.min
+      slider.value = value.value
+    })
+
+    container.appendChild(label)
+    container.appendChild(grid)
+    grid.appendChild(easeChannel)
+    grid.appendChild(slider)
+    grid.appendChild(value)
+
+    parentElement.appendChild(container)
   }
 
   setUIfromShader()
@@ -217,6 +335,7 @@ export default class Controls
 
     this.timelineSelectSlider.addEventListener('input', (event) => {
       if (event.target.value){
+        this.timelineIndex = event.target.value
         this.timeline.setTimeline(event.target.value)
       }
     })
@@ -226,17 +345,7 @@ export default class Controls
     })
 
     this.easeSelect.addEventListener('change', (event) => {
-      this.currentEase = event.target.value
-      switch (this.currentEase) {
-        case "custom":
-          this.paperCanvas.hidden = false;
-          this.curveEditor.updateCurve()
-          break;
-        default:
-          this.paperCanvas.hidden = true;
-          this.timeline.setEase(this.currentEase, "inOut")
-          break;
-      }
+      this.setEase(event.target.value)
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {
@@ -302,7 +411,7 @@ export default class Controls
       this.setStartTimelineButton.classList.toggle('selected-button');
       if (this.settingStart)
       {
-        this.initialValues = this.getUniformValues()
+        this.initialValues[this.timelineIndex] = this.getUniformValues()
         this.setTimeline()
         this.timeline.pause()
         this.settingStart = false
@@ -317,7 +426,7 @@ export default class Controls
     this.setEndTimelineButton.addEventListener('click', (event) => {      
       this.setEndTimelineButton.classList.toggle('selected-button');
       if (this.settingFinal){
-        this.finalValues = this.getUniformValues()
+        this.finalValues[this.timelineIndex] = this.getUniformValues()
         this.setTimeline()
         this.timeline.pause()
         this.settingFinal = false
@@ -342,28 +451,32 @@ export default class Controls
 
   setTimeline()
   {
-    if (!this.finalValues || !this.initialValues){
+    if (!this.finalValues[this.timelineIndex] || !this.initialValues[this.timelineIndex]){
       return
     }
+    const initialValues = this.initialValues[this.timelineIndex]
+    const finalValues = this.finalValues[this.timelineIndex]
     this.timeline.renew()
     // this.timeline.fromTo(this, {value : 0}, {value : 1}, 0,  ["timelineSlider"])
     for (const [key, value] of Object.entries(this.finalValues)) {
-      if (this.initialValues[key]){
-        if (this.initialValues[key] != this.finalValues[key]){
+      if (initialValues[key]){
+        if (initialValues[key] != finalValues[key]){
           switch (key){
             case "uZoom": case "uFocusX": case "uFocusY":
-              this.timeline.fromTo(this.shaderUniforms,
-                {"value" : this.initialValues[key].value},
-                {"value" : this.finalValues[key].value},
-                0,
-                [key],
-              )
+              if (this.timelineIndex == 0){
+                this.timeline.fromTo(this.shaderUniforms,
+                  {"value" : initialValues[key].value},
+                  {"value" : finalValues[key].value},
+                  0,
+                  [key],
+                )
+              }
               break;
             default:              
               if (!isNaN(value.value)){
                 this.timeline.fromTo(this.shaderUniforms,
-                  {"value" : this.initialValues[key].value},
-                  {"value" : this.finalValues[key].value},
+                  {"value" : initialValues[key].value},
+                  {"value" : finalValues[key].value},
                   0,
                   [key],
                 )
@@ -441,6 +554,25 @@ export default class Controls
     for (const element of dualInputs) {
       const range = element.children[0]
       const number = element.children[1]
+      range.addEventListener('input',(event) =>{
+        number.value = range.value
+      })
+      number.addEventListener('input',(event) =>{
+        range.value = number.value
+        
+      })
+    }
+  }
+
+  // %JPA finish!!!
+  linkEaseInputs()
+  {
+    // set it so sliders change numbers
+    const easeInputs = document.getElementsByClassName('ease-input-grid')
+    for (const element of easeInputs) {
+      const ease = element.children[0]
+      const range = element.children[1]
+      const number = element.children[2]
       range.addEventListener('input',(event) =>{
         number.value = range.value
       })
@@ -666,5 +798,20 @@ export default class Controls
   setTimelineSlider(value)
   {
     this.timelineSlider.value = value
+  }
+
+  setEase(newEase)
+  {
+    this.currentEase = newEase
+      switch (this.currentEase) {
+        case "custom":
+          this.paperCanvas.hidden = false;
+          this.curveEditor.updateCurve()
+          break;
+        default:
+          this.paperCanvas.hidden = true;
+          this.timeline.setEase(this.currentEase, "inOut")
+          break;
+      }
   }
 }

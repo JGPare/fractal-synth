@@ -1,8 +1,8 @@
 
 import * as THREE from 'three'
 import Experience from "./Experience"
-import testVertexShader from './shaders/test/vertex.glsl?raw' // %JPA get rid of test?
-import testFragmentShader from './shaders/test/fragment.glsl?raw'
+import vertexShader from './Shaders/glsl/vertex.glsl?raw' // %JPA get rid of test?
+import fragmentShader from './Shaders/glsl/fragment.glsl?raw'
 
 const modes = 
 {
@@ -11,7 +11,7 @@ const modes =
   sinJulia : 2
 }
 
-export default class Shader 
+export default class ShaderMaterial 
 {
   constructor() 
   {
@@ -32,8 +32,8 @@ export default class Shader
       this.debugFolder.close()
     }
     this.material = new THREE.ShaderMaterial({
-      vertexShader: testVertexShader,
-      fragmentShader: testFragmentShader,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
       uniforms:
       {
@@ -41,6 +41,7 @@ export default class Shader
           type : "v3v",
           value : this.palette.palette
         },
+        uFloatPars : {value: new Float32Array([1,2,3])},
         uTime: { value: 0 },
         uFocusX: { value: -0.65 },
         uFocusY: { value: 0 },

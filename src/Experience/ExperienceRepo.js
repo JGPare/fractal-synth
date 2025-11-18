@@ -1,6 +1,6 @@
 import Controls from "./Controls.js"
 import Experience from "./Experience.js"
-import Shader from "./Shader.js"
+import ShaderMaterial from "./ShaderMaterial.js"
 import Timeline from "./Utils/Timeline.js"
 
 const debug = false
@@ -65,7 +65,7 @@ export default class ExperienceRepo
 
   /**
    * Get shader snapshot
-   * @param {Shader} shader
+   * @param {ShaderMaterial} shader
    */
   static getShaderSnapshot(shader)
   {
@@ -109,7 +109,7 @@ export default class ExperienceRepo
 
   /**
    * Set shader snapshot
-   * @param {Shader} shader
+   * @param {ShaderMaterial} shader
    */
   static setShader(shader, shaderSnapshot)
   {
