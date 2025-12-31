@@ -1,11 +1,17 @@
 {
 	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../CatchFlo"
-		}
-	],
+    {
+      "path": "."
+    },
+    {
+      "path": "../CatchFlo"
+    },
+    {
+      "path": "../../Projects/three-js-journey/27-shaders"
+    },
+    {
+      "path": "../../Projects/three-js-journey/28-shader-patterns"
+    }
+  ],
   "settings": {}
 }

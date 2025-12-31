@@ -1,5 +1,6 @@
 import Palette from './Palette'
 import * as THREE from 'three'
+import Palettes from './Palettes'
 
 export default class Storage
 {
@@ -22,6 +23,11 @@ export default class Storage
     return palettes ? this.parsePalettes(palettes) : []
   }
 
+  /**
+   * 
+   * @param {Palettes} palettes 
+   * @returns 
+   */
   static stringifyPalettes(palettes)
   {
     let palettesObject = []
@@ -31,6 +37,7 @@ export default class Storage
       {
         const paletteObject = {}
         paletteObject.name = palette.name
+        paletteObject.length = palette.displayLength
         paletteObject.colorHexes = []
         for (const color of palette.palette)
         {
@@ -48,12 +55,13 @@ export default class Storage
     for (const paletteObject of palettesObject) {
       const name = paletteObject.name
       const colors = []
+      const displayLength = paletteObject.length
       for (const colorHex of paletteObject.colorHexes) {
         let color = new THREE.Color()
         color.setHex(colorHex)
         colors.push(color)
       }
-      palettes.push(new Palette(colors,name))
+      palettes.push(new Palette(colors,name,displayLength))
     }
     return palettes
   }

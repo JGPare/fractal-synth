@@ -1,39 +1,50 @@
 
 #define PI 3.1415926535897932384626433832795
 
-uniform float uFloatPars[30];
-uniform float uAspect;
-uniform float uFocusX;
-uniform float uFocusY;
+// modes
+#define MANDLE  0
+#define JULIA  1
+#define SIN_JULIA  2
+#define BURNING_SHIP  3
+#define NEUTON  4
+#define PHOENIX  5
+#define NOISE  6
+#define CIRCULAR_WAVES  7
+#define LINEAR_WAVES  8
+
+// must match uNumInput eNum!
+#define uIters uFloatPar[0]
+#define uPower uFloatPar[1]
+#define uPosX uFloatPar[2]
+#define uPosY uFloatPar[3]
+#define uZoom uFloatPar[4]
+#define uCposX uFloatPar[5]
+#define uCposY uFloatPar[6]
+#define uVelDistortionDir uFloatPar[7]
+#define uVelDistortionMag uFloatPar[8]
+#define uMirrorFoldsX uFloatPar[9]
+#define uMirrorFoldsY uFloatPar[10]
+#define uMirrorOffsetX uFloatPar[11]
+#define uMirrorOffsetY uFloatPar[12]
+#define uNumColors uFloatPar[13]
+#define uColorOffset uFloatPar[14]
+#define uSinMagX uFloatPar[15]
+#define uSinMagY uFloatPar[16]
+#define uRotation uFloatPar[17]
+#define uSlot18 uFloatPar[18]
+#define uSlot19 uFloatPar[19]
+
+uniform float uFloatPar[20];
+
 uniform float uTime;
-uniform float uZoom;
-uniform float uIterBase;
-uniform float uPower;
-uniform float uRotation;
-uniform float uColorOffset;
-
-uniform float uCx;
-uniform float uCy;
-uniform float uVelocityDistortionDirection;
-uniform float uVelocityDistortionAmount;
-
-uniform float uSinJuliaXCoeff;
-uniform float uSinJuliaYCoeff;
-
-uniform float uAreaModX;
-uniform float uAreaModY;
-uniform float uAreaModXOffset;
-uniform float uAreaModYOffset;
+uniform float uAspect;
 
 uniform int uMode;
-
-uniform bool uAreaModOn;
 
 uniform vec3 uPalette[10]; // note that 10 is the max number of colors
 uniform int uPaletteLen;
 
 varying vec2 vUv;
-
 
 vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
 
@@ -59,10 +70,48 @@ vec2 complexPow(vec2 z, float n){
     return pow(r, n) * vec2(cos(theta * n), sin(theta * n));
 }
 
+vec4 permute(vec4 x)
+{
+    return mod(((x*34.0)+1.0)*x, 289.0);
+}
+
 float velocityDistort(float velocity)
 {
-  velocity = min(velocity,float(uPaletteLen*10));
-  return velocity*uVelocityDistortionDirection*uVelocityDistortionAmount;
+  float minVel = min(velocity,float(uPaletteLen*10));
+  return minVel*uVelDistortionDir*uVelDistortionMag;
+}
+
+float cnoise(vec2 P){
+  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+  Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+  vec4 ix = Pi.xzxz;
+  vec4 iy = Pi.yyww;
+  vec4 fx = Pf.xzxz;
+  vec4 fy = Pf.yyww;
+  vec4 i = permute(permute(ix) + iy);
+  vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+  vec4 gy = abs(gx) - 0.5;
+  vec4 tx = floor(gx + 0.5);
+  gx = gx - tx;
+  vec2 g00 = vec2(gx.x,gy.x);
+  vec2 g10 = vec2(gx.y,gy.y);
+  vec2 g01 = vec2(gx.z,gy.z);
+  vec2 g11 = vec2(gx.w,gy.w);
+  vec4 norm = 1.79284291400159 - 0.85373472095314 * 
+    vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+  g00 *= norm.x;
+  g01 *= norm.y;
+  g10 *= norm.z;
+  g11 *= norm.w;
+  float n00 = dot(g00, vec2(fx.x, fy.x));
+  float n10 = dot(g10, vec2(fx.y, fy.y));
+  float n01 = dot(g01, vec2(fx.z, fy.z));
+  float n11 = dot(g11, vec2(fx.w, fy.w));
+  vec2 fade_xy = fade(Pf.xy);
+  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+  return 2.3 * n_xy;
 }
 
 float mandle(vec2 uv, int maxIters)
@@ -84,7 +133,7 @@ float mandle(vec2 uv, int maxIters)
 
 float julia(vec2 uv, int maxIters)
 {
-    vec2 c = vec2(uCx, uCy);
+    vec2 c = vec2(uCposX, uCposY);
 
     int i;
 
@@ -101,7 +150,7 @@ float julia(vec2 uv, int maxIters)
 
 float sinJulia(vec2 uv, int maxIters)
 {
-    vec2 c = vec2(uCx, uCy);
+    vec2 c = vec2(uCposX, uCposY);
     int i;
     vec2 zn = vec2(uv.x,uv.y);
     vec2 z0 = zn;
@@ -109,8 +158,8 @@ float sinJulia(vec2 uv, int maxIters)
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
-        zn.x = sin(zn.x + uSinJuliaXCoeff);
-        zn.y = cos(zn.y + uSinJuliaYCoeff);
+        zn.x = sin(zn.x + uSinMagX);
+        zn.y = cos(zn.y + uSinMagY);
         zn = complexPow(zn,uPower) + c;
         mZ = dot(zn,zn);
     }
@@ -136,7 +185,7 @@ float burningShip(vec2 uv, int maxIters)
 float newton(vec2 uv, int maxIters)
 {
     int i;
-    vec2 c = vec2(uCx, uCy);
+    vec2 c = vec2(uCposX, uCposY);
 
     vec2 zn = vec2(uv.x,uv.y);
     vec2 z0 = zn;
@@ -152,8 +201,8 @@ float newton(vec2 uv, int maxIters)
 
 float phoenix(vec2 uv, int maxIters)
 {
-    vec2 c = vec2(uCx, uCy);
-    vec2 p = vec2(uSinJuliaXCoeff, uSinJuliaYCoeff);
+    vec2 c = vec2(uCposX, uCposY);
+    vec2 p = vec2(uSinMagX, uSinMagY);
     int i;
     vec2 zn = vec2(uv.x,uv.y);
     vec2 z1 = vec2(0.0, 0.0);
@@ -169,27 +218,27 @@ float phoenix(vec2 uv, int maxIters)
     return float(i) + velocityDistort(mZ-4.0);
 }
 
-vec2 areaModUv(vec2 uv)
+float myNoise(vec2 uv)
 {
-  float xOffsetDir = float(1 - 2*(int(floor(uv.x/(1.0/uAreaModX*uAspect)))%2));
-  float yOffsetDir = float(1 - 2*(int(floor(uv.y/(1.0/uAreaModY)))%2));
-  uv.x = mod(uv.x,1.0/uAreaModX*uAspect);
-  uv.y = mod(uv.y,1.0/uAreaModY);
-  uv.y += uAreaModYOffset*xOffsetDir;
-  uv.x += uAreaModXOffset*yOffsetDir;
-  return uv;
+  vec2 p = vec2(uSinMagX, uSinMagY);
+  return cnoise(uv*uCposX) + cnoise(uv*uCposY)+ cnoise(p);
 }
 
-vec2 rotate(vec2 uv)
+vec2 mirrorUv(vec2 uv)
 {
-  uv.x /= uAspect; // normalize
-  float s = sin(PI * uRotation);
-  float c = cos(PI * uRotation);
-  uv = vec2(
-      uv.x * c - uv.y * s,
-      uv.x * s + uv.y * c
-  );
-  uv.x *= uAspect; // de-normalize
+  // uv = uv + vec2(uMirrorFoldsX/2.*uAspect, uMirrorFoldsX/2.);
+  float xOffsetDir = float(1 - 2*(int(floor(uv.x/(1.0/uMirrorFoldsX*uAspect)))%2));
+  float yOffsetDir = float(1 - 2*(int(floor(uv.y/(1.0/uMirrorFoldsY)))%2));
+  float factorX = 2.*uAspect/uMirrorFoldsX;
+  float factorY = 2./uMirrorFoldsY;
+
+  uv.x = abs(mod(uv.x,factorX)-factorX/2.);
+  uv.x += uMirrorOffsetX*yOffsetDir;
+  uv.y = abs(mod(uv.y,factorY)-factorY/2.);
+  uv.y += uMirrorOffsetY*xOffsetDir;
+
+  // uv = uv - vec2(0.5*uAspect, 0.5);
+
   return uv;
 }
 
@@ -198,29 +247,41 @@ float getEscape(vec2 uv, int iterations)
   float escape;
   switch (uMode) 
   {
-    case 0:
+    case MANDLE:
       escape = mandle(uv, iterations);
       break;
-    case 1:
+    case JULIA:
       escape = julia(uv, iterations);
       break;
-    case 2:
+    case SIN_JULIA:
       escape = sinJulia(uv, iterations);
       break;
-    case 3:
+    case BURNING_SHIP:
       escape = burningShip(uv, iterations);
       break;
-    case 4:
+    case NEUTON:
       escape = newton(uv, iterations);
       break;
-    case 5:
+    case PHOENIX:
       escape = phoenix(uv, iterations);
       break;
-  }
+  } 
   return escape;
 }
 
-vec3 getColor(float escape, int iterations)
+float getNoiseMag(vec2 uv)
+{
+  float mag;
+  switch (uMode) 
+  {
+    case NOISE:
+      mag = myNoise(uv);
+      break;
+  } 
+  return mag;
+}
+
+vec3 getMixedColor(float escape, int iterations)
 {
   float arraySize =  float(uPaletteLen);
   float fMaxIters = float(iterations);
@@ -228,50 +289,159 @@ vec3 getColor(float escape, int iterations)
   float escapeNorm = squishNorm * (arraySize - 1.0);
   int clrIndex1 = int(escapeNorm+uColorOffset)%uPaletteLen;
   int clrIndex2 = (clrIndex1+1)%uPaletteLen;
-  int clrIndexPrev = (clrIndex1-1)%uPaletteLen;
   vec3 color1 = uPalette[clrIndex1]; 
   vec3 color2 = uPalette[clrIndex2]; 
-  vec3 colorPrev = uPalette[clrIndexPrev]; 
   float mixAmount = fract(escapeNorm);
   vec3 mixedColor = mix(color1,color2,mixAmount);
   return mixedColor;
 }
 
+vec2 getScaledUV(vec2 uv, vec2 focus)
+{
+    vec2 scale = vec2(uZoom); 
+    vec2 centerUv = uv - vec2(0.5*uAspect, 0.5);
+    vec2 scaledUv = centerUv*scale + focus;
+    return scaledUv;
+}
+
+vec3 getEscapeFractalColor(vec2 uv)
+{
+  float iterFloat = exp(6.8*uIters);
+  int iterations = int(iterFloat);
+  float iterFrac = fract(iterFloat);
+
+  float escape = getEscape(uv, iterations);
+  vec3 mixedColor = getMixedColor(escape, iterations);
+
+  if (iterations < 50)
+  {
+    float escapeCeil = getEscape(uv, iterations+1);
+    vec3 mixedColorCeil = getMixedColor(escapeCeil, iterations+1);
+    mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);
+  }
+  return mixedColor;
+}
+
+vec3 getNoiseFractalColor(vec2 uv)
+{
+  float mag = getNoiseMag(uv)*uIters*uPower;
+  
+  vec3 mixedColor = getMixedColor(mag, 100);
+
+  return mixedColor;
+}
+
+vec2 warpUv(vec2 uv)
+{
+  uv += vec2(sin(uv.y * uSinMagX), cos(uv.x * uSinMagY));
+  return uv;
+}
+
+float waveMag(vec2 uv, float freq)
+{
+
+  vec2 uvFloor1 = floor(uv*freq);
+  vec2 uvFloor2 = vec2(uvFloor1.x+1., uvFloor1.y);
+  vec2 uvFloor3 = vec2(uvFloor1.x, uvFloor1.y+1.);
+  vec2 uvFloor4 = vec2(uvFloor1.x+1., uvFloor1.y+1.);
+  
+  return distance(uv,uvFloor1/freq) +
+     distance(uv,uvFloor2/freq) +
+     distance(uv,uvFloor3/freq) +
+     distance(uv,uvFloor4/freq);
+}
+
+
+vec2 toPolar(vec2 uv)
+{
+  // Convert to polar coordinates
+  float angle = atan(uv.y, uv.x);
+  float radius = length(uv);
+  return vec2(angle, radius);
+}
+
+vec3 getCircularWavesColor(vec2 uv)
+{
+  uv = warpUv(uv);
+
+  float val1 = waveMag(uv, uIters);
+  float val2 = waveMag(uv, uPower);
+  float val3 = waveMag(uv, uCposX);
+
+  vec3 mixedColor = getMixedColor(sin(val1*0.1)+sin(val2*0.5)+sin(val3)+uCposY,1);
+
+  return mixedColor;
+}
+
+vec3 getLinearWavesColor(vec2 uv)
+{
+  uv = warpUv(uv);
+
+  float val1 = abs(sin(uv.x*uIters) + sin(uv.x*uIters*0.6 + PI/2.) + sin(uv.x*uIters*0.1 + 3.*PI/2.) );
+  float val2 = abs(sin(uv.y*uPower) + sin(uv.y*uPower*0.6 + PI/2.) + sin(uv.y*uPower*0.1 + 3.*PI/2.) );
+  float val3 = abs(uCposX);
+
+  vec3 mixedColor = getMixedColor(val1+val2+val3,int(10.*uCposY));
+
+  return mixedColor;
+}
+
+vec3 getWavesFractalColor(vec2 uv)
+{
+  vec3 mixedColor;
+  switch (uMode)
+  {
+    case CIRCULAR_WAVES:
+      mixedColor = getCircularWavesColor(uv);
+      break;
+    case LINEAR_WAVES:
+      mixedColor = getLinearWavesColor(uv);
+      break;
+  }
+
+  return mixedColor;
+}
+
+vec3 getColor(vec2 uv)
+{
+  vec3 mixedColor;
+  switch (uMode) 
+  {
+    case MANDLE:            
+    case JULIA:            
+    case SIN_JULIA:            
+    case BURNING_SHIP:            
+    case NEUTON:            
+    case PHOENIX:            
+      mixedColor = getEscapeFractalColor(uv);
+      break;
+    case NOISE:    
+      mixedColor = getNoiseFractalColor(uv);
+      break;
+    case CIRCULAR_WAVES:
+    case LINEAR_WAVES:
+      mixedColor = getWavesFractalColor(uv);
+      break;
+    break;      
+  } 
+  return mixedColor;
+}
+
 void main()
 {
-    float iterFloat = exp(6.8*uIterBase);
-    int iterations = int(iterFloat);
-
-    int iterFloor = int(iterFloat);
-    float iterFrac = fract(iterFloat);
-
-// was having issues with jerky animation in gsap when uFocusX 
-// was very small, scaling larger on the JS side seems to help
-    vec2 focus = vec2(uFocusX, uFocusY);
-    vec2 scale = vec2(uZoom); 
 
     vec2 uv = vUv;
 
-    if (uAreaModOn)
+    if (uMirrorFoldsX > 1. || uMirrorFoldsY > 1.)
     {
-      uv = areaModUv(uv);
-    }
-    vec2 centerUv = uv - vec2(0.5)*vec2(uAspect,1.0);
-    vec2 scaledUv = centerUv*scale + focus;
-
-    scaledUv = rotate(scaledUv);
-
-    float escape = getEscape(scaledUv, iterations);
-    vec3 mixedColor = getColor(escape, iterations);
-
-    if (iterations < 50)
-    {
-      float escapeCeil = getEscape(scaledUv, iterations+1);
-      vec3 mixedColorCeil = getColor(escapeCeil, iterations+1);
-      mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);
+      uv = mirrorUv(uv);
     }
 
+    vec2 focus = vec2(uPosX, uPosY);
+    vec2 scaledUv = getScaledUV(uv, focus);
 
-    gl_FragColor = vec4(mixedColor,1.0);
+    vec3 color = getColor(scaledUv);
+
+    gl_FragColor = vec4(color,1.0);
 
 }

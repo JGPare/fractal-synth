@@ -185,7 +185,7 @@ export default class CurveEditor {
     // Draw control lines
     this.drawControlLines()
 
-    this.timeline.setEase("custom", this.getPathData())
+    this.timeline.setEase("custom", this.getPathData(), 0)
 
     // Update output
     //this.updateOutput()
@@ -236,7 +236,6 @@ export default class CurveEditor {
       anchor2: this.controlPoints[insertIndex + 3] ? this.controlPoints[insertIndex + 3].position : splitPoint
     }
     
-
     this.segments.splice(segmentIndex + 1, 0, newSegment)
     
     // Rebuild the curve

@@ -1,23 +1,34 @@
+import Shader from "./Shaders/Shader"
+import Palette from "./Utils/Palette"
+
 export default class Project {
-  constructor(name) {
+  /**
+   * 
+   * @param {String} name 
+   */
+  constructor(name, image = null, lastModified = null) {
     this.name = name
-    this.parameters = { }
+    this.image = image
+    this.lastModified = lastModified ? Date.now() : Date.parse(lastModified)
   }
 
-  addParameter(name, value, type)
+  setImage(image)
   {
-    switch (type) {
-      case "number":
-        this.parameters[name] = Number(value)
-        break;
-      default:
-        break;
+    this.image = image
+  }
+
+  getSnapshot()
+  {
+    return {
+      name : this.name,
+      image : this.image,
+      lastModified : this.lastModified.toString()
     }
   }
 
-  clearParameters()
+  updateModified()
   {
-    this.parameters = {}
+    this.lastModified = Date.now()
   }
 
 }

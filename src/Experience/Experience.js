@@ -14,10 +14,17 @@ import ExperienceRepo from './ExperienceRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
 import CurveEditor from './CurveEditor.js'
+import Project from './Project.js'
+import ShaderUtility from './Shaders/ShaderUtility.js'
+import { eShaders } from './Common/eNums.js'
+import Channel from './Channel.js'
+import ProjectList from './ProjectList.js'
 
 THREE.ColorManagement.enabled = true;
 
 let instance = null
+
+let debug = false
 
 export default class Experience
 {
@@ -37,6 +44,7 @@ export default class Experience
     this.canvas = canvas
 
     // Setup
+    this.projectList = new ProjectList()
     this.keyboard = new Keyboard()
     this.timeline = new Timeline(this)
     this.debug = new Debug()
@@ -47,13 +55,17 @@ export default class Experience
     this.camera = new Camera()
     this.renderer = new Render()
     this.mouse = new Mouse()
-    this.shader = new ShaderMaterial()
+    this.shaderMaterial = new ShaderMaterial()
     this.screen = new Screen()
     this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
+    this.channels = Array.from({ length: 5 }, () => new Channel({name : "Sin", ease : "sine", duration : 25, on : false}))
+    
     this.controls = new Controls()
     this.stats = new StatsPanel()
 
-    this.setItemIds()
+    this.shader = null
+    this.setShader(eShaders.mandle)
+
     this.setKeyMappings()
 
     this.sizes.on('resize', () =>
@@ -89,31 +101,22 @@ export default class Experience
     this.onLoad()
   }
 
+  setShader(eShader)
+  {
+    this.shader = ShaderUtility.getShader(eShader)
+    if (debug) {
+      console.log("setting shader: ", this.shader);
+    }
+    
+    this.controls.setShader()
+    this.screen.setShader()
+  }
+
   setKeyMappings()
   {
     this.keyboard.addMapping("Space", "togglePlay")
     this.keyboard.addMapping("Comma", "seekStart")
     this.keyboard.addMapping("Period", "seekEnd")
-  }
-
-  setItemIds()
-  {
-    this.itemIds = {
-      controls : this.controls,
-      shaderUniforms : this.shader.material.uniforms
-    }
-
-    for (const [key, value] of Object.entries(this.itemIds)) {
-      console.log(value);
-      
-      value.localId = key
-    }
-
-  }
-
-  getItemById(itemId)
-  {
-    return this.itemIds[itemId]
   }
 
   resize()
@@ -153,7 +156,7 @@ export default class Experience
   onLoad()
   {
     this.renderer.onLoad()
-    ExperienceRepo.loadLast(this)
+    ExperienceRepo.loadLastExperience(this)
   }
 
   onBeforeUnload()

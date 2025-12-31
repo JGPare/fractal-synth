@@ -1,44 +1,45 @@
+import Project from "./Project"
+
 export default class ProjectList {
-      constructor(elementId, projects = []) {
-        this.container = document.getElementById(elementId);
-        console.log(this.container);
-        
-        this.projects = projects;
-        this.render();
+      /**
+       * 
+       * @param {[Project]} projects 
+       */
+      constructor(projects = []) {
+        this.projects = projects
       }
 
-      render() {
-        this.container.innerHTML = '';
-        for (const proj of this.projects) {
-          const li = document.createElement('li');
+      addProject(project) 
+      {
+        this.projects.push(project)
+      }
 
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'project-name';
-          nameSpan.textContent = proj.name;
-
-          const paramsSpan = document.createElement('span');
-          paramsSpan.className = 'project-params';
-          paramsSpan.textContent = this.formatParams(proj.parameters);
-
-          li.appendChild(nameSpan);
-          li.appendChild(paramsSpan);
-          this.container.appendChild(li);
+      updateOrAddProject(name, thumbnail)
+      {
+        let found = false
+        this.projects.forEach(project => {
+          if (project.name == name){
+            project.updateModified()
+            project.setImage(thumbnail)
+            found = true
+          }
+        })
+        if (!found){
+          this.projects.push(new Project(name, thumbnail))
         }
       }
 
-      formatParams(params) {
-        return Object.entries(params)
-          .map(([key, val]) => `${key}: ${val}`)
-          .join(', ');
+      clear() 
+      {
+        this.projects = []
       }
 
-      addProject(project) {
-        this.projects.push(project);
-        this.render();
-      }
-
-      clear() {
-        this.projects = [];
-        this.render();
+      getSnapshot()
+      {
+        const snapshot = []
+        this.projects.forEach(project => {
+          snapshot.push(project.getSnapshot())
+        })
+        return snapshot
       }
     }

@@ -1,133 +1,174 @@
 import Controls from "./Controls.js"
 import Experience from "./Experience.js"
+import Project from "./Project.js"
 import ShaderMaterial from "./ShaderMaterial.js"
+import Shader from "./Shaders/Shader.js"
 import Timeline from "./Utils/Timeline.js"
 
-const debug = false
+const debug = true
 
-export default class ExperienceRepo
-{
+export default class ExperienceRepo {
   /**
- * Save experience snapshot
- * @param {Experience} experience
- */
-  static saveExperience(name, experience)
-  {
-   const experienceSnapshot = {}
+   * Save experience snapshot
+   * @param {Experience} experience
+   */
+  static saveExperience(name, experience) {
+    const experienceSnapshot = {}
 
-   experienceSnapshot.controls = this.getControlsSnapshot(experience.controls)
-   experienceSnapshot.shader = this.getShaderSnapshot(experience.shader)
-   experienceSnapshot.timeline = this.getTimelineSnapshot(experience.timeline)
+    experienceSnapshot.name = name
+    if (debug) {
+      console.log(experience.shader)
+    }
+
+    experienceSnapshot.shader = this.getShaderSnapshot(experience.shader)
+    experienceSnapshot.channels = this.getChannelSnapshot(experience.channels)
+    const thumbnail = experience.screen.captureImage('image/jpeg', 0.05);
+    
+    experience.projectList.updateOrAddProject(name, thumbnail)
 
     if (debug) {
-      console.log("snapshot", experienceSnapshot)
+      console.log("snapshot:", experienceSnapshot)
     }
 
-   localStorage.setItem(name,JSON.stringify(experienceSnapshot))
-   localStorage.setItem("lastExperience",name)
+    localStorage.setItem(name, JSON.stringify(experienceSnapshot))
+    localStorage.setItem("lastExperience", name)
+    localStorage.setItem("projects", JSON.stringify(experience.projectList.getSnapshot()))
   }
 
-
-  static loadExperience(name, experience)
-  {
-    const experienceSnapshot = JSON.parse(localStorage.getItem(name))
-
-    console.log(experienceSnapshot);
-  
-    this.setShader(experience.shader, experienceSnapshot.shader)
-    this.setTimeline(experience.timeline, experienceSnapshot.timeline)
-    this.setControls(experience.controls, experienceSnapshot.controls)
-  }
-
-  static loadLast(experience)
-  {
-    const name = localStorage.getItem("lastExperience")
-    if (name)
-    {
-      this.loadExperience(name, experience)
-    }
+  /**
+   * 
+   * @param {Shader} shader 
+   */
+  static getShaderSnapshot(shader) {
+    const shaderSnapshot = shader.getSnapshot()
+    return shaderSnapshot
   }
 
   /**
    * Get controls snapshot
    * @param {Controls} controls
    */
-  static getControlsSnapshot(controls)
-  {
+  static getControlsSnapshot(controls) {
     const snapshot = {
-      name : controls.getName(),
-      paletteIndex : controls.paletteIndex,
-      initialValues : controls.initialValues,
-      finalValues : controls.finalValues
+      name: controls.getName(),
+      paletteIndex: controls.paletteIndex,
+      initialValues: controls.initialValues,
+      finalValues: controls.finalValues
     }
-    return snapshot
-  }
-
-  /**
-   * Get shader snapshot
-   * @param {ShaderMaterial} shader
-   */
-  static getShaderSnapshot(shader)
-  {
-    const snapshot = {}
-    const uniformSnapshot = {}
-    const shaderUniforms = {...shader.getUniforms()}
-
-    for (const [key, value] of Object.entries(shaderUniforms)) {
-      uniformSnapshot[key] = value
-      delete uniformSnapshot[key]._gsap
-    }
-    delete shaderUniforms._gsap
-
-    snapshot.uniforms = uniformSnapshot
     return snapshot
   }
 
   /**
    * 
-   * @param {Timeline} timeline 
-   * @returns 
+   * @param {[Channel]} channels 
+   * @returns {Object}
    */
-  static getTimelineSnapshot(timeline)
-  {
-    return timeline.getSnapshot()
+  static getChannelSnapshot(channels) {
+    const channelSnapshot = []
+
+    for (const channel of channels) {
+      channelSnapshot.push({
+        duration: channel.duration,
+        ease: channel.ease,
+        on: channel.on
+      })
+    }
+
+    return channelSnapshot
   }
 
   /**
-   * Set controls from snapshot
-   * @param {Controls} controls
+   * 
+   * @param {*} name 
+   * @param {Experience} experience 
    */
-  static setControls(controls, controlsSnapshot)
-  {
-    controls.setUIfromShader()
-    controls.setTimelineSlider(0)
-    controls.setName(controlsSnapshot.name)
-    controls.setPaletteFromIndex(controlsSnapshot.paletteIndex)
-    controls.initialValues = controlsSnapshot.initialValues ?? {}
-    controls.finalValues = controlsSnapshot.finalValues ?? {}
+  static loadExperience(name, experience) {
+    const experienceSnapshot = JSON.parse(localStorage.getItem(name))
+
+    if (debug) {
+      console.log("loaded snapshot:", experienceSnapshot)
+      console.log(name)
+    }
+    this.setShaderFromSnapshot(experience, experienceSnapshot.shader)
+    this.setChannelsFromSnapshot(experience, experienceSnapshot.channels)
+
+    experience.controls.setName(name)
+    experience.controls.setShader()
   }
 
   /**
-   * Set shader snapshot
-   * @param {ShaderMaterial} shader
+   * 
+   * @param {Experience} experience 
    */
-  static setShader(shader, shaderSnapshot)
-  {
-    const shaderUniforms = shader.getUniforms()
-    const uniformSnapshot = shaderSnapshot.uniforms
-    for (const [key, value] of Object.entries(shaderUniforms)) {
-      if (uniformSnapshot[key] && key != "uPalette"){
-        shaderUniforms[key] = uniformSnapshot[key]
-      }
+  static loadProjectList(experience) {
+    experience.projectList.clear()
+    const projectList = JSON.parse(localStorage.projects)
+    projectList.forEach(projectSnapshot => {
+      experience.projectList.addProject(new Project(projectSnapshot.name, projectSnapshot.image, projectSnapshot.lastModified))
+    })
+  }
+
+  /**
+   * 
+   * @param {Experience} experience 
+   */
+  static loadLastExperience(experience) {
+    const name = localStorage.getItem("lastExperience")
+    if (name) {
+      this.loadExperience(name, experience)
+      this.loadProjectList(experience)
+      console.log(experience.projectList);
+      
     }
   }
 
   /**
-   * Set timeline snapshot
-   * @param {Timeline} timeline 
+   * 
+   * @param {Experience} experience 
+   * @param {Object} shaderSnapshot 
    */
-  static setTimeline(timeline, timelineSnapshot)
-  {
-    //timeline.setFromSnapshot(timelineSnapshot)
+  static setShaderFromSnapshot(experience, shaderSnapshot) {
+    experience.setShader(shaderSnapshot.eShader)
+    const shader = experience.shader
+    shader.paletteIndex = shaderSnapshot.paletteIndex
+
+    for (const [key, group] of Object.entries(shaderSnapshot.groups)) {
+      for (const input of group.numInputs) {
+        switch (input.type) {
+          case "number":
+            shader.setInput(input.name, input)
+            break
+          default:
+            break
+        }
+      }
+    }
+
+    shader.setInputs()
+  }
+
+  static setChannelsFromSnapshot(experience, channelsSnapshot) {
+    if (!channelsSnapshot) return
+    if (debug) {
+      console.log(channelsSnapshot)
+    }
+
+    for (let i = 0; i < channelsSnapshot.length; i++) {
+      const channelSnap = channelsSnapshot[i]
+      const channel = experience.channels[i]
+      if (channel && channelSnap) {
+
+        channel.duration = channelSnap.duration
+        channel.ease = channelSnap.ease
+        channel.on = false
+        if (debug) {
+          console.log("setting ", i, channel, channelSnap)
+        }
+      }
+    }
+
+    if (debug) {
+      console.log(experience.channels[0])
+    }
   }
 }

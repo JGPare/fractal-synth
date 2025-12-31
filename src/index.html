@@ -18,245 +18,306 @@
   <div id="main-grid">
     <!-- LEFT GRID -->
     <div id="ui-grid-l">
-      <div class="logo-container container">
-        <h2 class="inconsolata-main header-text"> Fractal Synth </h2>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl">
-        <label for="scene-name" class="slider-text inconsolata-main"> Scene Name </label>
-        <ul id="project-list"></ul>
-        <input class="control-text inconsolata-input" id="scene-name" type="text" name="sceneName" value="MyScene"
-          minlength="4" maxlength="20" size="20" />
-      </div>
-      <!-- PROJECT CONTROLS -->
-      <div class="button-container ctrl">
-        <button class="control-button inconsolata-main" id="delete-scene-button">Delete</button>
-        <button class="control-button inconsolata-main" id="save-scene-button">Save</button>
-        <button class="control-button inconsolata-main" id="load-scene-button">Load</button>
-      </div>
-      <div class="btm-outline"></div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Fractal </p>
-        <select class="control-select inconsolata-main w-100" id="mode-select">
-          <option value="mandle">Mandlebrot</option>
-          <option value="julia">Julia</option>
-          <option value="sinJulia">Sin Julia</option>
-          <option value="burningShip">Burning Ship</option>
-          <option value="neuton">Neuton</option>
-          <option value="phoenix">Phoenix</option>
-        </select>
-      </div>
-      <div class="slider-container ctrl">
-        <label for="velocity-distortion-direction" class="slider-text inconsolata-main"> Velocity Distortion Direction
-        </label>
-        <div class="number-input-grid">
-          <input type="number" min="0" max="5" step="1" value="0" class="control-ease inconsolata-main">
-          <input type="range" min="-1" max="1" step="1" value="0" class="control-slider"
-            id="velocity-distortion-direction">
-          <input type="number" min="-1" max="1" step="1" value="0"
-            class="control-number control-number-ease inconsolata-main">
+      <div class="container">
+        <div class="logo-container container">
+          <h2 class="header-text"> Fractal Synth </h2>
+          <div class="btm-outline"></div>
         </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Velocity Distortion Amount </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0" max="5" step="0.001" value="0.5" class="control-slider"
-            id="velocity-distortion-amount">
-          <input type="number" min="0" max="5" step="0.001" value="0.5"
-            class="control-number control-number-dual inconsolata-main">
+        <div class="slider-container">
+          <label for="scene-name" class="slider-text"> Scene Name </label>
+          <!-- <ul id="project-list"></ul> -->
+          <input class="control-text" id="scene-name" type="text" name="sceneName" value="MyScene" minlength="4"
+            maxlength="20" size="20" />
         </div>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Area Mod On </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0" max="1" step="1" value="0" class="control-slider" id="area-mod-on">
-          <input type="number" min="0" max="1" step="1" value="0"
-            class="control-number control-number-dual inconsolata-main">
+        <!-- PROJECT CONTROLS -->
+        <div class="button-container">
+          <button class="control-button default-button" id="delete-scene-button">Delete</button>
+          <button class="control-button default-button" id="save-scene-button">Save</button>
+          <button class="control-button default-button" id="load-scene-button">Load</button>
         </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Area Mod X Offset </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-1" max="1" step="0.001" value="0" class="control-slider" id="area-mod-x-offset">
-          <input type="number" min="-1" max="1" step="0.001" value="0"
-            class="control-number control-number-dual inconsolata-main">
+        <div class="slider-container">
+          <p class="sub-header-text"> Fractal </p>
+          <div class="btm-outline"></div>
+          <select class="control-select select-md w-100" id="mode-select">
+            <option value="mandle">Mandlebrot</option>
+            <option value="julia">Julia</option>
+            <option value="sinJulia">Sin Julia</option>
+            <option value="burningShip">Burning Ship</option>
+            <option value="neuton">Neuton</option>
+            <option value="phoenix">Phoenix</option>
+            <option value="noise">Noise</option>
+            <option value="circularWaves">Circular Waves</option>
+            <option value="linearWaves">Linear Waves</option>
+          </select>
         </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Area Mod Y Offset </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-1" max="1" step="0.001" value="0" class="control-slider" id="area-mod-y-offset">
-          <input type="number" min="-1" max="1" step="0.001" value="0"
-            class="control-number control-number-dual inconsolata-main">
+        <div class="container" id="left-inputs">
         </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Area Mod X Amount </p>
-        <div class="dual-input-grid">
-          <input type="range" min="1" max="16" step="1" value="2" class="control-slider" id="area-mod-x">
-          <input type="number" min="1" max="16" step="1" value="2"
-            class="control-number control-number-dual inconsolata-main">
-        </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Area Mod Y Amount </p>
-        <div class="dual-input-grid">
-          <input type="range" min="1" max="16" step="1" value="2" class="control-slider" id="area-mod-y">
-          <input type="number" min="1" max="16" step="1" value="2"
-            class="control-number control-number-dual inconsolata-main">
-        </div>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl">
-        <div class="btm-outline"></div>
-        <p class="slider-text inconsolata-main"> Constant Detail </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0.1" max="1" value="0.75" step="0.001" class="control-slider" id="constant-slider">
-          <input type="number" value="0.75" class="control-number control-number-dual inconsolata-main" id="constantValue"
-            readonly>
-        </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Power </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-30" max="30" value="2" step="1" class="control-slider" id="power-slider">
-          <input type="number" value="2" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Rotation </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-1" max="1" value="0" step="0.0001" class="control-slider" id="rotation-slider">
-          <input type="number" value="0" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl" style="display: none;" data-julia>
-        <p class="slider-text inconsolata-main"> Position X </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-2" max="2" value="1" step="0.0001" class="control-slider" id="position-x-slider">
-          <input type="number" value="1" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-      </div>
-      <div class="slider-container ctrl" style="display: none;" data-julia>
-        <p class="slider-text inconsolata-main"> Position Y </p>
-        <div class="dual-input-grid">
-          <input type="range" min="-2" max="2" value="0.5" step="0.0001" class="control-slider" id="position-y-slider">
-          <input type="number" value="0.5" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-        <div class="btm-outline"></div>
-      </div>
-      <div class="slider-container ctrl" style="display: none;" data-sinJulia>
-        <p class="slider-text inconsolata-main"> Sin X Amount </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0" max="1" value="0" step="0.001" class="control-slider" id="sin-julia-x-coeff">
-          <input type="number" value="0" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-      </div>
-      <div class="slider-container ctrl" style="display: none;" data-sinJulia>
-        <p class="slider-text inconsolata-main"> Sin y Amount </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0.001" max="1" value="0" step="0.001" class="control-slider" id="sin-julia-y-coeff">
-          <input type="number" value="0" class="control-number control-number-dual inconsolata-main" readonly>
-        </div>
-        <div class="btm-outline"></div>
-      </div>
-      <!-- COLORS -->
-      <div class="slider-container ctrl">
-        <label for="paletteName" class="slider-text inconsolata-main"> Palette Name </label>
-        <input class="control-text inconsolata-input" id="palette-input" type="text" id="name" required minlength="4"
-          maxlength="20" size="20" />
-      </div>
-      <div class="slider-container ctrl">
-        <label for="paletteSelect" class="slider-text inconsolata-main"> Select Palette </label>
-        <div>
-          <select class="control-select inconsolata-main w-75" id="palette-select"></select>
-        </div>
-      </div>
-      <div class="button-container ctrl">
-        <button class="control-button inconsolata-main" id="delete-palette-button">Delete</button>
-        <button class="control-button inconsolata-main" id="new-palette-button">New</button>
-        <button class="control-button inconsolata-main" id="random-palette-button">Random</button>
-      </div>
-      <div class="btm-outline"></div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Number of Colors </p>
-        <div class="dual-input-grid">
-          <input type="range" min="2" max="10" step="1" value="6" class="control-slider" id="number-of-colors">
-          <input type="number" min="2" max="10" step="1" value="6"
-            class="control-number control-number-dual inconsolata-main">
-        </div>
-      </div>
-      <div class="slider-container ctrl">
-        <p class="slider-text inconsolata-main"> Color Offset </p>
-        <div class="dual-input-grid">
-          <input type="range" min="0" max="10" step="0.01" value="0" class="control-slider" id="color-offset">
-          <input type="number" min="0" max="10" step="0.01" value="0"
-            class="control-number control-number-dual inconsolata-main">
-        </div>
-      </div>
-      <div id="colors-container">
-        <!-- inserted via JS here -->
       </div>
     </div>
     <!-- CENTER -->
-    <div id="center">
+    <div id="center-grid">
       <div id="viewer"></div>
+      <div id="loader" hidden>
+        <div class="projects-container">
+        </div>
+      </div>
     </div>
     <!-- RIGHT GRID -->
     <div id="ui-grid-r">
       <div id="controls-grid">
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Timeline Count </p>
-          <div class="dual-input-grid">
-            <input type="range" min="1" max="6" step="1" value="3" class="control-slider" id="timeline-count-slider">
-            <input type="number" min="1" max="6" step="1" value="3" class="control-number control-number-dual inconsolata-main">
-          </div>
-        </div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Timeline Select </p>
-          <div class="dual-input-grid">
-            <input type="range" min="0" max="5" step="1" value="0" class="control-slider" id="timeline-select-slider">
-            <input type="number" min="0" max="5" step="1" value="0" class="control-number control-number-dual inconsolata-main">
-          </div>
-          <div class="btm-outline"></div>
-        </div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Ease </p>
-          <select class="control-select inconsolata-main w-100" id="ease-select">
-            <option value="sine.inOut">Sin</option>
-            <option value="none">Linear</option>
-            <option value="power1">Power1</option>
-            <option value="power2">Power2</option>
-            <option value="power3">Power3</option>
-            <option value="circ">Circ</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
         <div>
           <canvas id="paper-canvas"></canvas>
-          <input type="range" min="0" max="1" step="0.0001" value="0" class="timeline-slider" id="timeline-slider">
         </div>
-        <div id="timeline">
-          <div id="timeline-button-container">
-            <button class="timeline-button inconsolata-main" id="play-timeline-button"> ▶ </button>
-            <button class="timeline-button inconsolata-main" id="pause-timeline-button"> ⏸︎ </button>
-            <button class="timeline-button inconsolata-main" id="set-start-timeline-button"> ▲ </button>
-            <button class="timeline-button inconsolata-main" id="set-end-timeline-button"> ▼ </button>
-            <button class="timeline-button inconsolata-main" id="loop-timeline-button"> ∞ </button>
+        <p class="sub-header-text"> Animation Channels </p>
+        <div class="btm-outline"></div>
+        <div id="channels-container">
+          <div>
+            <div class="channel-columns">
+              <div class="channel-number-container">
+                <p class=""> # </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <p class=""> Arm </p>
+              </div>
+              <div class="channel-duration-container">
+                <p class=""> Duration </p>
+              </div>
+              <div class="channel-ease-container">
+                <p class=""> Ease </p>
+              </div>
+              <div class="channel-offset-container">
+                <p class=""> Offset </p>
+              </div>
+              <div class="channel-clear-btn-container">
+
+              </div>
+            </div>
+            <div class=" timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="0"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-1">
+            </div>
+            <div class="channel-columns">
+              <div class="channel-number-container" id="channel-number-container-1">
+                <p class=""> 1 </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <input type="checkbox" class="channel-checkbox" id="option1" name="choices" value="on">
+              </div>
+              <div class="channel-duration-container">
+                <input type="number" min="1" max="180" step="1" value="15" class="channel-number-input channel-duration"
+                  id="duration-channel-1">
+              </div>
+              <div class="channel-ease-container">
+                <select class="channel-select-input select-sm w-100 channel-ease" id="ease-select-1">
+                  <option value="sine">Sin</option>
+                  <option value="none">Linear</option>
+                  <option value="power1">Power1</option>
+                  <option value="power2">Power2</option>
+                  <option value="power3">Power3</option>
+                  <option value="circ">Circ</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="channel-offset-container">
+                <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+              </div>
+              <div class="channel-clear-btn-container">
+                <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+              </div>
+            </div>
+            <div class=" timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="2"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-2">
+            </div>
+            <div class="channel-columns">
+              <div class="channel-number-container" id="channel-number-container-2">
+                <p class=""> 2 </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <input type="checkbox" class="channel-checkbox" id="option2" name="choices" value="on">
+              </div>
+              <div class="channel-duration-container">
+                <input type="number" min="1" max="180" step="1" value="15" class="channel-number-input channel-duration"
+                  id="duration-channel-2">
+              </div>
+              <div class="channel-ease-container">
+                <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-2">
+                  <option value="sine">Sin</option>
+                  <option value="none">Linear</option>
+                  <option value="power1">Power1</option>
+                  <option value="power2">Power2</option>
+                  <option value="power3">Power3</option>
+                  <option value="circ">Circ</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="channel-offset-container">
+                <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+              </div>
+              <div class="channel-clear-btn-container">
+                <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+              </div>
+            </div>
+            <div class=" timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="3"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-3">
+            </div>
+            <div class="channel-columns">
+              <div class="channel-number-container" id="channel-number-container-3">
+                <p class=""> 3 </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <input type="checkbox" class="channel-checkbox" id="option3" name="choices" value="on">
+              </div>
+              <div class="channel-duration-container">
+                <input type="number" min="1" max="180" step="1" value="15" class="channel-number-input channel-duration"
+                  id="duration-channel-3">
+              </div>
+              <div class="channel-ease-container">
+                <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-3">
+                  <option value="sine">Sin</option>
+                  <option value="none">Linear</option>
+                  <option value="power1">Power1</option>
+                  <option value="power2">Power2</option>
+                  <option value="power3">Power3</option>
+                  <option value="circ">Circ</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="channel-offset-container">
+                <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+              </div>
+              <div class="channel-clear-btn-container">
+                <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+              </div>
+            </div>
+            <div class=" timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="4"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-4">
+            </div>
+            <div class="channel-columns">
+              <div class="channel-number-container" id="channel-number-container-4">
+                <p class=""> 4 </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <input type="checkbox" class="channel-checkbox" id="option4" name="choices" value="on">
+              </div>
+              <div class="channel-duration-container">
+                <input type="number" min="1" max="180" step="1" value="15" class="channel-number-input channel-duration"
+                  id="duration-channel-4">
+              </div>
+              <div class="channel-ease-container">
+                <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-4">
+                  <option value="sine">Sin</option>
+                  <option value="none">Linear</option>
+                  <option value="power1">Power1</option>
+                  <option value="power2">Power2</option>
+                  <option value="power3">Power3</option>
+                  <option value="circ">Circ</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="channel-offset-container">
+                <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+              </div>
+              <div class="channel-clear-btn-container">
+                <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+              </div>
+            </div>
+            <div class=" timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="5"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-5">
+            </div>
+            <div class="channel-columns">
+              <div class="channel-number-container" id="channel-number-container-5">
+                <p class=""> 5 </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <input type="checkbox" class="channel-checkbox" id="option5" name="choices" value="on">
+              </div>
+              <div class="channel-duration-container">
+                <input type="number" min="1" max="180" step="1" value="15"
+                  class="channel-number-input channel-duration">
+              </div>
+              <div class="channel-ease-container">
+                <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-5">
+                  <option value="sine">Sin</option>
+                  <option value="none">Linear</option>
+                  <option value="power1">Power1</option>
+                  <option value="power2">Power2</option>
+                  <option value="power3">Power3</option>
+                  <option value="circ">Circ</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div class="channel-offset-container">
+                <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+              </div>
+              <div class="channel-clear-btn-container">
+                <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div id="timeline">
+            <div id="timeline-button-container">
+              <button class="timeline-button default-button tooltip-enabled" id="seek-start-timeline-button"
+                data-tooltip="Seek to Start [,]">⏮</button>
+              <button class="timeline-button default-button tooltip-enabled" id="play-timeline-button"
+                data-tooltip="Play">▶</button>
+              <button class="timeline-button default-button tooltip-enabled" id="pause-timeline-button"
+                data-tooltip="Pause">⏸</button>
+              <button class="timeline-button default-button tooltip-enabled" id="seek-end-timeline-button"
+                data-tooltip="Seek to End [.]">⏭</button>
+              <button class="timeline-button default-button tooltip-enabled" id="set-start-timeline-button"
+                data-tooltip="Set Start Points on Armed">▲</button>
+              <button class="timeline-button default-button tooltip-enabled" id="set-end-timeline-button"
+                data-tooltip="Set End Points on Armed">▼</button>
+            </div>
           </div>
         </div>
-        <div class="button-container ctrl">
-          <button class="control-button inconsolata-main" id="clear-tl-button">Clear</button>
-        </div>
-        <div class="slider-container ctrl">
-          <p class="slider-text inconsolata-main"> Duration </p>
+        <div class="slider-container">
+          <p class="slider-text"> Master Duration Multiplier </p>
           <div class="dual-input-grid">
-            <input type="range" min="1" max="60" step="1" value="15" class="control-slider" id="duration">
-            <input type="number" min="1" max="60" step="1" value="15" class="control-number control-number-dual inconsolata-main">
+            <input type="range" min="0.1" max="5" step="0.01" value="1" class="control-slider" id="master-duration">
+            <input type="number" min="0.1" max="5" step="0.01" value="1" class="control-number control-number-dual">
           </div>
+        </div>
+        <!-- COLORS -->
+        <p class="sub-header-text"> Palette </p>
+        <div class="btm-outline"></div>
+        <div class="slider-container">
+          <label for="paletteName" class="slider-text"> Palette Name </label>
+          <input class="control-text" id="palette-input" type="text" id="name" required minlength="4" maxlength="20"
+            size="20" />
+        </div>
+        <div class="slider-container">
+          <label for="paletteSelect" class="slider-text"> Select Palette </label>
+          <div>
+            <select class="control-select select-md w-75" id="palette-select"></select>
+          </div>
+        </div>
+        <div class="button-container">
+          <button class="control-button default-button" id="delete-palette-button">Delete</button>
+          <button class="control-button default-button" id="new-palette-button">New</button>
+          <button class="control-button default-button" id="random-palette-button">Random</button>
+        </div>
+        <div class="btm-outline"></div>
+        <div class="slider-container">
+          <p class="slider-text"> Number of Colors </p>
+          <div class="dual-input-grid">
+            <input type="range" min="2" max="10" step="1" value="6" class="control-slider" id="number-of-colors">
+            <input type="number" min="2" max="10" step="1" value="6" class="control-number control-number-dual">
+          </div>
+        </div>
+        <div class="slider-container">
+          <p class="slider-text"> Color Offset </p>
+          <div class="dual-input-grid">
+            <input type="range" min="0" max="10" step="0.01" value="0" class="control-slider" id="color-offset">
+            <input type="number" min="0" max="10" step="0.01" value="0" class="control-number control-number-dual">
+          </div>
+        </div>
+        <div id="colors-container">
+          <!-- inserted via JS here -->
         </div>
       </div>
     </div>

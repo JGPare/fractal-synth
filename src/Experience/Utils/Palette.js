@@ -3,7 +3,7 @@ import * as THREE from 'three'
 // this must be coordinate with shader
 const defaultPaletteLength = 10
 // this is how many colors are used by default
-const defaultPaletteDisplayLength = 6
+const defaultPaletteDisplayLength = 5
 
 export default class Palette
 {
@@ -12,6 +12,7 @@ export default class Palette
     this.name = name
     this.palette = palette
     this.locked = false
+    this.displayLength = length
     
     if (palette.length == 0)
     {
@@ -19,6 +20,7 @@ export default class Palette
       this.length = this.palette.length
       this.displayLength = defaultPaletteDisplayLength
     }
+
     if (name.length == 0)
     {
       this.setDefaultName()
@@ -126,6 +128,11 @@ export default class Palette
   removeColor(index = this.palette.length-1)
   {
     this.palette.pop(index)
+  }
+
+  setLength(length)
+  {
+    this.displayLength = length
   }
 
 }

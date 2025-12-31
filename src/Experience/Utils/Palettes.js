@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Palette from './Palette'
 import Storage from './Storage'
-import defaultPalettes from './defaultPalettes.js'
+import defaultPalettes from '../Common/defaultPalettes.js'
 
 export default class Palettes
 {
@@ -14,7 +14,7 @@ export default class Palettes
   {
     let palettes = []
     for (const paletteData of defaultPalettes) {
-      const palette = new Palette(paletteData.palette, paletteData.name)
+      const palette = new Palette(paletteData.palette, paletteData.name, paletteData.length)
       palette.lock()
       palettes.push(palette)
     }
