@@ -8,6 +8,8 @@ export default class Channel
     this.ease = params.ease
     this.duration = params.duration
     this.on = params.on
+    // active is has animated pars
+    this.active = false
 
     this.onSetDuration = null
   }

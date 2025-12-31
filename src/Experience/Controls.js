@@ -80,6 +80,8 @@ export default class Controls {
     this.paperCanvas = document.getElementById('paper-canvas')
     this.channelCheckboxes = document.querySelectorAll('input.channel-checkbox')
     this.channelDurations = document.querySelectorAll('input.channel-duration')
+    const channelsContainer = document.querySelector('#channels')
+    this.channelNumberContainers = channelsContainer.querySelectorAll('div.channel-number-container')
     this.channelEases = document.querySelectorAll('select.channel-ease')
     this.channelProgressSliders = document.querySelectorAll('input.timeline-slider')
     this.channelClearBtns = document.querySelectorAll('button.channel-clear-btn')
@@ -92,12 +94,12 @@ export default class Controls {
       this.shader.setInputs()
       this.shaderMaterial.setShader(this.shader)
       this.clearControls()
-      console.log("set shader from setShader:", this.shader)
 
       this.setControls(this.shader)
       this.setUIfromShader()
       this.setPaletteFromIndex(this.shader.paletteIndex)
       this.setAllTimelines()
+      this.turnOnActiveChannels()
     }
   }
 
@@ -207,8 +209,7 @@ export default class Controls {
       const prevIndex = input.channelIndex
       input.setChannelIndex(event.target.value - 1)
       this.setTimeline(prevIndex)
-      this.timeline.play(prevIndex)
-      this.clearChannel(input)
+      this.clearInputAnimation(input)
       easeChannel.classList.add(`control-ease-channel-${input.channelIndex + 1}`)
     })
 
@@ -396,14 +397,12 @@ export default class Controls {
       }
     }
     if (inputSet) {
-      this.channelProgressSliders[index].classList.add("timeline-slider-has-content")
-      this.channelProgressSliders[index].classList.remove("timeline-slider-default")
+      this.setChannelAsActive(index)
       this.timeline.fromToTimeline(this.channelProgressSliders[index], index)
       this.timeline.setDuration(channel.duration, index)
     }
     else {
-      this.channelProgressSliders[index].classList.remove("timeline-slider-has-content")
-      this.channelProgressSliders[index].classList.add("timeline-slider-default")
+      this.setChannelAsInactive(index)
     }
   }
 
@@ -478,6 +477,17 @@ export default class Controls {
     return card
   }
 
+  turnOnActiveChannels()
+  {
+    for (let i = 0; i < this.channels.length; i++) {
+      const channel = this.channels[i];
+      if (channel.active){
+        channel.on = true
+        this.channelCheckboxes[i].checked = true
+      }
+    }
+  }
+
   /**
    * 
    * @param {NumberInput} input 
@@ -498,16 +508,20 @@ export default class Controls {
     easeChannel.classList.remove(`control-ease-channel-on-${input.channelIndex + 1}`)
   }
 
-  clearChannels(index) {
+  clearChannelInputs(index) {
     const numInputs = this.shader.getNumInputs()
     for (const input of numInputs) {
       if (input.channelIndex == index) {
-        this.clearChannel(input)
+        this.clearInputAnimation(input)
       }
     }
   }
 
-  clearChannel(input)
+  /**
+   * 
+   * @param {NumberInput} input 
+   */
+  clearInputAnimation(input)
   {
     input.startVal = input.endVal = input.getValue()
     this.setInputElementInactive(input)
@@ -521,6 +535,10 @@ export default class Controls {
     return copy
   }
 
+  /**
+   * 
+   * @param {NumberInput} input 
+   */
   setUniformValues(input) {
     if (!input) return
     console.log("set uniforms with", input.uZoom)
@@ -656,6 +674,7 @@ export default class Controls {
     for (let i = 0; i < this.channels.length; i++) {
       const channel = this.channels[i]
       const channelCheckbox = this.channelCheckboxes[i]
+      const channelNumberContainer = this.channelNumberContainers[i]
       const channelDuration = this.channelDurations[i]
       const channelEase = this.channelEases[i]
       const channelProgressSlider = this.channelProgressSliders[i]
@@ -681,9 +700,8 @@ export default class Controls {
 
       channelClearBtn.addEventListener('click', (event) => {
         this.timeline.renew(i)
-        this.clearChannels(i)
-        this.channelProgressSliders[i].classList.remove("timeline-slider-has-content")
-        this.channelProgressSliders[i].classList.add("timeline-slider-default")
+        this.clearChannelInputs(i)
+        this.setChannelAsInactive(i)
       })
     }
   }
@@ -700,6 +718,22 @@ export default class Controls {
       channelDuration.value = channel.duration
       channelEase.value = channel.ease
     }
+  }
+
+  setChannelAsActive(i){
+    this.channels[i].active = true
+    this.channelProgressSliders[i].classList.add("timeline-slider-has-content")
+    this.channelProgressSliders[i].classList.remove("timeline-slider-default")
+    this.channelNumberContainers[i].classList.add(`control-ease-channel-on-${i+1}`)
+    this.channelNumberContainers[i].classList.remove(`control-ease-channel-${i+1}`)
+  }
+
+  setChannelAsInactive(i){
+    this.channels[i].active = false
+    this.channelProgressSliders[i].classList.remove("timeline-slider-has-content")
+    this.channelProgressSliders[i].classList.add("timeline-slider-default")
+    this.channelNumberContainers[i].classList.remove(`control-ease-channel-on-${i+1}`)
+    this.channelNumberContainers[i].classList.add(`control-ease-channel-${i+1}`)
   }
 
   lockPaletteInput() {

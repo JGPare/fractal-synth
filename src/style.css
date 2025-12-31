@@ -381,26 +381,6 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-area: number;
 }
 
-#channel-number-container-1 {
-  background-color: color-mix(in srgb, var(--clr-channel-1), black 30%);
-}
-
-#channel-number-container-2 {
-  background-color: color-mix(in srgb, var(--clr-channel-2), black 30%);
-}
-
-#channel-number-container-3 {
-  background-color: color-mix(in srgb, var(--clr-channel-3), black 30%);
-}
-
-#channel-number-container-4 {
-  background-color: color-mix(in srgb, var(--clr-channel-4), black 30%);
-}
-
-#channel-number-container-5 {
-  background-color: color-mix(in srgb, var(--clr-channel-5), black 30%);
-}
-
 .channel-checkbox-container {
   background-color: var(--clr-channel-checkbox-2);
   text-align: center;
@@ -700,23 +680,48 @@ select:disabled {
   background-color: color-mix(in srgb, var(--clr-channel-5), black 30%);
 }
 
+
+/* Add the keyframes animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 1px rgba(255, 255, 255, 0.1),
+                0 0 3px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3),
+                0 0 5px currentColor;
+  }
+}
+
+/* Apply to the "on" classes */
 .control-ease-channel-on-0 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-0), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
+
 .control-ease-channel-on-1 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-1), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
+
 .control-ease-channel-on-2 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-2), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
+
 .control-ease-channel-on-3 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-3), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
+
 .control-ease-channel-on-4 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-4), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
+
 .control-ease-channel-on-5 {
   background-color: color-mix(in srgb, var(--clr-channel-focused-5), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 /* ============================================================================
