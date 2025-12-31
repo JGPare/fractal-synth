@@ -11,7 +11,7 @@ export default class NumberInput
    * @param {Number} step 
    * @param {Number} channelIndex 
    */
-  constructor(eIdOrObj, name = "", value = 0, min = 0, max = 1, step = 0.1, channelIndex = 0, startVal = 0, endVal = 0) 
+  constructor(eIdOrObj, name = "", value = 0, min = 0, max = 1, step = 0.1, channelIndex =-10, startVal = 0, endVal = 0) 
   {
     if (typeof eIdOrObj === 'object'){
       this.eId = eIdOrObj.eId

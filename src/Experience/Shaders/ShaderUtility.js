@@ -1,6 +1,7 @@
 import { eShaders } from "../Common/eNums"
 import mandleShaders from "./mandleShaders"
 import noiseShaders from "./noiseShaders"
+import standardParameters from "./standardParameters"
 
 export default class ShaderUtility {
 
@@ -31,6 +32,14 @@ export default class ShaderUtility {
       default:
         break
     }
+
+    this.addStandardParameters(shader)
     return shader
+  }
+
+  static addStandardParameters(shader)
+  {
+    shader.addGroup("Mirror", standardParameters.Mirror)
+    shader.addGroup("Color", standardParameters.Color)
   }
 }

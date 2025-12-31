@@ -1,13 +1,14 @@
 import { eNumInput, eShaders } from "../Common/eNums"
 import NumberInput from "../Inputs/NumberInput"
 import Shader from "./Shader"
+import ShaderUtility from "./ShaderUtility"
 
 // ALL MANDLE AND MANDLE LIKE SHADERS HERE
 
 // MANDLEBROT
 
 const noise = new Shader("Noise", eShaders.noise)
-const circleWaves = new Shader("Circle Waves", eShaders.circleWaves)
+const circularWaves = new Shader("Circle Waves", eShaders.circularWaves)
 const linearWaves = new Shader("Circle Waves", eShaders.linearWaves)
 
 // noise
@@ -85,7 +86,7 @@ const zoom = new NumberInput({
 })
 
 noise.addGroup("Core", [iters, power, posX, posY, zoom])
-circleWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
+circularWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
 linearWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
 
 const cPosX = new NumberInput({
@@ -109,7 +110,7 @@ const cPosY = new NumberInput({
 })
 
 noise.addGroup("Point", [cPosX, cPosY])
-circleWaves.addGroup("Point", [cPosX, cPosY])
+circularWaves.addGroup("Point", [cPosX, cPosY])
 linearWaves.addGroup("Point", [cPosX, cPosY])
 
 const velocityDistortionDirection = new NumberInput({
@@ -134,74 +135,6 @@ const velocityDistortionAmount = new NumberInput({
 
 noise.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 
-const mirrorFoldsX = new NumberInput({
-  eId : eNumInput.mirrorFoldsX,
-  name: "Mirror Folds X",
-  value: 1,
-  min: 1,
-  max: 16,
-  step: 1,
-  channelIndex: -1
-});
-
-
-const mirrorFoldsY = new NumberInput({
-  eId : eNumInput.mirrorFoldsY,
-  name: "Mirror Folds Y",
-  value: 1,
-  min: 1,
-  max: 16,
-  step: 1,
-  channelIndex: -1 
-});
-
-const mirrorOffsetX = new NumberInput({
-  eId : eNumInput.mirrorOffsetX,
-  name: "Mirror Offset X",
-  value: 0,
-  min: -1,
-  max: 1,
-  step: 0.001,
-  channelIndex: -1
-});
-
-const mirrorOffsetY = new NumberInput({
-  eId : eNumInput.mirrorOffsetY,
-  name: "Mirror Offset Y",
-  value: 0,
-  min: -1,
-  max: 1,
-  step: 0.001,
-  channelIndex: -1
-});
-
-
-noise.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-circleWaves.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-linearWaves.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-
-const numberOfColors = new NumberInput({
-  eId : eNumInput.numColors,
-  name: "Number of Colors",
-  value: 6,
-  min: 2,
-  max: 10,
-  step: 1,
-  channelIndex: -1
-});
-
-const colorOffset = new NumberInput({
-  eId : eNumInput.colorOffset,
-  name: "Color Offset",
-  value: 0,
-  min: 0,
-  max: 10,
-  step: 0.01,
-  channelIndex: -1
-});
-
-noise.addGroup("Colors", [numberOfColors, colorOffset])
-
 const sinXCoeff = new NumberInput({
   eId : eNumInput.sinMagX,
   name: "Sin X Amount",
@@ -222,12 +155,12 @@ const sinYCoeff = new NumberInput({
   channelIndex: -1
 });
 
-
 noise.addGroup("Sin", [sinXCoeff, sinYCoeff])
-circleWaves.addGroup("Sin", [sinXCoeff, sinYCoeff])
+circularWaves.addGroup("Sin", [sinXCoeff, sinYCoeff])
 linearWaves.addGroup("Sin", [sinXCoeff, sinYCoeff])
+
 export default {
   noise : noise,
-  circleWaves : circleWaves,
+  circularWaves : circularWaves,
   linearWaves : linearWaves,
 }

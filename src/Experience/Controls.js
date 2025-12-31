@@ -204,10 +204,12 @@ export default class Controls {
 
       const on = easeChannel.classList.contains(`control-ease-channel-on-${input.channelIndex + 1}`) ? "-on" : ""
       easeChannel.classList.remove(`control-ease-channel${on}-${input.channelIndex + 1}`)
-      this.setTimeline(input.channelIndex)
+      const prevIndex = input.channelIndex
       input.setChannelIndex(event.target.value - 1)
-      this.setTimeline(input.channelIndex)
-      easeChannel.classList.add(`control-ease-channel${on}-${input.channelIndex + 1}`)
+      this.setTimeline(prevIndex)
+      this.timeline.play(prevIndex)
+      this.clearChannel(input)
+      easeChannel.classList.add(`control-ease-channel-${input.channelIndex + 1}`)
     })
 
     easeChannel.value = input.channelIndex + 1
@@ -252,12 +254,8 @@ export default class Controls {
       this.setNumberOfColors()
     })
 
-    this.colorOffsetSlider.addEventListener('input', (event) => {
-      this.shaderUniforms.uColorOffset.value = event.target.value
-    })
-
     this.deleteSceneButton.addEventListener('click', (event) => {
-      this.timeline.clearAll()
+      this.timeline.renewAll()
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {
@@ -504,10 +502,15 @@ export default class Controls {
     const numInputs = this.shader.getNumInputs()
     for (const input of numInputs) {
       if (input.channelIndex == index) {
-        input.startVal = input.endVal = input.getValue()
-        this.setInputElementInactive(input)
+        this.clearChannel(input)
       }
     }
+  }
+
+  clearChannel(input)
+  {
+    input.startVal = input.endVal = input.getValue()
+    this.setInputElementInactive(input)
   }
 
   getUniformValues() {

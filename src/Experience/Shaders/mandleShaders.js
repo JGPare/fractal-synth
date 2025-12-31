@@ -1,6 +1,7 @@
 import { eNumInput, eShaders } from "../Common/eNums"
 import NumberInput from "../Inputs/NumberInput"
 import Shader from "./Shader"
+import ShaderUtility from "./ShaderUtility"
 
 // ALL MANDLE AND MANDLE LIKE SHADERS HERE
 
@@ -118,78 +119,6 @@ julia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDist
 sinJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 phoenix.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 neuton.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-
-const mirrorFoldsX = new NumberInput({
-  eId : eNumInput.mirrorFoldsX,
-  name: "Mirror Folds X",
-  value: 1,
-  min: 1,
-  max: 16,
-  step: 1,
-  channelIndex: -1
-});
-
-const mirrorFoldsY = new NumberInput({
-  eId : eNumInput.mirrorFoldsY,
-  name: "Mirror Folds Y",
-  value: 1,
-  min: 1,
-  max: 16,
-  step: 1,
-  channelIndex: -1 
-});
-
-const mirrorOffsetX = new NumberInput({
-  eId : eNumInput.mirrorOffsetX,
-  name: "Mirror Offset X",
-  value: 0,
-  min: -1,
-  max: 1,
-  step: 0.001,
-  channelIndex: -1
-});
-
-const mirrorOffsetY = new NumberInput({
-  eId : eNumInput.mirrorOffsetY,
-  name: "Mirror Offset Y",
-  value: 0,
-  min: -1,
-  max: 1,
-  step: 0.001,
-  channelIndex: -1
-});
-
-mandle.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-julia.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-sinJulia.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-phoenix.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-neuton.addGroup("Mirror", [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY])
-
-const numberOfColors = new NumberInput({
-  eId : eNumInput.numColors,
-  name: "Number of Colors",
-  value: 6,
-  min: 2,
-  max: 10,
-  step: 1,
-  channelIndex: -1
-});
-
-const colorOffset = new NumberInput({
-  eId : eNumInput.colorOffset,
-  name: "Color Offset",
-  value: 0,
-  min: 0,
-  max: 10,
-  step: 0.01,
-  channelIndex: -1
-});
-
-mandle.addGroup("Colors", [numberOfColors, colorOffset])
-julia.addGroup("Colors", [numberOfColors, colorOffset])
-sinJulia.addGroup("Colors", [numberOfColors, colorOffset])
-phoenix.addGroup("Colors", [numberOfColors, colorOffset])
-neuton.addGroup("Colors", [numberOfColors, colorOffset])
 
 const sinJuliaXCoeff = new NumberInput({
   eId : eNumInput.sinMagX,

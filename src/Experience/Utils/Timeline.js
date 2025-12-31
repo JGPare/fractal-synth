@@ -38,11 +38,6 @@ export default class Timeline extends EventEmitter {
     this.proxyCounter = 0
     this.proxy = {}
 
-    this.segmentCount = 5
-    this.segmentIndex = 0
-
-    this.currentProgress = 0
-
     this.playing = false
     this.playingArray = [false, false, false, false, false]
 
@@ -143,15 +138,6 @@ export default class Timeline extends EventEmitter {
 
   }
 
- 
-  clearAll()
-  {
-    for (let i  = 0; i < tls.length; i++) {
-      const tl = tls[i];
-      this.tl.clear()
-    }
-  }
-
   setDuration(duration, index)
   {
     this.tls[index].duration(duration)
@@ -168,23 +154,6 @@ export default class Timeline extends EventEmitter {
     }
     else {
       return this.tls[index].progress(value)
-    }
-  }
-
-  to(item, params, start = 0, access = [])
-  {
-    let target = item
-    access.forEach(elem => {
-      target = target[elem]
-    })
-    this.tl.to(target, params, start)
-
-    if (item.localId)
-    {
-      this.snapshot.segments[this.segmentIndex].to.push({
-        localId : item.localId,
-        pars : [{...params}, start, access],
-      })
     }
   }
 
@@ -229,7 +198,6 @@ export default class Timeline extends EventEmitter {
                     "yoyo" : true
      }
      
-    
     this.tls[timelineIndex].fromTo(timelineSlider, fromPars, toPars, 0)
   }
 
@@ -248,11 +216,6 @@ export default class Timeline extends EventEmitter {
         )
   }
 
-  getTargetFromEid(item, eId)
-  {
-    return item[eId]
-  }
-
   getProxyNameFromEid(eId)
   {
     for (const [key, value] of Object.entries(eNumInput)){
@@ -260,16 +223,6 @@ export default class Timeline extends EventEmitter {
       return key
      }
     }
-  }
-
-  getTargetFromAccess(item, access)
-  {
-    let target = item
-    access.forEach(elem => {
-      target = target[elem]
-    });
-
-    return target
   }
 
   pause(index) 
@@ -294,27 +247,12 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-  canPlay()
+  play(index)
   {
-    let canPlay = true
-    // for (let i = 0; i < this.segmentCount; i++) {
-    //   const seg = this.segmentTLs[i]
-    //   if (seg.duration() > 0){
-    //     canPlay = true
-    //   }
-    // }
-    return canPlay
-  }
-
-  play()
-  {
-    if (this.canPlay()){
-      if (debug){
-        console.log("playing timeline", this.tl);
-      }
-      this.playing = true
-      this.tl.play(0)
-    }
+    this.tls[index].play()
+    if (debug){
+          console.log("playing tl:", index);
+    }        
   }
 
   playTimelinesSelect(timelineSelections)
@@ -330,29 +268,19 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-  togglePlay()
-  {
-    if (this.tl.isActive()){
-      this.tl.pause()
-    }
-    else {
-      this.tl.play()
-    }
-  }
-
-  clear(tl)
-  {
-    if (tl){
-      tl.clear()
-    }
-  }
-
 
   renew(index)
   {
     const tl = this.tls[index]
-    this.clear(tl)
+    tl.clear()
     tl.pause()
+  }
+
+  renewAll()
+  {
+    for (let i = 0; i < this.tls.length; i++) {
+      this.renew(i)
+    }
   }
 
 
@@ -360,14 +288,12 @@ export default class Timeline extends EventEmitter {
   {
     const tl = this.tls[index]
     tl.time(0)
-    console.log("seeking start");
   }
 
   seekEnd(index)
   {
     const tl = this.tls[index]
     tl.time(tl.duration())
-    // tl.progress(1)
   }
   
   getSnapshot()
@@ -388,7 +314,6 @@ export default class Timeline extends EventEmitter {
       const segment = snapshot.segments[i];
       this.addTimeline(i)
       this.tl = this.segmentTLs[i]
-      this.segmentIndex = i
       segment.to.forEach(tweenSnapshot => {
         const item = this.experience.getItemById(tweenSnapshot.localId)
         this.to(item, ...tweenSnapshot.pars)
@@ -408,176 +333,9 @@ export default class Timeline extends EventEmitter {
     }
     
     this.masterTL.seek(0,false)
-    this.segmentIndex = 0
     this.tl = this.segmentTLs[0]
     this.play()
     this.pause()
   }
-
-
-  // not used
-
-  setTimelines()
-  {
-    const currInd = this.segmentIndex
-    for (let i = 0; i < this.segmentCount; i++) {
-      if (this.segmentTLs[i]) this.segmentTLs[i].kill()
-      this.addTimeline(i)
-    }
-    this.segmentIndex = currInd
-  }
-
-  seekFromChild(seekAmount)
-  {
-    let time = 0
-    for (let i = 0; i <= this.segmentIndex; i++) {
-      const element = this.segmentTLs[i]
-      if (i == this.segmentIndex)
-      {
-        time += element.duration()*seekAmount
-        if (debug){
-          console.log(this.segmentIndex,seekAmount,time);
-        }        
-      }
-      else
-      {
-        time += element.duration()
-      }
-    }
-    if (debug){
-      console.log(this.tl.progress());
-      console.log("seeking form child");
-    }
-    
-    this.masterTL.time(time)
-  }
-
-  setSegmentCount(segmentCount)
-  {
-    this.segmentCount = segmentCount
-    for (let i = 0; i < this.segmentTLs.length; i++) {
-      const timeline = this.segmentTLs[i];
-      if (i > this.segmentCount)
-      {
-        timeline.kill()
-      }
-    }
-    for (let i = 0; i < this.segmentCount; i++) {
-      if (i > this.segmentTLs.length)
-      {
-        this.addTimeline(i)
-      }
-    }
-    this.segmentTLs.length = segmentCount
-  }
-
-  goToSegment(index) {
-    if (debug) {
-      console.log("prev segment", this.tl.data)
-    }
-    this.segmentIndex = index
-    this.tl = this.segmentTLs[index]
-    if (debug){
-      console.log("new segment", this.tl.data)
-    }
-
-    let time = 0
-    for (let i = 0; i < index; i++) {
-      time += this.segmentTLs[i].duration()
-    }
-    this.masterTL.time(time)
-    this.currentProgress = this.masterTL.progress()
-    if (debug) {
-      console.log(this.currentProgress)
-    }
-  }
-
-  buildMaster()
-  {
-    console.log("building master");
-
-    if (this.masterTL){
-      this.masterTL.kill(); 
-    }
-    this.masterTL = gsap.timeline({
-      paused: true,
-      smoothChildTiming: true 
-    });
-
-    let position = 0;
-    for (let i = 0; i < this.segmentTLs.length; i++) {
-      const seg = this.segmentTLs[i]
-      if (seg && seg.duration() > 0){
-        console.log("added seg", seg, position);
-        seg.paused(false)
-        seg.totalTime(0, false); // Reset playhead to 0
-        this.masterTL.add(seg, position)
-        position += seg.duration()
-      }
-    }
-    console.log("master", this.masterTL);
-    console.log("master duration", this.masterTL.duration());
-    
-    this.trigger("masterBuilt");
-  }
-
-  
-  setMasterTime() {
-    let elapsed = 0;
-    console.log("curr ind",this.segmentIndex);
-    
-    for (let i = 0; i < this.segmentTLs.length; i++) {
-      if (this.segmentIndex > i){
-        elapsed += this.segmentTLs[i].duration();
-      }
-    }
-    //console.log("tl", this.tl.data, "progress:", this.tl.progress());
-    console.log("setting master time to: ", elapsed);
-    console.log("master duration", this.masterTL.duration())
-    
-    this.masterTL.time(elapsed);
-  }
-
-
-  addTimeline(index)
-  {
-    const tl = this.getNewTimeline(
-      {...this.tlParams, 
-      data : "sec-" + index, 
-      onComplete: () => {
-      const newInd = index + 1
-      if (this.segmentTLs.length > newInd && this.segmentTLs[newInd].duration() > 0){
-        this.segmentIndex = index + 1
-        this.tl = this.segmentTLs[index]
-        this.trigger('setSegment')
-      }
-    }})
-    this.segmentTLs[index] = tl
-    
-    console.log("added tl", tl);
-    
-    this.snapshot.segments[index] = {
-      duration : tl.duration(),
-      fromTo : [],
-      to : []
-    }
-  }
-
-  removeTimeline(index)
-  {
-    console.log("killing tl at index:", index);
-    
-    const tl = this.segmentTLs[index]
-    tl.kill()
-    this.segmentTLs[index] = null
-  }
-
-  removeAllTimelines()
-  {
-    for (let i = 0; i < this.segmentCount; i++) {
-      this.removeTimeline(i)
-    }
-  }
-
 
 }

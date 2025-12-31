@@ -32,6 +32,6 @@ export const eNumInput  = {
   sinMagX : 15,
   sinMagY : 16,
   uRotation : 17,
-  slot18 : 18,
+  hueRotation : 18,
   slot19 : 19,
 }
