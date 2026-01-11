@@ -86,7 +86,6 @@ export default class NumberInput
   {
     this.value = Number(value)
     this.uFloatPar[this.eId] = this.value
-    console.log(this.name, this.eId, this.value);
     
   }
 

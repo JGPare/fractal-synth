@@ -10,6 +10,7 @@ import ShaderUtility from "./ShaderUtility"
 const noise = new Shader("Noise", eShaders.noise)
 const circularWaves = new Shader("Circle Waves", eShaders.circularWaves)
 const linearWaves = new Shader("Circle Waves", eShaders.linearWaves)
+const fibonacci = new Shader("Circle Waves", eShaders.fibonacci)
 
 // noise
 const iters = new NumberInput({
@@ -88,6 +89,7 @@ const zoom = new NumberInput({
 noise.addGroup("Core", [iters, power, posX, posY, zoom])
 circularWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
 linearWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
+fibonacci.addGroup("Core", [scale1, scale2, posX, posY, zoom])
 
 const cPosX = new NumberInput({
   eId : eNumInput.cPosX,
@@ -112,6 +114,7 @@ const cPosY = new NumberInput({
 noise.addGroup("Point", [cPosX, cPosY])
 circularWaves.addGroup("Point", [cPosX, cPosY])
 linearWaves.addGroup("Point", [cPosX, cPosY])
+fibonacci.addGroup("Point", [cPosX, cPosY])
 
 const velocityDistortionDirection = new NumberInput({
   eId : eNumInput.velDistortionDir,
@@ -135,8 +138,18 @@ const velocityDistortionAmount = new NumberInput({
 
 noise.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 
+const sinMag = new NumberInput({
+  eId : eNumInput.uSinMag,
+  name: "Sin Mag",
+  value: 0,
+  min: 0,
+  max: 1,
+  step: 0.001,
+  channelIndex: -1
+});
+
 const sinXCoeff = new NumberInput({
-  eId : eNumInput.sinMagX,
+  eId : eNumInput.sinFreqX,
   name: "Sin X Amount",
   value: 0,
   min: -5,
@@ -146,7 +159,7 @@ const sinXCoeff = new NumberInput({
 });
 
 const sinYCoeff = new NumberInput({
-  eId : eNumInput.sinMagY,
+  eId : eNumInput.sinFreqY,
   name: "Sin y Amount",
   value: 0,
   min: -5,
@@ -155,12 +168,14 @@ const sinYCoeff = new NumberInput({
   channelIndex: -1
 });
 
-noise.addGroup("Sin", [sinXCoeff, sinYCoeff])
-circularWaves.addGroup("Sin", [sinXCoeff, sinYCoeff])
-linearWaves.addGroup("Sin", [sinXCoeff, sinYCoeff])
+noise.addGroup("Sin", [sinMag, sinXCoeff, sinYCoeff])
+linearWaves.addGroup("Sin", [sinMag, sinXCoeff, sinYCoeff])
+circularWaves.addGroup("Sin", [sinMag, sinXCoeff, sinYCoeff])
+fibonacci.addGroup("Sin", [sinMag, sinXCoeff, sinYCoeff])
 
 export default {
   noise : noise,
   circularWaves : circularWaves,
   linearWaves : linearWaves,
+  fibonacci : fibonacci,
 }

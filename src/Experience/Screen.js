@@ -32,25 +32,6 @@ export default class Screen {
 
   setInstance() {
     const geometry = new THREE.PlaneGeometry(2, 2, 32, 32)
-    if (this.debug.active) {
-      this.debugFolder.add(this.material.uniforms.uCx, 'value')
-        .min(-1)
-        .max(1)
-        .step(0.0001)
-        .name('Cx')
-
-      this.debugFolder.add(this.material.uniforms.uCy, 'value')
-        .min(-1)
-        .max(1)
-        .step(0.0001)
-        .name('Cy')
-
-      this.debugFolder.add(this.material.uniforms.uPower, 'value')
-        .min(-10)
-        .max(10)
-        .step(0.01)
-        .name('power')
-    }
     this.instance = new THREE.Mesh(geometry, this.shaderMaterial.material)
     this.scene.add(this.instance)
   }

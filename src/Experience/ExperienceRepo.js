@@ -1,6 +1,7 @@
 import Controls from "./Controls.js"
 import Experience from "./Experience.js"
 import Project from "./Project.js"
+import ProjectList from "./ProjectList.js"
 import ShaderMaterial from "./ShaderMaterial.js"
 import Shader from "./Shaders/Shader.js"
 import Timeline from "./Utils/Timeline.js"
@@ -32,7 +33,16 @@ export default class ExperienceRepo {
 
     localStorage.setItem(name, JSON.stringify(experienceSnapshot))
     localStorage.setItem("lastExperience", name)
-    localStorage.setItem("projects", JSON.stringify(experience.projectList.getSnapshot()))
+    this.saveProjectList(experience.projectList)
+  }
+
+  /**
+   * 
+   * @param {ProjectList} projectList 
+   */
+  static saveProjectList(projectList)
+  {
+    localStorage.setItem("projects", JSON.stringify(projectList.getSnapshot()))
   }
 
   /**
@@ -85,15 +95,18 @@ export default class ExperienceRepo {
   static loadExperience(name, experience) {
     const experienceSnapshot = JSON.parse(localStorage.getItem(name))
 
+
     if (debug) {
       console.log("loaded snapshot:", experienceSnapshot)
       console.log(name)
     }
-    this.setShaderFromSnapshot(experience, experienceSnapshot.shader)
-    this.setChannelsFromSnapshot(experience, experienceSnapshot.channels)
-
-    experience.controls.setName(name)
-    experience.controls.setShader()
+    if (experienceSnapshot){
+      this.setShaderFromSnapshot(experience, experienceSnapshot.shader)
+      this.setChannelsFromSnapshot(experience, experienceSnapshot.channels)
+  
+      experience.controls.setName(name)
+      experience.controls.setShader()
+    }
   }
 
   /**
@@ -118,8 +131,15 @@ export default class ExperienceRepo {
       this.loadExperience(name, experience)
       this.loadProjectList(experience)
       console.log(experience.projectList);
-      
     }
+  }
+
+  /**
+   * 
+   * @param {string} name 
+   */
+  static deleteExperience(name) {
+    localStorage.removeItem(name)
   }
 
   /**

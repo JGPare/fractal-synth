@@ -20,6 +20,12 @@ export default class ShaderUtility {
       case eShaders.sinJulia:
         shader = mandleShaders.sinJulia
         break
+      case eShaders.neuton:
+        shader = mandleShaders.neuton
+        break
+      case eShaders.burningShip:
+        shader = mandleShaders.burningShip
+        break
       case eShaders.noise:
         shader = noiseShaders.noise
         break;
@@ -28,6 +34,9 @@ export default class ShaderUtility {
         break;
       case eShaders.linearWaves:
         shader = noiseShaders.linearWaves
+        break;
+      case eShaders.fibonacci:
+        shader = noiseShaders.fibonacci
         break;
       default:
         break

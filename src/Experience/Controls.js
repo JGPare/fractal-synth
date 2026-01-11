@@ -5,8 +5,11 @@ import NumberInput from './Inputs/NumberInput'
 import Shader from './Shaders/Shader'
 import { eShaders } from './Common/eNums'
 import Palette from './Utils/Palette'
+import ShaderUtility from './Shaders/ShaderUtility'
 
 const debugObj = {}
+
+const defaultSceneName = "MyScene"
 
 export default class Controls {
   constructor() {
@@ -256,7 +259,12 @@ export default class Controls {
     })
 
     this.deleteSceneButton.addEventListener('click', (event) => {
+      ExperienceRepo.deleteExperience(this.sceneName.value)
+      this.projectList.deleteProject(this.sceneName.value)
+      ExperienceRepo.saveProjectList(this.projectList)
       this.timeline.renewAll()
+      this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
+      this.sceneName.value = defaultSceneName
     })
 
     this.saveSceneButton.addEventListener('click', (event) => {
@@ -280,6 +288,27 @@ export default class Controls {
 
     this.keyboard.on('seekEnd', () => {
       this.seekEndOnSelectTimelines()
+    })
+
+    this.keyboard.on('toggleArm1', () => {
+      this.channels[0].on = !this.channels[0].on
+      this.channelCheckboxes[0].checked = this.channels[0].on 
+    })
+    this.keyboard.on('toggleArm2', () => {
+      this.channels[1].on = !this.channels[1].on
+      this.channelCheckboxes[1].checked = this.channels[1].on
+    })
+    this.keyboard.on('toggleArm3', () => {
+      this.channels[2].on = !this.channels[2].on
+      this.channelCheckboxes[2].checked = this.channels[2].on
+    })
+    this.keyboard.on('toggleArm4', () => {
+      this.channels[3].on = !this.channels[3].on
+      this.channelCheckboxes[3].checked = this.channels[3].on
+    })
+    this.keyboard.on('toggleArm5', () => {
+      this.channels[4].on = !this.channels[4].on
+      this.channelCheckboxes[4].checked = this.channels[4].on
     })
 
     this.timeline.on('setSegment', () => {
@@ -468,8 +497,6 @@ export default class Controls {
     card.appendChild(name)
 
     card.addEventListener('click', () => {
-      console.log("clicked exp")
-
       ExperienceRepo.loadExperience(project.name, this.experience)
       this.closeLoadView()
     })
@@ -484,6 +511,8 @@ export default class Controls {
       if (channel.active){
         channel.on = true
         this.channelCheckboxes[i].checked = true
+        console.log("onActiveChecked");
+        
       }
     }
   }
@@ -692,6 +721,8 @@ export default class Controls {
 
       channelCheckbox.addEventListener('change', (event) => {
         channel.on = channelCheckbox.checked
+        console.log("event changed checked");
+        
       })
 
       channelProgressSlider.addEventListener('input', (event) => {
@@ -715,6 +746,8 @@ export default class Controls {
       const channelProgressSlider = this.channelProgressSliders[i]
 
       channelCheckbox.checked = channel.on
+      console.log("set ui checked");
+      
       channelDuration.value = channel.duration
       channelEase.value = channel.ease
     }

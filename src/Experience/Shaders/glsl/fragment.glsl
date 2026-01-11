@@ -11,6 +11,7 @@
 #define NOISE  6
 #define CIRCULAR_WAVES 7
 #define LINEAR_WAVES  8
+#define FIBONACCI  9
 
 // must match uNumInput eNum!
 #define uIters uFloatPar[0]
@@ -28,11 +29,11 @@
 #define uMirrorOffsetY uFloatPar[12]
 #define uNumColors uFloatPar[13]
 #define uColorOffset uFloatPar[14]
-#define uSinMagX uFloatPar[15]
-#define uSinMagY uFloatPar[16]
+#define sinFreqX uFloatPar[15]
+#define sinFreqY uFloatPar[16]
 #define uRotation uFloatPar[17]
 #define uHueRotation uFloatPar[18]
-#define uSlot19 uFloatPar[19]
+#define uSinMag uFloatPar[19]
 
 uniform float uFloatPar[20];
 
@@ -61,8 +62,11 @@ vec2 rotate(vec2 uv, float rotation, vec2 mid)
     );
 }
 
-//https://cdn.jsdelivr.net/npm/three@<version>/build/three.module.js
-//https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js
+vec2 warpUv(vec2 uv, float mag, vec2 freq, vec2 offset)
+{
+  uv += mag*vec2(sin(uv.x * freq.x + offset.x), sin(uv.y * freq.y + offset.y));
+  return uv;
+}
 
 vec2 complexPow(vec2 z, float n){
     float theta = atan(z.y, z.x);
@@ -152,14 +156,12 @@ float sinJulia(vec2 uv, int maxIters)
 {
     vec2 c = vec2(uCposX, uCposY);
     int i;
-    vec2 zn = vec2(uv.x,uv.y);
+    vec2 zn = warpUv(uv, 0.001*uSinMag, vec2(sinFreqY*10000., sinFreqX*10000.), vec2(0.,0.));
     vec2 z0 = zn;
     float mZ = dot(zn,zn);
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
-        zn.x = sin(zn.x + uSinMagX);
-        zn.y = cos(zn.y + uSinMagY);
         zn = complexPow(zn,uPower) + c;
         mZ = dot(zn,zn);
     }
@@ -184,25 +186,35 @@ float burningShip(vec2 uv, int maxIters)
 
 float newton(vec2 uv, int maxIters)
 {
-    int i;
-    vec2 c = vec2(uCposX, uCposY);
+  vec2 c = vec2(uCposX, uCposY);
+  int i;
+  vec2 zn = warpUv(uv, 0.001*uSinMag, vec2(sinFreqY*10000., sinFreqX*10000.), vec2(0.,0.));
+  vec2 z0 = zn;
+  float mZ = dot(zn,zn);
 
-    vec2 zn = vec2(uv.x,uv.y);
-    vec2 z0 = zn;
-    float mZ = dot(zn,zn);
+  for (i = 0; mZ < 4.0 && i<maxIters/2; i++)
+  {
+      zn = complexPow(zn,uPower) + c;
+      mZ = dot(zn,zn);
+  }
 
-    for (i = 0; mZ < 4.0 && i<maxIters; i++)
-    {
-        zn = zn - (complexPow(zn, uPower) - vec2(1.0, 0.0)) / (3.0 * complexPow(zn, uPower - 1.0)) + c;
-        mZ = dot(zn,zn);
-    }
-    return float(i) + velocityDistort(mZ-4.0);
+  vec2 newUv = uv - zn;
+  zn = newUv;
+  mZ = dot(zn,zn);
+
+  for (i = 0; mZ < 4.0 && i<maxIters; i++)
+  {
+      zn = complexPow(zn,-uPower) + c;
+      mZ = dot(zn,zn);
+  }
+
+  return float(i) + velocityDistort(mZ-4.0);
 }
 
 float phoenix(vec2 uv, int maxIters)
 {
     vec2 c = vec2(uCposX, uCposY);
-    vec2 p = vec2(uSinMagX, uSinMagY);
+    vec2 p = vec2(sinFreqX, sinFreqY);
     int i;
     vec2 zn = vec2(uv.x,uv.y);
     vec2 z1 = vec2(0.0, 0.0);
@@ -220,7 +232,7 @@ float phoenix(vec2 uv, int maxIters)
 
 float myNoise(vec2 uv)
 {
-  vec2 p = vec2(uSinMagX, uSinMagY);
+  vec2 p = vec2(sinFreqX, sinFreqY);
   return cnoise(uv*uCposX) + cnoise(uv*uCposY)+ cnoise(p);
 }
 
@@ -331,12 +343,6 @@ vec3 getNoiseFractalColor(vec2 uv)
   return mixedColor;
 }
 
-vec2 warpUv(vec2 uv)
-{
-  uv += vec2(sin(uv.y * uSinMagX), cos(uv.x * uSinMagY));
-  return uv;
-}
-
 float waveMag(vec2 uv, float freq)
 {
 
@@ -362,7 +368,7 @@ vec2 toPolar(vec2 uv)
 
 vec3 getCircularWavesColor(vec2 uv)
 {
-  uv = warpUv(uv);
+  uv = warpUv(uv, uSinMag, vec2(sinFreqX, sinFreqY), vec2(0.,0.));
 
   float val1 = waveMag(uv, uIters);
   float val2 = waveMag(uv, uPower);
@@ -375,13 +381,41 @@ vec3 getCircularWavesColor(vec2 uv)
 
 vec3 getLinearWavesColor(vec2 uv)
 {
-  uv = warpUv(uv);
+  uv = warpUv(uv, uSinMag, vec2(sinFreqX, sinFreqY), vec2(0.,0.));
 
   float val1 = abs(sin(uv.x*uIters) + sin(uv.x*uIters*0.6 + PI/2.) + sin(uv.x*uIters*0.1 + 3.*PI/2.) );
   float val2 = abs(sin(uv.y*uPower) + sin(uv.y*uPower*0.6 + PI/2.) + sin(uv.y*uPower*0.1 + 3.*PI/2.) );
   float val3 = abs(uCposX);
 
   vec3 mixedColor = getMixedColor(val1+val2+val3,int(10.*uCposY));
+
+  return mixedColor;
+}
+
+
+vec3 getFibonacciColor(vec2 uv)
+{
+
+  uv = rotate(uv, PI/4., vec2(0.));
+
+  float stagger1 = floor(sin(uv.x*3.*uCposX+2.*PI/3.)+sin(uv.x*2.+PI/3.)+sin(uv.x*1.)+uv.x/5.);
+  float stagger2 = floor(cos(uv.y*10.*uCposY+2.*PI/3.)+cos(uv.y*2.+PI/3.)+cos(uv.y*1.)+uv.y/5.);
+
+  vec2 focus = vec2(sinFreqX*stagger1, sinFreqY*stagger2);
+
+  uv *= focus;
+
+  float gridSize = 2.;
+
+  uv = floor(uv*gridSize)/gridSize;
+
+  float val = abs(uv.x) + abs(uv.y) + uIters;
+
+  // val = floor(val*gridSize)/gridSize;
+
+  vec3 mixedColor = getMixedColor(val,int(2.));
+
+  // mixedColor = vec3(uv.y);
 
   return mixedColor;
 }
@@ -398,7 +432,6 @@ vec3 getWavesFractalColor(vec2 uv)
       mixedColor = getLinearWavesColor(uv);
       break;
   }
-
   return mixedColor;
 }
 // RGB to HSV
@@ -445,6 +478,9 @@ vec3 getColor(vec2 uv)
     case CIRCULAR_WAVES:
     case LINEAR_WAVES:
       mixedColor = getWavesFractalColor(uv);
+      break;
+    case FIBONACCI:
+      mixedColor = getFibonacciColor(uv);
       break;
     break;      
   } 

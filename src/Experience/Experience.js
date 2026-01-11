@@ -117,6 +117,11 @@ export default class Experience
     this.keyboard.addMapping("Space", "togglePlay")
     this.keyboard.addMapping("Comma", "seekStart")
     this.keyboard.addMapping("Period", "seekEnd")
+    this.keyboard.addMapping("Digit1", "toggleArm1")
+    this.keyboard.addMapping("Digit2", "toggleArm2")
+    this.keyboard.addMapping("Digit3", "toggleArm3")
+    this.keyboard.addMapping("Digit4", "toggleArm4")
+    this.keyboard.addMapping("Digit5", "toggleArm5")
   }
 
   resize()

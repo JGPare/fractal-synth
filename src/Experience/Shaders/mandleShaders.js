@@ -120,9 +120,20 @@ sinJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityD
 phoenix.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 neuton.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 
+
+const sinMag = new NumberInput({
+  eId : eNumInput.uSinMag,
+  name: "Sin Mag",
+  value: 0,
+  min: 0,
+  max: 1,
+  step: 0.001,
+  channelIndex: -1
+});
+
 const sinJuliaXCoeff = new NumberInput({
-  eId : eNumInput.sinMagX,
-  name: "Sin X Amount",
+  eId : eNumInput.sinFreqX,
+  name: "Sin X Frequency",
   value: 0,
   min: 0,
   max: 1,
@@ -131,8 +142,8 @@ const sinJuliaXCoeff = new NumberInput({
 });
 
 const sinJuliaYCoeff = new NumberInput({
-  eId : eNumInput.sinMagY,
-  name: "Sin y Amount",
+  eId : eNumInput.sinFreqY,
+  name: "Sin y Frequency",
   value: 0,
   min: 0.001,
   max: 1,
@@ -140,9 +151,9 @@ const sinJuliaYCoeff = new NumberInput({
   channelIndex: -1
 });
 
-sinJulia.addGroup("Sin Offsets", [sinJuliaXCoeff, sinJuliaYCoeff])
-phoenix.addGroup("Sin Offsets", [sinJuliaXCoeff, sinJuliaYCoeff])
-neuton.addGroup("Sin Offsets", [sinJuliaXCoeff, sinJuliaYCoeff])
+sinJulia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+phoenix.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+neuton.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 
 export default {
   julia : julia,

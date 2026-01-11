@@ -29,6 +29,16 @@ export default class ProjectList {
         }
       }
 
+      deleteProject(name) {
+        for (let i = 0; i < this.projects.length; i++) {
+          const project = this.projects[i]
+          if (name == project.name) {
+            this.projects.pop(i)
+            break;
+          }
+        }
+      }
+
       clear() 
       {
         this.projects = []

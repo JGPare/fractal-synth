@@ -10,6 +10,7 @@ export const eShaders  = {
   noise : 6,
   circularWaves : 7,
   linearWaves : 8,
+  fibonacci : 9,
 } 
 
 // must match with shader 
@@ -29,9 +30,9 @@ export const eNumInput  = {
   mirrorOffsetY : 12,
   numColors : 13,
   colorOffset : 14,
-  sinMagX : 15,
-  sinMagY : 16,
+  sinFreqX : 15,
+  sinFreqY : 16,
   uRotation : 17,
   hueRotation : 18,
-  slot19 : 19,
+  uSinMag : 19,
 }
