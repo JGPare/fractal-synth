@@ -63,11 +63,21 @@ const zoom = new NumberInput({
   channelIndex : -1
 })
 
-mandle.addGroup("Core", [iters, power, posX, posY, zoom])
-julia.addGroup("Core", [iters, power, posX, posY, zoom])
-sinJulia.addGroup("Core", [iters, power, posX, posY, zoom])
-phoenix.addGroup("Core", [iters, power, posX, posY, zoom])
-neuton.addGroup("Core", [iters, power, posX, posY, zoom])
+const rotation = new NumberInput({
+  eId : eNumInput.rotation,
+  name : "Rotation", 
+  value : 0, 
+  min : -Math.PI*2, 
+  max : Math.PI*2, 
+  step : 0.001, 
+  channelIndex : -1
+})
+
+mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+sinJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+neuton.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 
 const cPosX = new NumberInput({
   eId : eNumInput.cPosX,

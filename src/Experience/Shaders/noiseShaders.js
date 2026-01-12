@@ -86,10 +86,20 @@ const zoom = new NumberInput({
   channelIndex : -1
 })
 
-noise.addGroup("Core", [iters, power, posX, posY, zoom])
-circularWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
-linearWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom])
-fibonacci.addGroup("Core", [scale1, scale2, posX, posY, zoom])
+const rotation = new NumberInput({
+  eId : eNumInput.rotation,
+  name : "Rotation", 
+  value : 0, 
+  min : -Math.PI*2, 
+  max : Math.PI*2, 
+  step : 0.001, 
+  channelIndex : -1
+})
+
+noise.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+circularWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom, rotation])
+linearWaves.addGroup("Core", [scale1, scale2, posX, posY, zoom, rotation])
+fibonacci.addGroup("Core", [scale1, scale2, posX, posY, zoom, rotation])
 
 const cPosX = new NumberInput({
   eId : eNumInput.cPosX,

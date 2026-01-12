@@ -216,18 +216,24 @@ float phoenix(vec2 uv, int maxIters)
     vec2 c = vec2(uCposX, uCposY);
     vec2 p = vec2(sinFreqX, sinFreqY);
     int i;
-    vec2 zn = vec2(uv.x,uv.y);
-    vec2 z1 = vec2(0.0, 0.0);
-    vec2 z0 = zn;
-    float mZ = dot(zn,zn);
+    vec2 z1 = vec2(uv.x,uv.y);
+    vec2 z2 = vec2(0.0, 0.0);
+
+    vec2 d = vec2(0.,0.);
+    vec2 d1 = vec2(1.,0.);
+    vec2 d2 = vec2(0.,0.);
+    float mZ = dot(z1,z1);
 
     for (i = 0; mZ < 4.0 && i<maxIters; i++)
     {
-        zn = complexPow(zn,uPower) + c + p*z1;
-        z1 = zn;
-        mZ = dot(zn,zn);
+        z2 = z1;
+        z1 = complexPow(z1,uPower) + c + p*z2;
+        d = 2.0*d1*z1+p*d2;
+        d2 = d1;
+        d1 = d;
+        mZ = dot(z1,z1);
     }
-    return float(i) + velocityDistort(mZ-4.0);
+    return float(log(abs(dot(d1,d1)))) + velocityDistort(dot(d-d2,d-d2));
 }
 
 float myNoise(vec2 uv)
@@ -498,6 +504,7 @@ void main()
     }
 
     vec2 focus = vec2(uPosX, uPosY);
+    uv = rotate(uv, uRotation, focus);
     vec2 scaledUv = getScaledUV(uv, focus);
 
     vec3 color = getColor(scaledUv);

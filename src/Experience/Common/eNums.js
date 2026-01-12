@@ -32,7 +32,7 @@ export const eNumInput  = {
   colorOffset : 14,
   sinFreqX : 15,
   sinFreqY : 16,
-  uRotation : 17,
+  rotation : 17,
   hueRotation : 18,
   uSinMag : 19,
 }
