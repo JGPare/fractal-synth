@@ -35,7 +35,7 @@ export default class ShaderMaterial
           type : "v3v",
           value : this.palette.palette
         },
-        uFloatPar : {value: new Float32Array(20)},
+        uFloatPar : {value: new Float32Array(25)},
         uTime: { value: 0 },
         uAspect: { value: this.sizes.aspect },
         uMode : {value : this.mode},

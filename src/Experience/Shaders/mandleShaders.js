@@ -23,6 +23,16 @@ const iters = new NumberInput({
   channelIndex : -1
 })
 
+const iters2 = new NumberInput({
+  eId : eNumInput.iters2,
+  name : "Iterations 2", 
+  value : 0.75, 
+  min : 0.1, 
+  max : 1, 
+  step : 0.001, 
+  channelIndex : -1
+})
+
 const power = new NumberInput({
   eId : eNumInput.power,
   name : "Power", 
@@ -77,7 +87,7 @@ mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 sinJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
-neuton.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+neuton.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 
 const cPosX = new NumberInput({
   eId : eNumInput.cPosX,

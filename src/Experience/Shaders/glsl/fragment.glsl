@@ -34,8 +34,13 @@
 #define uRotation uFloatPar[17]
 #define uHueRotation uFloatPar[18]
 #define uSinMag uFloatPar[19]
+#define uIters2 uFloatPar[20]
+#define uColorScale uFloatPar[21]
+#define spare2 uFloatPar[22]
+#define spare3 uFloatPar[23]
+#define spare4 uFloatPar[24]
 
-uniform float uFloatPar[20];
+uniform float uFloatPar[25];
 
 uniform float uTime;
 uniform float uAspect;
@@ -192,19 +197,22 @@ float newton(vec2 uv, int maxIters)
   vec2 z0 = zn;
   float mZ = dot(zn,zn);
 
-  for (i = 0; mZ < 4.0 && i<maxIters/2; i++)
+  for (i = 0; mZ < 4.0 && i<maxIters; i++)
   {
       zn = complexPow(zn,uPower) + c;
       mZ = dot(zn,zn);
   }
 
-  vec2 newUv = uv - zn;
+  vec2 newUv = uv * zn;
   zn = newUv;
   mZ = dot(zn,zn);
 
-  for (i = 0; mZ < 4.0 && i<maxIters; i++)
+  float iter2Float = exp(6.8*uIters2);
+  int maxIters2 = int(iter2Float);
+
+  for (i = 0; mZ < 4.0 && i<maxIters2; i++)
   {
-      zn = complexPow(zn,-uPower) + c;
+      zn = complexPow(zn,uPower) + c;
       mZ = dot(zn,zn);
   }
 
@@ -304,7 +312,7 @@ vec3 getMixedColor(float escape, int iterations)
   float arraySize =  float(uPaletteLen);
   float fMaxIters = float(iterations);
   float squishNorm = escape / fMaxIters;
-  float escapeNorm = squishNorm * (arraySize - 1.0);
+  float escapeNorm = uColorScale*squishNorm * (arraySize - 1.0);
   int clrIndex1 = int(escapeNorm+uColorOffset)%uPaletteLen;
   int clrIndex2 = (clrIndex1+1)%uPaletteLen;
   vec3 color1 = uPalette[clrIndex1]; 

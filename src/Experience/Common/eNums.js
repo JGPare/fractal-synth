@@ -35,4 +35,9 @@ export const eNumInput  = {
   rotation : 17,
   hueRotation : 18,
   uSinMag : 19,
+  iters2 : 20,
+  colorScale : 21,
+  spare2 : 22,
+  spare3 : 23,
+  spare4 : 24,
 }

@@ -63,7 +63,18 @@ const hueRotation = new NumberInput({
 });
 
 
+const colorScale = new NumberInput({
+  eId : eNumInput.colorScale,
+  name: "Color Scale",
+  value: 1,
+  min: 0.1,
+  max: 5,
+  step: 0.01,
+  channelIndex: -1
+});
+
+
 export default {
     Mirror : [mirrorFoldsX, mirrorFoldsY, mirrorOffsetX, mirrorOffsetY],
-    Color : [colorOffset, hueRotation],
+    Color : [colorOffset, hueRotation, colorScale],
 }
