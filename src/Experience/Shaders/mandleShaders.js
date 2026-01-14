@@ -16,7 +16,7 @@ const neuton = new Shader("Neuton", eShaders.neuton)
 const iters = new NumberInput({
   eId : eNumInput.iters,
   name : "Iterations", 
-  value : 0.75, 
+  value : 0.6, 
   min : 0.1, 
   max : 1, 
   step : 0.001, 
@@ -26,7 +26,7 @@ const iters = new NumberInput({
 const iters2 = new NumberInput({
   eId : eNumInput.iters2,
   name : "Iterations 2", 
-  value : 0.75, 
+  value : 0.5, 
   min : 0.1, 
   max : 1, 
   step : 0.001, 
@@ -46,7 +46,7 @@ const power = new NumberInput({
 const posX = new NumberInput({
   eId : eNumInput.posX,
   name : "Position X", 
-  value : -.38, 
+  value : -0.5, 
   min : -2, 
   max : 2, 
   step : 0.0001, 
@@ -56,7 +56,7 @@ const posX = new NumberInput({
 const posY = new NumberInput({
   eId : eNumInput.posY,
   name : "Position Y", 
-  value : 0.5, 
+  value : 0, 
   min : -2, 
   max : 2, 
   step : 0.0001, 
@@ -66,7 +66,7 @@ const posY = new NumberInput({
 const zoom = new NumberInput({
   eId : eNumInput.zoom,
   name : "Zoom", 
-  value : 0.2, 
+  value : 2.2, 
   min : 0, 
   max : 1, 
   step : 0.01, 
@@ -92,7 +92,7 @@ neuton.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 const cPosX = new NumberInput({
   eId : eNumInput.cPosX,
   name : "Const Position X", 
-  value : 1, 
+  value : -0.75, 
   min : -2, 
   max : 2, 
   step : 0.0001, 
@@ -102,7 +102,7 @@ const cPosX = new NumberInput({
 const cPosY = new NumberInput({
   eId : eNumInput.cPosY,
   name : "Const Position Y", 
-  value : 0.5, 
+  value : 0.25, 
   min : -2, 
   max : 2, 
   step : 0.0001, 

@@ -47,15 +47,15 @@ export default class NumberInput
     }
   }
 
-  setFromSnap(inputSnap)
+  setFromSnapshot(inputSnap)
   {
       // this.eId = inputSnap.eId
       this.name = new String(inputSnap.name)
       this.value = inputSnap.value
       // for now these are not set from snap
-      // this.min = inputSnap.min
-      // this.max = inputSnap.max
-      // this.step = inputSnap.step
+      this.min = inputSnap.min
+      this.max = inputSnap.max
+      this.step = inputSnap.step
       this.channelIndex = inputSnap.channelIndex ?? 0
       this.startVal = inputSnap.startVal ?? 0
       this.endVal = inputSnap.endVal ?? 0

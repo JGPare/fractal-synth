@@ -43,7 +43,7 @@ export default class ShaderUtility {
     }
 
     this.addStandardParameters(shader)
-    return shader
+    return shader.clone()
   }
 
   static addStandardParameters(shader)

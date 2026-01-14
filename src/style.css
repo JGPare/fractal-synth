@@ -491,8 +491,15 @@ input.channel-checkbox {
    BUTTONS
    ============================================================================ */
 
-.control-button {
+.three-width-btn {
   width: 31%;
+}
+
+.four-width-btn {
+  width: 22%;
+}
+
+.control-button {
   padding: 0.2rem;
   border-radius: 0.2rem;
   border-width: 0;
@@ -596,6 +603,10 @@ select:disabled {
 
 #fractal-select {
   margin-bottom: 0.5rem;
+}
+
+#mode-select {
+  width: 74%;
 }
 
 /* NUMBER INPUTS */

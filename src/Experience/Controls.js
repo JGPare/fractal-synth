@@ -81,6 +81,7 @@ export default class Controls {
     this.timelineSelectSlider = document.getElementById('timeline-select-slider')
     this.colorsContainer = document.getElementById('colors-container')
     this.paperCanvas = document.getElementById('paper-canvas')
+    this.resetShader = document.getElementById('reset-shader')
     this.channelCheckboxes = document.querySelectorAll('input.channel-checkbox')
     this.channelDurations = document.querySelectorAll('input.channel-duration')
     const channelsContainer = document.querySelector('#channels')
@@ -203,6 +204,7 @@ export default class Controls {
 
     value.addEventListener('change', (event) => {
       slider.value = value.value
+      input.setValue(slider.value)
     })
 
     easeChannel.addEventListener('change', (event) => {
@@ -277,6 +279,10 @@ export default class Controls {
       this.openLoadView()
     })
 
+    this.resetShader.addEventListener('click', (event) => {
+      this.experience.setShader(this.modeIndex)
+    })
+
     this.keyboard.on('togglePlay', () => {
       console.log("toggled play")
       this.timeline.togglePlay()
@@ -347,7 +353,7 @@ export default class Controls {
         if (this.channels[i].on) {
           this.timeline.pause(i)
           if (this.settingStart) {
-            this.shader.setStartValFromUniforms(this.getUniformValues(), i)
+            this.shader.setStartValFromUniforms(i)
             this.setTimeline(i)
             this.settingStart = false
           }
@@ -364,7 +370,7 @@ export default class Controls {
         if (this.channels[i].on) {
           this.timeline.pause(i)
           if (this.settingEnd) {
-            this.shader.setEndValFromUniforms(this.getUniformValues(), i)
+            this.shader.setEndValFromUniforms(i)
             this.setTimeline(i)
             this.settingEnd = false
           }

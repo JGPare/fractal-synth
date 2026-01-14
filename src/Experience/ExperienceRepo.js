@@ -152,18 +152,7 @@ export default class ExperienceRepo {
     const shader = experience.shader
     shader.paletteIndex = shaderSnapshot.paletteIndex
 
-    for (const [key, group] of Object.entries(shaderSnapshot.groups)) {
-      for (const input of group.numInputs) {
-        switch (input.type) {
-          case "number":
-            shader.setInput(input.name, input)
-            break
-          default:
-            break
-        }
-      }
-    }
-
+    shader.setFromSnapshot(shaderSnapshot)
     shader.setInputs()
   }
 

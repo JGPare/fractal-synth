@@ -1,4 +1,5 @@
 import { eNumInput } from "../Common/eNums"
+import NumberInput from "../Inputs/NumberInput"
 
 export default class Shader 
 {
@@ -46,17 +47,6 @@ export default class Shader
     }
   }
 
-  setInput(inputName, inputSnap)
-  {
-    for (const [key, group] of Object.entries(this.groups)){
-      for (let i = 0; i < group.length; i++){
-        if (group[i].name == inputName){
-          group[i].setFromSnap(inputSnap)
-        }
-      }
-    }
-  }
-
   getInput(eNumInput)
   {
     for (const [key, group] of Object.entries(this.groups)){
@@ -81,7 +71,7 @@ export default class Shader
     return inputs;
   }
 
-  setStartValFromUniforms(uniforms, channelIndex)
+  setStartValFromUniforms(channelIndex)
   {
     const numInputs = this.getNumInputs()
     
@@ -92,7 +82,7 @@ export default class Shader
     }
   }
 
-  setEndValFromUniforms(uniforms, channelIndex)
+  setEndValFromUniforms(channelIndex)
   {
     const numInputs = this.getNumInputs()
     for (let i = 0; i < numInputs.length; i++) {
@@ -144,4 +134,62 @@ export default class Shader
       paletteIndex : this.paletteIndex
     }
   }
+
+  setFromSnapshot(snapshot)
+  {
+    this.paletteIndex = snapshot.paletteIndex
+    for (const [key, group] of Object.entries(snapshot.groups)) {
+      for (const input of group.numInputs) {
+        switch (input.type) {
+          case "number":
+            this.setInputFromSnapshot(input.name, input)
+            break
+          default:
+            break
+        }
+      }
+    }
+  }
+
+  setInputFromSnapshot(inputName, inputSnap)
+  {
+    for (const [key, group] of Object.entries(this.groups)){
+      for (let i = 0; i < group.length; i++){
+        if (group[i].name == inputName){
+          group[i].setFromSnapshot(inputSnap)
+        }
+      }
+    }
+  }
+
+  clone() {
+    const newShader = new Shader(this.name, this.eShader, this.paletteIndex)
+
+    for (const [groupName, inputs] of Object.entries(this.groups)) {
+      newShader.addGroup(groupName)
+
+      for (const input of inputs) {
+        const clonedInput = new NumberInput({
+          eId: input.eId,
+          name: input.name,
+          value: input.value,
+          min: input.min,
+          max: input.max,
+          step: input.step,
+          channelIndex: input.channelIndex,
+          startVal: input.startVal,
+          endVal: input.endVal
+        }
+        )
+
+        newShader.groups[groupName].push(clonedInput)
+      }
+    }
+
+    newShader.setUfloatPars = this.uFloatPars
+    newShader.setInputs()
+
+    return newShader
+  }
+  
 }
