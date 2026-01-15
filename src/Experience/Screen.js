@@ -1,9 +1,12 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
-import ShaderMaterial from './ShaderMaterial'
 import { eNumInput } from './Common/eNums'
 
 export default class Screen {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
@@ -20,7 +23,6 @@ export default class Screen {
     this.y = 0
     this.zoom = 2.47
 
-    // Debug
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Screen')
       this.debugFolder.close()
@@ -35,16 +37,33 @@ export default class Screen {
     this.scene.add(this.instance)
   }
 
+  /**
+   * @param {Shader} shader
+   */
+  setShader() {
+    this.shader = this.experience.shader
+  }
+
+  // ============================================================
+  // LIFECYCLE
+  // ============================================================
+
   resize() {
     this.shaderUniforms.uAspect.value = this.sizes.aspect
   }
 
+  update() {
+    this.shaderUniforms.uTime.value = this.time.elapsed / 1000
+  }
+
+  // ============================================================
+  // INPUT HANDLERS
+  // ============================================================
+
   touchmove() {
-    const shader = this.experience.shader
     const deltaX = -this.mouse.deltaX / this.sizes.width * 2
     const deltaY = this.mouse.deltaY / this.sizes.height * 2
     if (this.mouse.clickHeld) {
-
       this.shaderUniforms.uFloatPar.value[eNumInput.posX] -= deltaX * this.zoom / 2 * this.sizes.aspect
       this.shaderUniforms.uFloatPar.value[eNumInput.posY] -= deltaY * this.zoom / 2
       this.shader.getInput(eNumInput.posX).setFromShader()
@@ -55,7 +74,6 @@ export default class Screen {
   }
 
   mousemove() {
-    const shader = this.experience.shader
     const newX = -this.mouse.x / this.sizes.width * 2 + 1
     const newY = this.mouse.y / this.sizes.height * 2 - 1
     if (this.mouse.clickHeld) {
@@ -73,7 +91,6 @@ export default class Screen {
   }
 
   scroll() {
-
     this.zoom = this.shaderUniforms.uFloatPar.value[eNumInput.zoom]
     this.x = -this.mouse.x / this.sizes.width * 2 + 1
     this.y = this.mouse.y / this.sizes.height * 2 - 1
@@ -91,25 +108,17 @@ export default class Screen {
     this.shader.getInput(eNumInput.posY).setFromShader()
   }
 
-  update() {
-    this.shaderUniforms.uTime.value = this.time.elapsed / 1000
-  }
-
-  setShader() {
-    this.shader = this.experience.shader
-  }
+  // ============================================================
+  // CAPTURE
+  // ============================================================
 
   /**
- * Capture the current canvas as an image data URL
- * @param {string} format - 'image/png' or 'image/jpeg'
- * @param {number} quality - 0 to 1 for jpeg quality
- * @returns {string} Data URL of the image
- */
+   * @param {string} format
+   * @param {number} quality
+   * @returns {string}
+   */
   captureImage(format = 'image/jpeg', quality = 0.8) {
-    // Render one more frame to ensure it's up to date
     this.experience.renderer.instance.render(this.scene, this.experience.camera.instance)
-
-    // Capture the canvas as data URL
     return this.canvas.toDataURL(format, quality)
   }
 }

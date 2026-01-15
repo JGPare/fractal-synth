@@ -1,11 +1,13 @@
-
 import * as THREE from 'three'
 import Experience from "./Experience"
-import vertexShader from './Shaders/glsl/vertex.glsl?raw' // %JPA get rid of test?
+import vertexShader from './Shaders/glsl/vertex.glsl?raw'
 import fragmentShader from './Shaders/glsl/fragment.glsl?raw'
-import Shader from './Shaders/Shader'
 
 export default class ShaderMaterial {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
@@ -17,17 +19,16 @@ export default class ShaderMaterial {
     this.mode = 0
     this.numberOfColors = 6
 
-    // Debug
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Shader')
       this.debugFolder.close()
     }
+
     this.material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
-      uniforms:
-      {
+      uniforms: {
         uPalette: {
           type: "v3v",
           value: this.palette.palette
@@ -41,13 +42,19 @@ export default class ShaderMaterial {
     })
   }
 
+  // ============================================================
+  // UNIFORMS
+  // ============================================================
+
+  /**
+   * @returns {Object}
+   */
   getUniforms() {
     return this.material.uniforms
   }
 
   /**
-   * 
-   * @param {Shader} shader 
+   * @param {Shader} shader
    */
   setShader(shader) {
     const uniforms = this.material.uniforms
@@ -55,4 +62,3 @@ export default class ShaderMaterial {
     shader.setInputs()
   }
 }
-

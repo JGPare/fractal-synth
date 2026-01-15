@@ -2,6 +2,10 @@ import * as THREE from 'three'
 import Experience from "./Experience"
 
 export default class Render {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
@@ -11,7 +15,6 @@ export default class Render {
     this.camera = this.experience.camera
     this.mouse = this.experience.mouse
 
-    // Debug
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Renderer')
       this.debugFolder.close()
@@ -28,26 +31,33 @@ export default class Render {
     this.instance.setPixelRatio(this.sizes.pixelRatio)
   }
 
+  onLoad() {
+    this.mouse = this.experience.mouse
+  }
+
+  // ============================================================
+  // LIFECYCLE
+  // ============================================================
+
   resize() {
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)
   }
+
   update() {
     this.instance.render(this.scene, this.camera.instance)
   }
 
-  onLoad() {
-    this.mouse = this.experience.mouse
-  }
+  // ============================================================
+  // FULLSCREEN
+  // ============================================================
 
   doubleClick() {
     if (!document.fullscreenElement) {
       this.instance.domElement.requestFullscreen()
     }
-    else if (document.fullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen()
-      }
+    else if (document.exitFullscreen) {
+      document.exitFullscreen()
     }
   }
 }
