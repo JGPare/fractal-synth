@@ -1,20 +1,19 @@
 import gsap from 'gsap'
 import { CustomEase } from 'gsap/CustomEase'
 import EventEmitter from './EventEmitter.js'
-import Experience from '../Experience.js'
 import { eNumInput } from '../Common/eNums.js'
-import NumberInput from '../Inputs/NumberInput.js'
-import Channel from '../Channel.js'
 
-// Register the plugin
 gsap.registerPlugin(CustomEase)
 
-let debug = true
+const debug = true
 
 export default class Timeline extends EventEmitter {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   /**
-   * 
-   * @param {Experience} experience 
+   * @param {Experience} experience
    */
   constructor(experience) {
     super()
@@ -37,12 +36,10 @@ export default class Timeline extends EventEmitter {
     this.proxyCounter = 0
     this.proxy = {}
 
-    this.playing = false
+    this.globalPlay = false
     this.playingArray = [false, false, false, false, false]
 
-    /** 
-     * @type {Array<gsap.core.Timeline>} 
-    */
+    /** @type {gsap.core.Timeline[]} */
     this.tls = [
       this.getNewTimeline(this.tlParams, { index: 0 }),
       this.getNewTimeline(this.tlParams, { index: 1 }),
@@ -57,12 +54,30 @@ export default class Timeline extends EventEmitter {
       console.log("init snapshot", this.snapshot)
     }
 
-    /**
-     * @type {gsap.core.Timeline}
-     */
+    /** @type {gsap.core.Timeline} */
     this.tl = this.tls[0]
   }
 
+  /**
+   * @param {Object} params
+   * @param {Object} data
+   * @returns {gsap.core.Timeline}
+   */
+  getNewTimeline(params, data = {}) {
+    const tl = gsap.timeline(params)
+    tl.data = data
+    return tl
+  }
+
+  // ============================================================
+  // TIMELINE CONFIGURATION
+  // ============================================================
+
+  /**
+   * @param {string} easeType
+   * @param {string} easeString
+   * @param {number} i
+   */
   setEase(easeType, easeString, i) {
     let ease
     switch (easeType) {
@@ -73,50 +88,60 @@ export default class Timeline extends EventEmitter {
         ease = easeType + "." + easeString
     }
     this.tlParams.defaults.ease = ease
-    // Change ease for all tweens in the timeline
     this.tls[i].getChildren().forEach(tween => {
       if (tween.vars) {
         tween.vars.ease = ease
-        // Invalidate and restart to apply new ease
         tween.invalidate()
       }
     })
   }
 
+  /**
+   * @param {boolean} isRepeat
+   * @param {boolean[]} tlSelections
+   */
   setRepeat(isRepeat, tlSelections) {
     this.tlParams.repeat = isRepeat ? -1 : 0
-    for (let i = 0; i < tls.length; i++) {
-      const tl = tls[i]
+    for (let i = 0; i < this.tls.length; i++) {
+      const tl = this.tls[i]
       if (tlSelections[i]) {
         tl.repeat(isRepeat ? -1 : 0)
       }
     }
   }
 
+  /**
+   * @param {boolean} isYoyo
+   * @param {boolean[]} tlSelections
+   */
   setYoyo(isYoyo, tlSelections) {
     this.tlParams.yoyo = isYoyo
-    for (let i = 0; i < tls.length; i++) {
-      const tl = tls[i]
+    for (let i = 0; i < this.tls.length; i++) {
+      const tl = this.tls[i]
       if (tlSelections[i]) {
         tl.yoyo(isYoyo)
       }
     }
   }
 
-
-  getBlankSnapshot() {
-    return {
-      channels: [],
-      tlParams: this.tlParams
+  /**
+   * @param {number} duration
+   * @param {number} index
+   */
+  setDuration(duration, index) {
+    this.tls[index].duration(duration)
+    if (debug) {
+      console.log("setting duration for tl:", index, this.tls[index])
     }
   }
 
-  getNewTimeline(params, data = {}) {
-    const tl = gsap.timeline(params)
-    tl.data = data
-    return tl
-  }
+  // ============================================================
+  // TIMELINE SELECTION
+  // ============================================================
 
+  /**
+   * @param {number} index
+   */
   setTimeline(index) {
     if (index < this.tls.length) {
       this.tl = this.tls[index]
@@ -127,27 +152,117 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-  setTimelineCount(count) {
+  // ============================================================
+  // PLAYBACK CONTROL
+  // ============================================================
 
-  }
-
-  setDuration(duration, index) {
-    this.tls[index].duration(duration)
+  /**
+   * @param {number} index
+   */
+  play(index) {
+    this.tls[index].play()
     if (debug) {
-      console.log("setting duration for tl:", index, this.tls[index])
-
+      console.log("playing tl:", index)
     }
   }
 
-  progress(value = null, index = -1) {
-    if (index > -1) {
+  /**
+   * @param {boolean[]} timelineSelections
+   */
+  playTimelinesSelect(timelineSelections) {
+    for (let i = 0; i < this.tls.length; i++) {
+      const tl = this.tls[i]
+      if (timelineSelections[i]) {
+        tl.play()
+        if (debug) {
+          console.log("playing tl:", i)
+        }
+      }
+    }
+  }
+
+  /**
+   * @param {number} index
+   */
+  pause(index) {
+    if (this.tls[index]) {
+      this.playingArray[index] = false
+      this.tls[index].pause()
+      if (debug) {
+        console.log("pausing index:", index)
+      }
+    }
+  }
+
+  /**
+   * @param {boolean[]} timelineSelections
+   */
+  pauseTimelinesSelect(timelineSelections) {
+    for (let i = 0; i < this.tls.length; i++) {
+      const tl = this.tls[i]
+      if (timelineSelections[i]) {
+        tl.pause()
+      }
+    }
+  }
+
+  /**
+   * @param {number} index
+   */
+  seekStart(index) {
+    const tl = this.tls[index]
+    tl.time(0)
+  }
+
+  /**
+   * @param {number} index
+   */
+  seekEnd(index) {
+    const tl = this.tls[index]
+    tl.time(tl.duration())
+  }
+
+  /**
+   * @param {number|null} value
+   * @param {number} index
+   * @returns {number|undefined}
+   */
+  progress(value = null, index) {
+    if (value !== null) {
       this.tls[index].progress(value)
     }
     else {
-      return this.tls[index].progress(value)
+      return this.tls[index].progress()
     }
   }
 
+  /**
+   * @param {number} index
+   */
+  renew(index) {
+    const tl = this.tls[index]
+    tl.clear()
+    tl.pause()
+  }
+
+  renewAll() {
+    for (let i = 0; i < this.tls.length; i++) {
+      this.renew(i)
+    }
+  }
+
+  // ============================================================
+  // TWEENS
+  // ============================================================
+
+  /**
+   * @param {Float32Array} item
+   * @param {Object} fromPars
+   * @param {Object} toPars
+   * @param {number} start
+   * @param {number} eId
+   * @param {number} timelineIndex
+   */
   fromTo(item, fromPars, toPars, start, eId, timelineIndex) {
     const scaleFactor = 100000
     const target = item
@@ -178,9 +293,8 @@ export default class Timeline extends EventEmitter {
   }
 
   /**
-   * 
-   * @param {object} timelineSlider 
-   * @param {Channel} channel 
+   * @param {Object} timelineSlider
+   * @param {number} timelineIndex
    */
   fromToTimeline(timelineSlider, timelineIndex) {
     const fromPars = { "value": 0 }
@@ -194,8 +308,8 @@ export default class Timeline extends EventEmitter {
   }
 
   /**
-   * 
-   * @param {NumberInput} numInput 
+   * @param {NumberInput} numInput
+   * @param {number} timelineIndex
    */
   setFromToFromNumInput(numInput, timelineIndex) {
     this.fromTo(numInput.uFloatPar,
@@ -207,112 +321,40 @@ export default class Timeline extends EventEmitter {
     )
   }
 
+  // ============================================================
+  // SNAPSHOT
+  // ============================================================
+
+  /**
+   * @returns {Object}
+   */
+  getBlankSnapshot() {
+    return {
+      channels: [],
+      tlParams: this.tlParams
+    }
+  }
+
+  /**
+   * @returns {Object}
+   */
+  getSnapshot() {
+    return this.snapshot
+  }
+
+  // ============================================================
+  // UTILITIES
+  // ============================================================
+
+  /**
+   * @param {number} eId
+   * @returns {string|undefined}
+   */
   getProxyNameFromEid(eId) {
     for (const [key, value] of Object.entries(eNumInput)) {
       if (eId == value) {
         return key
       }
     }
-  }
-
-  pause(index) {
-    if (this.tls[index]) {
-      this.playingArray[index] = false
-      this.tls[index].pause()
-      if (debug) {
-        console.log("pausing index:", index)
-      }
-    }
-  }
-
-  pauseTimelinesSelect(timelineSelections) {
-
-    for (let i = 0; i < this.tls.length; i++) {
-      const tl = this.tls[i]
-      if (timelineSelections[i]) {
-        tl.pause()
-      }
-    }
-  }
-
-  play(index) {
-    this.tls[index].play()
-    if (debug) {
-      console.log("playing tl:", index)
-    }
-  }
-
-  playTimelinesSelect(timelineSelections) {
-    for (let i = 0; i < this.tls.length; i++) {
-      const tl = this.tls[i]
-      if (timelineSelections[i]) {
-        tl.play()
-        if (debug) {
-          console.log("playing tl:", i)
-        }
-      }
-    }
-  }
-
-  renew(index) {
-    const tl = this.tls[index]
-    tl.clear()
-    tl.pause()
-  }
-
-  renewAll() {
-    for (let i = 0; i < this.tls.length; i++) {
-      this.renew(i)
-    }
-  }
-
-  seekStart(index) {
-    const tl = this.tls[index]
-    tl.time(0)
-  }
-
-  seekEnd(index) {
-    const tl = this.tls[index]
-    tl.time(tl.duration())
-  }
-
-  getSnapshot() {
-    return this.snapshot
-  }
-
-  setFromSnapshot(snapshot) {
-    this.snapshot = this.getBlankSnapshot()
-    this.setTimelines()
-
-    if (debug) {
-      console.log("loaded snap", snapshot)
-    }
-
-    for (let i = 0; i < snapshot.segments.length; i++) {
-      const segment = snapshot.segments[i]
-      this.addTimeline(i)
-      this.tl = this.segmentTLs[i]
-      segment.to.forEach(tweenSnapshot => {
-        const item = this.experience.getItemById(tweenSnapshot.localId)
-        this.to(item, ...tweenSnapshot.pars)
-      })
-      segment.fromTo.forEach(tweenSnapshot => {
-        const item = this.experience.getItemById(tweenSnapshot.localId)
-        this.fromTo(item, ...tweenSnapshot.pars)
-      })
-      const duration = segment.duration ?? this.tlParams.defaults.duration
-      if (debug) {
-
-        console.log("set from snap seg and dur", segment, duration)
-      }
-
-      this.tl.duration(duration)
-      this.tl.paused(false)
-    }
-
-    this.masterTL.seek(0, false)
-    this.tl = this.segmentTLs[0]
-    this.play()
-    this.pause()
   }
 }

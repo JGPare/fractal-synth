@@ -329,8 +329,14 @@ export default class Controls {
 
   linkKeyboardEvents() {
     this.keyboard.on('togglePlay', () => {
-      console.log("toggled play")
-      this.timeline.togglePlay()
+      const timelineSelections = this.getTimelineSelection()
+      if (this.globalPlay){
+        this.timeline.pauseTimelinesSelect(timelineSelections)
+      }
+      else {
+        this.timeline.playTimelinesSelect(timelineSelections)
+      }
+      this.globalPlay = !this.globalPlay
     })
 
     this.keyboard.on('seekStart', () => {
@@ -352,11 +358,13 @@ export default class Controls {
 
   linkTimeline() {
     this.playTimelineButton.addEventListener('click', (event) => {
+      this.globalPlay = true
       const timelineSelections = this.getTimelineSelection()
       this.timeline.playTimelinesSelect(timelineSelections)
     })
 
     this.pauseTimelineButton.addEventListener('click', (event) => {
+      this.globalPlay = false
       const timelineSelections = this.getTimelineSelection()
       this.timeline.pauseTimelinesSelect(timelineSelections)
     })
