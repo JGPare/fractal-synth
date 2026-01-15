@@ -12,7 +12,22 @@ const debugObj = {}
 const defaultSceneName = "MyScene"
 
 export default class Controls {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   constructor() {
+    this.initExperienceReferences()
+    this.initState()
+    this.initDebug()
+    this.createColorElements()
+    this.getElements()
+    this.linkUI()
+    this.setShader()
+    this.paperCanvas.hidden = true
+  }
+
+  initExperienceReferences() {
     this.experience = new Experience()
     this.debug = this.experience.debug
     this.canvas = this.experience.canvas
@@ -23,39 +38,29 @@ export default class Controls {
     this.timeline = this.experience.timeline
     this.keyboard = this.experience.keyboard
     this.curveEditor = this.experience.curveEditor
-    this.canvas = this.experience.canvas
-
     this.channels = this.experience.channels
     this.channel = this.experience.channels[0]
-
     this.projectList = this.experience.projectList
     this.shader = this.experience.shader
-
     this.shaderUniforms = this.shaderMaterial.getUniforms()
     this.palettes = this.experience.palettes
     this.palette = this.palettes.getPaletteByIndex(0)
+  }
 
+  initState() {
     this.numberOfColors = 5
     this.numberOfChannels = 5
-
     this.modeIndex = eShaders.mandle
-
     this.settingStart = false
     this.settingEnd = false
-
     this.loopTimeline = false
+  }
 
-    // Debug
+  initDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Screen')
       this.debugFolder.close()
     }
-    this.createColorElements()
-    this.getElements()
-    this.linkUI()
-
-    this.setShader()
-    this.paperCanvas.hidden = true
   }
 
   getElements() {
@@ -81,6 +86,7 @@ export default class Controls {
     this.colorsContainer = document.getElementById('colors-container')
     this.paperCanvas = document.getElementById('paper-canvas')
     this.resetShader = document.getElementById('reset-shader')
+    this.paletteInput = document.getElementById('palette-input')
     this.channelCheckboxes = document.querySelectorAll('input.channel-checkbox')
     this.channelDurations = document.querySelectorAll('input.channel-duration')
     const channelsContainer = document.querySelector('#channels')
@@ -90,6 +96,10 @@ export default class Controls {
     this.channelClearBtns = document.querySelectorAll('button.channel-clear-btn')
 
   }
+
+  // ============================================================
+  // SHADER CONTROLS
+  // ============================================================
 
   setShader() {
     if (this.experience.shader) {
@@ -106,6 +116,9 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {Shader} shader
+   */
   setControls(shader) {
     const parentElement = document.getElementById('left-inputs')
     this.clearControls(parentElement)
@@ -127,6 +140,10 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {NumberInput} input
+   * @param {HTMLElement} parentElement
+   */
   addControl(input, parentElement) {
     switch (input.type) {
       case "number":
@@ -137,6 +154,9 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {HTMLElement} parentElement
+   */
   addBreak(parentElement) {
     const breakElem = document.createElement("div")
     breakElem.setAttribute("class", "btm-outline")
@@ -228,6 +248,9 @@ export default class Controls {
     parentElement.appendChild(container)
   }
 
+  /**
+   * @param {HTMLElement} parentElement
+   */
   clearControls(parentElement) {
     if (parentElement) {
       parentElement.innerHTML = ''
@@ -248,7 +271,26 @@ export default class Controls {
 
   }
 
+  // ============================================================
+  // UI EVENT LINKING
+  // ============================================================
+
   linkUI() {
+    this.linkModeSelect()
+    this.linkSceneButtons()
+    this.linkKeyboardEvents()
+    this.linkTimeline()
+    this.linkDualInputs()
+    this.linkPaletteSelect()
+    this.linkPaletteInput()
+    this.setPaletteInputFromSelect()
+    this.linkNewPaletteButton()
+    this.linkRandomPaletteButton()
+    this.linkDeletePaletteButton()
+    this.linkChannels()
+  }
+
+  linkModeSelect() {
     this.modeSelect.addEventListener('change', (event) => {
       this.modeIndex = event.target.selectedIndex
       this.experience.setShader(this.modeIndex)
@@ -258,8 +300,10 @@ export default class Controls {
       this.numberOfColors = event.target.value
       this.setNumberOfColors()
     })
+  }
 
-    this.deleteSceneButton.addEventListener('click', (event) => {
+  linkSceneButtons() {
+    this.deleteSceneButton.addEventListener('click', () => {
       ExperienceRepo.deleteExperience(this.sceneName.value)
       this.projectList.deleteProject(this.sceneName.value)
       ExperienceRepo.saveProjectList(this.projectList)
@@ -268,20 +312,22 @@ export default class Controls {
       this.sceneName.value = defaultSceneName
     })
 
-    this.saveSceneButton.addEventListener('click', (event) => {
+    this.saveSceneButton.addEventListener('click', () => {
       console.log("save scene")
       ExperienceRepo.saveExperience(this.sceneName.value, this.experience)
     })
 
-    this.loadSceneButton.addEventListener('click', (event) => {
+    this.loadSceneButton.addEventListener('click', () => {
       console.log("load scene")
       this.openLoadView()
     })
 
-    this.resetShader.addEventListener('click', (event) => {
+    this.resetShader.addEventListener('click', () => {
       this.experience.setShader(this.modeIndex)
     })
+  }
 
+  linkKeyboardEvents() {
     this.keyboard.on('togglePlay', () => {
       console.log("toggled play")
       this.timeline.togglePlay()
@@ -295,44 +341,13 @@ export default class Controls {
       this.seekEndOnSelectTimelines()
     })
 
-    this.keyboard.on('toggleArm1', () => {
-      this.channels[0].on = !this.channels[0].on
-      this.channelCheckboxes[0].checked = this.channels[0].on
-    })
-    this.keyboard.on('toggleArm2', () => {
-      this.channels[1].on = !this.channels[1].on
-      this.channelCheckboxes[1].checked = this.channels[1].on
-    })
-    this.keyboard.on('toggleArm3', () => {
-      this.channels[2].on = !this.channels[2].on
-      this.channelCheckboxes[2].checked = this.channels[2].on
-    })
-    this.keyboard.on('toggleArm4', () => {
-      this.channels[3].on = !this.channels[3].on
-      this.channelCheckboxes[3].checked = this.channels[3].on
-    })
-    this.keyboard.on('toggleArm5', () => {
-      this.channels[4].on = !this.channels[4].on
-      this.channelCheckboxes[4].checked = this.channels[4].on
-    })
+    for (let i = 0; i < this.numberOfChannels; i++) {
+      this.keyboard.on(`toggleArm${i + 1}`, () => this.toggleChannelArm(i))
+    }
 
     this.timeline.on('setSegment', () => {
       this.segmentSlider.value = this.timeline.segmentIndex
-      var event = new Event('input', {
-        bubbles: true,
-        value: null
-      })
     })
-
-    this.linkTimeline()
-    this.linkDualInputs()
-    this.linkPaletteSelect()
-    this.linkPaletteInput()
-    this.setPaletteInputFromSelect()
-    this.linkNewPaletteButton()
-    this.linkRandomPaletteButton()
-    this.linkDeletePaletteButton()
-    this.linkChannels()
   }
 
   linkTimeline() {
@@ -397,11 +412,21 @@ export default class Controls {
 
   }
 
+  // ============================================================
+  // TIMELINE OPERATIONS
+  // ============================================================
+
+  /**
+   * @param {HTMLElement} element
+   */
   toggleSelectButtonElement(element) {
     element.classList.toggle('selected-button')
     element.classList.toggle('default-button')
   }
 
+  /**
+   * @returns {boolean[]}
+   */
   getTimelineSelection() {
     return this.channels.map(channel => (channel.on))
   }
@@ -412,6 +437,9 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {number} index
+   */
   setTimeline(index) {
     if (!this.shader || index < 0) {
       return
@@ -460,6 +488,10 @@ export default class Controls {
     this.setUIfromShader()
   }
 
+  // ============================================================
+  // PROJECT/SCENE MANAGEMENT
+  // ============================================================
+
   openLoadView() {
     this.createProjectCards()
     this.viewerElement.hidden = true
@@ -485,6 +517,10 @@ export default class Controls {
     })
   }
 
+  /**
+   * @param {Object} project
+   * @returns {HTMLElement}
+   */
   createProjectCard(project) {
     const card = document.createElement('div')
     card.className = 'project-card'
@@ -509,6 +545,10 @@ export default class Controls {
     return card
   }
 
+  // ============================================================
+  // CHANNEL OPERATIONS
+  // ============================================================
+
   turnOnActiveChannels() {
     for (let i = 0; i < this.channels.length; i++) {
       const channel = this.channels[i]
@@ -516,14 +556,24 @@ export default class Controls {
         channel.on = true
         this.channelCheckboxes[i].checked = true
         console.log("onActiveChecked")
-
       }
     }
   }
 
   /**
-   * 
-   * @param {NumberInput} input 
+   * @param {number} index
+   */
+  toggleChannelArm(index) {
+    this.channels[index].on = !this.channels[index].on
+    this.channelCheckboxes[index].checked = this.channels[index].on
+  }
+
+  // ============================================================
+  // INPUT STATE MANAGEMENT
+  // ============================================================
+
+  /**
+   * @param {NumberInput} input
    */
   setInputElementActive(input) {
     const easeChannel = input.elements.easeChannel
@@ -541,6 +591,9 @@ export default class Controls {
     easeChannel.classList.remove(`control-ease-channel-on-${input.channelIndex + 1}`)
   }
 
+  /**
+   * @param {number} index
+   */
   clearChannelInputs(index) {
     const numInputs = this.shader.getNumInputs()
     for (const input of numInputs) {
@@ -559,6 +612,9 @@ export default class Controls {
     this.setInputElementInactive(input)
   }
 
+  /**
+   * @returns {Object}
+   */
   getUniformValues() {
     const copy = {}
     for (const [key, value] of Object.entries(this.shaderUniforms)) {
@@ -604,6 +660,10 @@ export default class Controls {
     }
   }
 
+  // ============================================================
+  // PALETTE OPERATIONS
+  // ============================================================
+
   linkPaletteSelect() {
     this.setPaletteSelectOptions()
     this.paletteSelect.addEventListener('change', () => {
@@ -620,24 +680,24 @@ export default class Controls {
   }
 
   linkPaletteInput() {
-    const paletteInput = document.getElementById('palette-input')
-    paletteInput.addEventListener('change', () => {
-      const paletteSelect = document.getElementById('palette-select')
-      const paletteOption = paletteSelect.options[paletteSelect.selectedIndex]
-      this.paletteIndex = paletteSelect.selectedIndex
+    this.paletteInput.addEventListener('change', () => {
+      const paletteOption = this.paletteSelect.options[this.paletteSelect.selectedIndex]
+      this.paletteIndex = this.paletteSelect.selectedIndex
       if (this.shader) {
-        this.shader.paletteIndex = paletteSelect.selectedIndex
+        this.shader.paletteIndex = this.paletteSelect.selectedIndex
       }
-      paletteOption.value = paletteInput.value
-      paletteOption.innerHTML = paletteInput.value
-      this.palette.name = paletteInput.value
+      paletteOption.value = this.paletteInput.value
+      paletteOption.innerHTML = this.paletteInput.value
+      this.palette.name = this.paletteInput.value
     })
   }
 
+  /**
+   * @param {number} index
+   */
   setPaletteFromIndex(index) {
-    const paletteSelect = document.getElementById('palette-select')
-    const paletteOption = paletteSelect.options[index]
-    paletteSelect.value = paletteOption.value
+    const paletteOption = this.paletteSelect.options[index]
+    this.paletteSelect.value = paletteOption.value
     const palette = this.palettes.getPaletteByName(this.paletteSelect.value)
     this.setPalette(palette)
     this.setPaletteInputFromSelect()
@@ -650,14 +710,11 @@ export default class Controls {
   }
 
   setPaletteInputFromSelect() {
-    const paletteInput = document.getElementById('palette-input')
-    const paletteSelect = document.getElementById('palette-select')
-
-    this.paletteIndex = paletteSelect.selectedIndex
+    this.paletteIndex = this.paletteSelect.selectedIndex
     if (this.shader) {
       this.shader.paletteIndex = this.paletteIndex
     }
-    paletteInput.value = paletteSelect.value
+    this.paletteInput.value = this.paletteSelect.value
   }
 
   linkNewPaletteButton() {
@@ -756,6 +813,9 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {number} i
+   */
   setChannelAsActive(i) {
     this.channels[i].active = true
     this.channelProgressSliders[i].classList.add("timeline-slider-has-content")
@@ -764,6 +824,9 @@ export default class Controls {
     this.channelNumberContainers[i].classList.remove(`control-ease-channel-${i + 1}`)
   }
 
+  /**
+   * @param {number} i
+   */
   setChannelAsInactive(i) {
     this.channels[i].active = false
     this.channelProgressSliders[i].classList.remove("timeline-slider-has-content")
@@ -773,27 +836,27 @@ export default class Controls {
   }
 
   lockPaletteInput() {
-    const paletteInput = document.getElementById('palette-input')
-    paletteInput.disabled = true
+    this.paletteInput.disabled = true
   }
 
   unlockPaletteInput() {
-    const paletteInput = document.getElementById('palette-input')
-    paletteInput.disabled = false
-
+    this.paletteInput.disabled = false
   }
 
   setPaletteSelectOptions() {
-    const paletteSelect = document.getElementById('palette-select')
-    paletteSelect.innerHTML = ''
+    this.paletteSelect.innerHTML = ''
     for (const palette of this.palettes) {
       const paletteOption = document.createElement("option")
       paletteOption.setAttribute("value", palette.name)
       paletteOption.innerHTML = palette.name
-      paletteSelect.appendChild(paletteOption)
+      this.paletteSelect.appendChild(paletteOption)
     }
-    paletteSelect.selectedIndex = this.palettes.getPaletteIndex(this.palette)
+    this.paletteSelect.selectedIndex = this.palettes.getPaletteIndex(this.palette)
   }
+
+  // ============================================================
+  // COLOR OPERATIONS
+  // ============================================================
 
   createColorElements() {
     const colorGrid = document.getElementById('colors-container')
@@ -842,6 +905,10 @@ export default class Controls {
     }
   }
 
+  /**
+   * @param {HTMLElement} element
+   * @param {number} i
+   */
   setColorFromElement(element, i) {
     const color = new THREE.Color(element.value)
     color.convertLinearToSRGB()
@@ -849,14 +916,23 @@ export default class Controls {
     this.shaderUniforms.uPalette.value[i] = color
   }
 
+  /**
+   * @param {string} name
+   */
   setName(name) {
     this.sceneName.value = name
   }
 
+  /**
+   * @returns {string}
+   */
   getName() {
     return this.sceneName.value
   }
 
+  /**
+   * @param {string} newEase
+   */
   setEase(newEase) {
     this.currentEase = newEase
     this.channel.ease = newEase
