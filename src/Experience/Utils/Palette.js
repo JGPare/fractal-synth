@@ -1,11 +1,20 @@
 import * as THREE from 'three'
 
-// this must be coordinate with shader
+// This must be coordinated with shader
 const defaultPaletteLength = 10
-// this is how many colors are used by default
+// This is how many colors are used by default
 const defaultPaletteDisplayLength = 5
 
 export default class Palette {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
+  /**
+   * @param {THREE.Color[]} palette
+   * @param {string} name
+   * @param {number} length
+   */
   constructor(palette = [], name = "", length = null) {
     this.name = name
     this.palette = palette
@@ -23,9 +32,12 @@ export default class Palette {
     }
   }
 
+  /**
+   * @returns {Palette}
+   */
   clone() {
     const palette = new Palette()
-    for (let i = 0; i < palette.length; i++) {
+    for (let i = 0; i < this.palette.length; i++) {
       const color = this.getColor(i).clone()
       palette.setColor(i, color)
     }
@@ -37,20 +49,20 @@ export default class Palette {
     this.locked = true
   }
 
+  // ============================================================
+  // PALETTE MANAGEMENT
+  // ============================================================
+
+  /**
+   * @param {THREE.Color[]} palette
+   */
   setPalette(palette) {
     this.palette = palette
   }
 
-  setColor(index, color) {
-    this.palette[index] = color
-  }
-
-  setColorFromElement(index, element) {
-    const color = new THREE.Color(element.value)
-    color.convertLinearToSRGB()
-    palette[i] = color
-  }
-
+  /**
+   * @param {number} length
+   */
   setDefaultPalette(length) {
     this.clearPalette()
     for (let i = 0; i < length; i++) {
@@ -69,16 +81,71 @@ export default class Palette {
     }
   }
 
+  /**
+   * @param {number} length
+   */
+  setLength(length) {
+    this.displayLength = length
+  }
+
+  randomize() {
+    for (const color of this.palette) {
+      this.setColorAsRandom(color)
+    }
+  }
+
+  // ============================================================
+  // COLOR MANAGEMENT
+  // ============================================================
+
+  /**
+   * @param {number} index
+   * @returns {THREE.Color}
+   */
   getColor(index) {
     return this.palette[Math.min(index, this.palette.length - 1)]
   }
 
+  /**
+   * @param {number} index
+   * @param {THREE.Color} color
+   */
+  setColor(index, color) {
+    this.palette[index] = color
+  }
+
+  /**
+   * @param {number} index
+   * @param {HTMLInputElement} element
+   */
+  setColorFromElement(index, element) {
+    const color = new THREE.Color(element.value)
+    color.convertLinearToSRGB()
+    this.palette[index] = color
+  }
+
+  /**
+   * @param {THREE.Color} color
+   */
+  setColorAsRandom(color) {
+    color.setRGB(Math.random(), Math.random(), Math.random())
+  }
+
+  /**
+   * @param {number} index
+   * @returns {string}
+   */
   getHexOfIndex(index) {
     const color = this.palette[index].clone()
     color.convertSRGBToLinear()
     return color.getHexString()
   }
 
+  /**
+   * @param {THREE.Color} color
+   * @param {boolean} random
+   * @returns {THREE.Color}
+   */
   addColor(color = new THREE.Color(), random = false) {
     if (random) {
       this.setColorAsRandom(color)
@@ -88,30 +155,19 @@ export default class Palette {
     return color
   }
 
-  setColorAsRandom(color) {
-    color.setRGB(Math.random(),
-      Math.random(),
-      Math.random())
-  }
-
-  randomize() {
-    for (const color of this.palette) {
-      this.setColorAsRandom(color)
-    }
-  }
-
+  /**
+   * @param {number} colorHex
+   */
   addColorByHex(colorHex) {
     const color = new THREE.Color()
     color.setHex(colorHex, THREE.SRGBColorSpace)
     this.addColor(color)
   }
 
+  /**
+   * @param {number} index
+   */
   removeColor(index = this.palette.length - 1) {
     this.palette.pop(index)
   }
-
-  setLength(length) {
-    this.displayLength = length
-  }
-
 }
