@@ -9,7 +9,6 @@ export default class Channel {
     this.on = params.on
     // active is has animated pars
     this.active = false
-
     this.onSetDuration = null
   }
 

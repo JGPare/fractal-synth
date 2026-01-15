@@ -3,7 +3,6 @@ import Experience from "./Experience"
 import ShaderMaterial from './ShaderMaterial'
 import { eNumInput } from './Common/eNums'
 
-
 export default class Screen {
   constructor() {
     this.experience = new Experience()

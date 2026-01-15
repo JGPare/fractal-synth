@@ -254,7 +254,6 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-
   renew(index) {
     const tl = this.tls[index]
     tl.clear()
@@ -266,7 +265,6 @@ export default class Timeline extends EventEmitter {
       this.renew(i)
     }
   }
-
 
   seekStart(index) {
     const tl = this.tls[index]
@@ -317,5 +315,4 @@ export default class Timeline extends EventEmitter {
     this.play()
     this.pause()
   }
-
 }

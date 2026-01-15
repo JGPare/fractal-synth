@@ -16,7 +16,6 @@ export default class Camera {
     }
 
     this.setInstance()
-
   }
 
   setInstance() {

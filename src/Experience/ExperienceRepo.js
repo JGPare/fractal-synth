@@ -94,7 +94,6 @@ export default class ExperienceRepo {
   static loadExperience(name, experience) {
     const experienceSnapshot = JSON.parse(localStorage.getItem(name))
 
-
     if (debug) {
       console.log("loaded snapshot:", experienceSnapshot)
       console.log(name)

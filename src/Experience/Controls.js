@@ -59,7 +59,6 @@ export default class Controls {
   }
 
   getElements() {
-
     this.sceneName = document.getElementById('scene-name')
     this.loaderElement = document.getElementById('loader')
     this.viewerElement = document.getElementById('viewer')
