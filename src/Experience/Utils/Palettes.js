@@ -1,13 +1,28 @@
-import * as THREE from 'three'
 import Palette from './Palette'
 import Storage from './Storage'
 import defaultPalettes from '../Common/defaultPalettes.js'
 
 export default class Palettes {
-  constructor(defaultPalettes) {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
+  constructor() {
     this.load()
   }
 
+  load() {
+    this.palettes = this.readDefaultPalettes()
+    const palettes = Storage.getPalettes()
+
+    palettes.forEach(palette => {
+      this.addPalette(palette)
+    })
+  }
+
+  /**
+   * @returns {Palette[]}
+   */
   readDefaultPalettes() {
     let palettes = []
     for (const paletteData of defaultPalettes) {
@@ -19,13 +34,24 @@ export default class Palettes {
     return palettes
   }
 
+  // ============================================================
+  // PALETTE ACCESS
+  // ============================================================
+
+  /**
+   * @param {number} index
+   * @returns {Palette}
+   */
   getPaletteByIndex(index) {
     return this.palettes[Math.min(index, this.palettes.length - 1)]
   }
 
+  /**
+   * @param {Palette} inputPalette
+   * @returns {number|undefined}
+   */
   getPaletteIndex(inputPalette) {
-    let i
-    for (i = 0; i < this.palettes.length; i++) {
+    for (let i = 0; i < this.palettes.length; i++) {
       const palette = this.palettes[i]
       if (palette === inputPalette) {
         return i
@@ -33,6 +59,10 @@ export default class Palettes {
     }
   }
 
+  /**
+   * @param {string} name
+   * @returns {Palette|null}
+   */
   getPaletteByName(name) {
     for (const palette of this.palettes) {
       if (palette.name == name) {
@@ -42,32 +72,6 @@ export default class Palettes {
     return null
   }
 
-  load() {
-    this.palettes = this.readDefaultPalettes(defaultPalettes)
-    const palettes = Storage.getPalettes()
-
-    palettes.forEach(palette => {
-      this.addPalette(palette)
-    })
-  }
-
-  save() {
-    Storage.setPalettes(this.palettes)
-  }
-
-  addPalette(palette = new Palette()) {
-    this.palettes.push(palette)
-    return palette
-  }
-
-  // deletes palette and returns next valid palette
-  deletePalette(paletteToDelete) {
-    const i = this.getPaletteIndex(paletteToDelete)
-    this.palettes.splice(i)
-    return this.palettes[i < this.palettes.length ? i : this.palettes.length - 1]
-  }
-
-  // allow for indexing
   [Symbol.iterator]() {
     var index = -1
     var data = this.palettes
@@ -75,5 +79,32 @@ export default class Palettes {
     return {
       next: () => ({ value: data[++index], done: !(index in data) })
     }
-  };
+  }
+
+  // ============================================================
+  // PALETTE MANAGEMENT
+  // ============================================================
+
+  /**
+   * @param {Palette} palette
+   * @returns {Palette}
+   */
+  addPalette(palette = new Palette()) {
+    this.palettes.push(palette)
+    return palette
+  }
+
+  /**
+   * @param {Palette} paletteToDelete
+   * @returns {Palette}
+   */
+  deletePalette(paletteToDelete) {
+    const i = this.getPaletteIndex(paletteToDelete)
+    this.palettes.splice(i, 1)
+    return this.palettes[i < this.palettes.length ? i : this.palettes.length - 1]
+  }
+
+  save() {
+    Storage.setPalettes(this.palettes)
+  }
 }
