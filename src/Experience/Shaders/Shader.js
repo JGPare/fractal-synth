@@ -1,10 +1,8 @@
 import { eNumInput } from "../Common/eNums"
 import NumberInput from "../Inputs/NumberInput"
 
-export default class Shader 
-{
-  constructor(name, eShader, paletteIndex = 0) 
-  {
+export default class Shader {
+  constructor(name, eShader, paletteIndex = 0) {
     this.name = name
     this.groups = {}
     this.uFloatPars = new Float32Array(Object.keys(eNumInput).length)
@@ -12,111 +10,100 @@ export default class Shader
     this.paletteIndex = paletteIndex
   }
 
-  addGroup(name, inputs = [])
-  {
+  addGroup(name, inputs = []) {
     this.groups[name] = []
-    if (inputs){
+    if (inputs) {
       this.addToGroup(name, inputs)
     }
   }
 
-  addToGroup(groupName, inputs)
-  {
-    if (this.groups[groupName]){
+  addToGroup(groupName, inputs) {
+    if (this.groups[groupName]) {
       inputs.forEach(input => {
         this.groups[groupName].push(input)
       })
     }
-    else{
+    else {
       console.log("Group does not exist")
     }
   }
 
-  setInputs()
-  {
-    for (const [key, group] of Object.entries(this.groups)){
-      for (const input of group){
+  setInputs() {
+    for (const [key, group] of Object.entries(this.groups)) {
+      for (const input of group) {
         switch (input.type) {
-        case "number":
-          input.setUfloatPars(this.uFloatPars)
-          break;
-        default:
-          break;
+          case "number":
+            input.setUfloatPars(this.uFloatPars)
+            break
+          default:
+            break
         }
       }
     }
   }
 
-  getInput(eNumInput)
-  {
-    for (const [key, group] of Object.entries(this.groups)){
-      for (const input of group){        
-        if (input.eId == eNumInput){
+  getInput(eNumInput) {
+    for (const [key, group] of Object.entries(this.groups)) {
+      for (const input of group) {
+        if (input.eId == eNumInput) {
           return input
         }
       }
     }
   }
 
-  getNumInputs()
-  {
-    const inputs = [];
-    for (const [key, group] of Object.entries(this.groups)){
-      for (const input of group){        
-        if (input.type == "number"){
+  getNumInputs() {
+    const inputs = []
+    for (const [key, group] of Object.entries(this.groups)) {
+      for (const input of group) {
+        if (input.type == "number") {
           inputs.push(input)
         }
       }
     }
-    return inputs;
+    return inputs
   }
 
-  setStartValFromUniforms(channelIndex)
-  {
+  setStartValFromUniforms(channelIndex) {
     const numInputs = this.getNumInputs()
-    
+
     for (let i = 0; i < numInputs.length; i++) {
-      if (numInputs[i].channelIndex == channelIndex){
+      if (numInputs[i].channelIndex == channelIndex) {
         numInputs[i].startVal = numInputs[i].getValue()
       }
     }
   }
 
-  setEndValFromUniforms(channelIndex)
-  {
+  setEndValFromUniforms(channelIndex) {
     const numInputs = this.getNumInputs()
     for (let i = 0; i < numInputs.length; i++) {
-      if (numInputs[i].channelIndex == channelIndex){
+      if (numInputs[i].channelIndex == channelIndex) {
         numInputs[i].endVal = numInputs[i].getValue()
       }
     }
   }
 
-  getUfloatPars()
-  {
+  getUfloatPars() {
     return this.uFloatPars
   }
 
 
-  getGroups()
-  {
+  getGroups() {
     return this.groups
   }
 
-  getGroup(name)
-  {
+  getGroup(name) {
     return groups[name]
   }
 
-  getGroupsSnapshot()
-  {
+  getGroupsSnapshot() {
     const groupsSnap = {}
-    for (const [key, group] of Object.entries(this.groups)){
-      const groupSnap = { 
-        name : key,
-        numInputs : []
+    for (const [key, group] of Object.entries(this.groups)) {
+      const groupSnap = {
+        name: key,
+        numInputs: []
       }
-      for (const input of group){
+      for (const input of group) {
         groupSnap.numInputs.push(input.getSnapshot())
       }
       groupsSnap[key] = groupSnap
@@ -125,18 +112,16 @@ export default class Shader
     return groupsSnap
   }
 
-  getSnapshot()
-  {
+  getSnapshot() {
     return {
-      name : this.name,
-      groups : this.getGroupsSnapshot(),
-      eShader : this.eShader,
-      paletteIndex : this.paletteIndex
+      name: this.name,
+      groups: this.getGroupsSnapshot(),
+      eShader: this.eShader,
+      paletteIndex: this.paletteIndex
     }
   }
 
-  setFromSnapshot(snapshot)
-  {
+  setFromSnapshot(snapshot) {
     this.paletteIndex = snapshot.paletteIndex
     for (const [key, group] of Object.entries(snapshot.groups)) {
       for (const input of group.numInputs) {
@@ -151,11 +136,10 @@ export default class Shader
     }
   }
 
-  setInputFromSnapshot(inputName, inputSnap)
-  {
-    for (const [key, group] of Object.entries(this.groups)){
-      for (let i = 0; i < group.length; i++){
-        if (group[i].name == inputName){
+  setInputFromSnapshot(inputName, inputSnap) {
+    for (const [key, group] of Object.entries(this.groups)) {
+      for (let i = 0; i < group.length; i++) {
+        if (group[i].name == inputName) {
           group[i].setFromSnapshot(inputSnap)
         }
       }
@@ -191,5 +175,5 @@ export default class Shader
 
     return newShader
   }
-  
+
 }

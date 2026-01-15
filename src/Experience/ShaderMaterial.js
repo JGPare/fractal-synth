@@ -5,10 +5,8 @@ import vertexShader from './Shaders/glsl/vertex.glsl?raw' // %JPA get rid of tes
 import fragmentShader from './Shaders/glsl/fragment.glsl?raw'
 import Shader from './Shaders/Shader'
 
-export default class ShaderMaterial 
-{
-  constructor() 
-  {
+export default class ShaderMaterial {
+  constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
     this.sizes = this.experience.sizes
@@ -20,8 +18,7 @@ export default class ShaderMaterial
     this.numberOfColors = 6
 
     // Debug
-    if (this.debug.active)
-    {
+    if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Shader')
       this.debugFolder.close()
     }
@@ -31,21 +28,20 @@ export default class ShaderMaterial
       side: THREE.DoubleSide,
       uniforms:
       {
-        uPalette : { 
-          type : "v3v",
-          value : this.palette.palette
+        uPalette: {
+          type: "v3v",
+          value: this.palette.palette
         },
-        uFloatPar : {value: new Float32Array(25)},
+        uFloatPar: { value: new Float32Array(25) },
         uTime: { value: 0 },
         uAspect: { value: this.sizes.aspect },
-        uMode : {value : this.mode},
-        uPaletteLen : {value : this.numberOfColors},
+        uMode: { value: this.mode },
+        uPaletteLen: { value: this.numberOfColors },
       }
     })
   }
 
-  getUniforms()
-  {
+  getUniforms() {
     return this.material.uniforms
   }
 
@@ -53,8 +49,7 @@ export default class ShaderMaterial
    * 
    * @param {Shader} shader 
    */
-  setShader(shader)
-  {
+  setShader(shader) {
     const uniforms = this.material.uniforms
     shader.uFloatPars = uniforms.uFloatPar.value
     shader.setInputs()

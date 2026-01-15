@@ -12,22 +12,19 @@ export default class Project {
     this.lastModified = lastModified ? Date.now() : Date.parse(lastModified)
   }
 
-  setImage(image)
-  {
+  setImage(image) {
     this.image = image
   }
 
-  getSnapshot()
-  {
+  getSnapshot() {
     return {
-      name : this.name,
-      image : this.image,
-      lastModified : this.lastModified.toString()
+      name: this.name,
+      image: this.image,
+      lastModified: this.lastModified.toString()
     }
   }
 
-  updateModified()
-  {
+  updateModified() {
     this.lastModified = Date.now()
   }
 

@@ -1,10 +1,8 @@
 import * as THREE from 'three'
 import Experience from './Experience.js'
 
-export default class Camera
-{
-  constructor() 
-  {
+export default class Camera {
+  constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
     this.sizes = this.experience.sizes
@@ -12,31 +10,27 @@ export default class Camera
     this.canvas = this.experience.canvas
 
     // Debug
-    if (this.debug.active)
-    {
+    if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Camera')
       this.debugFolder.close()
     }
-    
+
     this.setInstance()
 
   }
 
-  setInstance()
-  {
-    this.instance = new THREE.OrthographicCamera(-1,1,1,-1)
+  setInstance() {
+    this.instance = new THREE.OrthographicCamera(-1, 1, 1, -1)
 
     this.instance.position.set(0, 0, 1)
     this.scene.add(this.instance)
-    
-    if(this.debug.active)
-    {
-      
+
+    if (this.debug.active) {
+
     }
   }
 
-  resize()
-  {
+  resize() {
     this.instance.aspect = this.sizes.width / this.sizes.height
   }
 }

@@ -9,26 +9,25 @@ import Channel from '../Channel.js'
 // Register the plugin
 gsap.registerPlugin(CustomEase)
 
-let debug = true;
+let debug = true
 
-export default class Timeline extends EventEmitter { 
+export default class Timeline extends EventEmitter {
   /**
    * 
    * @param {Experience} experience 
    */
-  constructor(experience) 
-  {
+  constructor(experience) {
     super()
 
     this.experience = experience
-    
+
     this.tlParams = {
       repeat: -1,
       yoyo: true,
       repeatDelay: 0,
       paused: true,
-      defaults: { 
-        duration: 5, 
+      defaults: {
+        duration: 5,
         ease: "sine.inOut",
       }
     }
@@ -45,17 +44,17 @@ export default class Timeline extends EventEmitter {
      * @type {Array<gsap.core.Timeline>} 
     */
     this.tls = [
-      this.getNewTimeline(this.tlParams, {index: 0}),
-      this.getNewTimeline(this.tlParams, {index: 1}),
-      this.getNewTimeline(this.tlParams, {index: 2}),
-      this.getNewTimeline(this.tlParams, {index: 3}),
-      this.getNewTimeline(this.tlParams, {index: 4})
+      this.getNewTimeline(this.tlParams, { index: 0 }),
+      this.getNewTimeline(this.tlParams, { index: 1 }),
+      this.getNewTimeline(this.tlParams, { index: 2 }),
+      this.getNewTimeline(this.tlParams, { index: 3 }),
+      this.getNewTimeline(this.tlParams, { index: 4 })
     ]
 
     this.currInd = 0
 
-    if (debug){
-      console.log("init snapshot",this.snapshot);
+    if (debug) {
+      console.log("init snapshot", this.snapshot)
     }
 
     /**
@@ -64,13 +63,12 @@ export default class Timeline extends EventEmitter {
     this.tl = this.tls[0]
   }
 
-  setEase(easeType, easeString, i)
-  {
-    let ease;
-    switch (easeType){
+  setEase(easeType, easeString, i) {
+    let ease
+    switch (easeType) {
       case "custom":
         ease = CustomEase.create("custom", easeString)
-        break;
+        break
       default:
         ease = easeType + "." + easeString
     }
@@ -85,71 +83,64 @@ export default class Timeline extends EventEmitter {
     })
   }
 
-  setRepeat(isRepeat, tlSelections)
-  {    
-    this.tlParams.repeat = isRepeat ?  -1 : 0
-    for (let i  = 0; i < tls.length; i++) {
-      const tl = tls[i];
-      if (tlSelections[i]){
-        tl.repeat(isRepeat ?  -1 : 0)
+  setRepeat(isRepeat, tlSelections) {
+    this.tlParams.repeat = isRepeat ? -1 : 0
+    for (let i = 0; i < tls.length; i++) {
+      const tl = tls[i]
+      if (tlSelections[i]) {
+        tl.repeat(isRepeat ? -1 : 0)
       }
     }
   }
 
   setYoyo(isYoyo, tlSelections) {
     this.tlParams.yoyo = isYoyo
-    for (let i  = 0; i < tls.length; i++) {
-      const tl = tls[i];
-      if (tlSelections[i]){
+    for (let i = 0; i < tls.length; i++) {
+      const tl = tls[i]
+      if (tlSelections[i]) {
         tl.yoyo(isYoyo)
       }
     }
   }
 
 
-  getBlankSnapshot()
-  {
+  getBlankSnapshot() {
     return {
-      channels : [],
-      tlParams : this.tlParams
+      channels: [],
+      tlParams: this.tlParams
     }
   }
 
-  getNewTimeline(params, data = {})
-  {
+  getNewTimeline(params, data = {}) {
     const tl = gsap.timeline(params)
     tl.data = data
     return tl
   }
 
-  setTimeline(index)
-  {    
-    if (index < this.tls.length){
+  setTimeline(index) {
+    if (index < this.tls.length) {
       this.tl = this.tls[index]
       this.currInd = index
     }
     else {
-      console.log("tl index error");
+      console.log("tl index error")
     }
   }
 
-  setTimelineCount(count)
-  {
+  setTimelineCount(count) {
 
   }
 
-  setDuration(duration, index)
-  {
+  setDuration(duration, index) {
     this.tls[index].duration(duration)
-    if (debug){
-      console.log("setting duration for tl:", index, this.tls[index]);
-      
+    if (debug) {
+      console.log("setting duration for tl:", index, this.tls[index])
+
     }
   }
 
-  progress(value = null, index = -1)
-  {
-    if (index > -1){
+  progress(value = null, index = -1) {
+    if (index > -1) {
       this.tls[index].progress(value)
     }
     else {
@@ -157,30 +148,31 @@ export default class Timeline extends EventEmitter {
     }
   }
 
-  fromTo(item, fromPars, toPars, start, eId, timelineIndex)
-  {
+  fromTo(item, fromPars, toPars, start, eId, timelineIndex) {
     const scaleFactor = 100000
     const target = item
     const proxyName = this.getProxyNameFromEid(eId)
-    
+
     const tl = this.tls[timelineIndex]
 
-    const newFromPars = {...fromPars}
-    const newToPars = {...toPars, 
+    const newFromPars = { ...fromPars }
+    const newToPars = {
+      ...toPars,
       immediateRender: false,
       data: eId,
       onUpdate: () => {
-        target[eId] = this.proxy[proxyName].value/scaleFactor
-    }}
+        target[eId] = this.proxy[proxyName].value / scaleFactor
+      }
+    }
 
-    this.proxy[proxyName] = {value : fromPars.value*scaleFactor}
-    
+    this.proxy[proxyName] = { value: fromPars.value * scaleFactor }
+
     newFromPars.value *= scaleFactor
     newToPars.value *= scaleFactor
-    
-    tl.fromTo(this.proxy[proxyName], 
-      newFromPars, 
-      newToPars, 
+
+    tl.fromTo(this.proxy[proxyName],
+      newFromPars,
+      newToPars,
       start,
     )
   }
@@ -190,14 +182,14 @@ export default class Timeline extends EventEmitter {
    * @param {object} timelineSlider 
    * @param {Channel} channel 
    */
-  fromToTimeline(timelineSlider, timelineIndex)
-  {
-    const fromPars = {"value" : 0}
-    const toPars = {"value" : 1,
-                    "ease" : "none",
-                    "yoyo" : true
-     }
-     
+  fromToTimeline(timelineSlider, timelineIndex) {
+    const fromPars = { "value": 0 }
+    const toPars = {
+      "value": 1,
+      "ease": "none",
+      "yoyo": true
+    }
+
     this.tls[timelineIndex].fromTo(timelineSlider, fromPars, toPars, 0)
   }
 
@@ -205,113 +197,101 @@ export default class Timeline extends EventEmitter {
    * 
    * @param {NumberInput} numInput 
    */
-  setFromToFromNumInput(numInput, timelineIndex)
-  {
-    this.fromTo(numInput.uFloatPar, 
-          {"value" : numInput.startVal},
-          {"value" : numInput.endVal},
-          0,
-          numInput.eId, 
-          timelineIndex
-        )
+  setFromToFromNumInput(numInput, timelineIndex) {
+    this.fromTo(numInput.uFloatPar,
+      { "value": numInput.startVal },
+      { "value": numInput.endVal },
+      0,
+      numInput.eId,
+      timelineIndex
+    )
   }
 
-  getProxyNameFromEid(eId)
-  {
-    for (const [key, value] of Object.entries(eNumInput)){
-     if(eId == value){
-      return key
-     }
-    }
-  }
-
-  pause(index) 
-  {
-    if (this.tls[index]) {
-      this.playingArray[index] = false
-      this.tls[index].pause()
-      if (debug){
-        console.log("pausing index:", index);
+  getProxyNameFromEid(eId) {
+    for (const [key, value] of Object.entries(eNumInput)) {
+      if (eId == value) {
+        return key
       }
     }
   }
 
-  pauseTimelinesSelect(timelineSelections)
-  {
+  pause(index) {
+    if (this.tls[index]) {
+      this.playingArray[index] = false
+      this.tls[index].pause()
+      if (debug) {
+        console.log("pausing index:", index)
+      }
+    }
+  }
+
+  pauseTimelinesSelect(timelineSelections) {
 
     for (let i = 0; i < this.tls.length; i++) {
-      const tl = this.tls[i];
-      if (timelineSelections[i]){
+      const tl = this.tls[i]
+      if (timelineSelections[i]) {
         tl.pause()
       }
     }
   }
 
-  play(index)
-  {
+  play(index) {
     this.tls[index].play()
-    if (debug){
-          console.log("playing tl:", index);
-    }        
+    if (debug) {
+      console.log("playing tl:", index)
+    }
   }
 
-  playTimelinesSelect(timelineSelections)
-  {
+  playTimelinesSelect(timelineSelections) {
     for (let i = 0; i < this.tls.length; i++) {
-      const tl = this.tls[i];
-      if (timelineSelections[i]){
+      const tl = this.tls[i]
+      if (timelineSelections[i]) {
         tl.play()
-        if (debug){
-          console.log("playing tl:", i);
-        }        
+        if (debug) {
+          console.log("playing tl:", i)
+        }
       }
     }
   }
 
 
-  renew(index)
-  {
+  renew(index) {
     const tl = this.tls[index]
     tl.clear()
     tl.pause()
   }
 
-  renewAll()
-  {
+  renewAll() {
     for (let i = 0; i < this.tls.length; i++) {
       this.renew(i)
     }
   }
 
 
-  seekStart(index)
-  {
+  seekStart(index) {
     const tl = this.tls[index]
     tl.time(0)
   }
 
-  seekEnd(index)
-  {
+  seekEnd(index) {
     const tl = this.tls[index]
     tl.time(tl.duration())
   }
-  
-  getSnapshot()
-  {
+
+  getSnapshot() {
     return this.snapshot
   }
 
-  setFromSnapshot(snapshot)
-  {
+  setFromSnapshot(snapshot) {
     this.snapshot = this.getBlankSnapshot()
     this.setTimelines()
 
-    if (debug){
-      console.log("loaded snap", snapshot);
+    if (debug) {
+      console.log("loaded snap", snapshot)
     }
 
     for (let i = 0; i < snapshot.segments.length; i++) {
-      const segment = snapshot.segments[i];
+      const segment = snapshot.segments[i]
       this.addTimeline(i)
       this.tl = this.segmentTLs[i]
       segment.to.forEach(tweenSnapshot => {
@@ -319,20 +299,20 @@ export default class Timeline extends EventEmitter {
         this.to(item, ...tweenSnapshot.pars)
       })
       segment.fromTo.forEach(tweenSnapshot => {
-        const item = this.experience.getItemById(tweenSnapshot.localId)      
-        this.fromTo(item, ...tweenSnapshot.pars) 
+        const item = this.experience.getItemById(tweenSnapshot.localId)
+        this.fromTo(item, ...tweenSnapshot.pars)
       })
       const duration = segment.duration ?? this.tlParams.defaults.duration
-      if (debug){
+      if (debug) {
 
-        console.log("set from snap seg and dur", segment, duration);
+        console.log("set from snap seg and dur", segment, duration)
       }
-      
+
       this.tl.duration(duration)
       this.tl.paused(false)
     }
-    
-    this.masterTL.seek(0,false)
+
+    this.masterTL.seek(0, false)
     this.tl = this.segmentTLs[0]
     this.play()
     this.pause()

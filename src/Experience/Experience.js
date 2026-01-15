@@ -20,19 +20,16 @@ import { eShaders } from './Common/eNums.js'
 import Channel from './Channel.js'
 import ProjectList from './ProjectList.js'
 
-THREE.ColorManagement.enabled = true;
+THREE.ColorManagement.enabled = true
 
 let instance = null
 
 let debug = false
 
-export default class Experience
-{
-  constructor(canvas)
-  {
+export default class Experience {
+  constructor(canvas) {
     // Singleton
-    if (instance) 
-    {
+    if (instance) {
       return instance
     }
     instance = this
@@ -50,7 +47,7 @@ export default class Experience
     this.debug = new Debug()
     this.sizes = new Sizes()
     this.time = new Time()
-    this.scene = new THREE.Scene() 
+    this.scene = new THREE.Scene()
     this.palettes = new Palettes()
     this.camera = new Camera()
     this.renderer = new Render()
@@ -58,8 +55,8 @@ export default class Experience
     this.shaderMaterial = new ShaderMaterial()
     this.screen = new Screen()
     this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
-    this.channels = Array.from({ length: 5 }, () => new Channel({name : "Sin", ease : "sine", duration : 25, on : false}))
-    
+    this.channels = Array.from({ length: 5 }, () => new Channel({ name: "Sin", ease: "sine", duration: 25, on: false }))
+
     this.controls = new Controls()
     this.stats = new StatsPanel()
 
@@ -68,52 +65,44 @@ export default class Experience
 
     this.setKeyMappings()
 
-    this.sizes.on('resize', () =>
-    {
+    this.sizes.on('resize', () => {
       this.resize()
     })
 
-    this.time.on('tick', () =>
-    {
+    this.time.on('tick', () => {
       this.stats.update()
       this.update()
     })
 
-    this.mouse.on('mousemove', () =>
-    {
+    this.mouse.on('mousemove', () => {
       this.mousemove()
     })
-    
-    this.mouse.on('touchmove', () =>
-    {
+
+    this.mouse.on('touchmove', () => {
       this.touchmove()
     })
 
-    this.mouse.on('doubleClick', () =>
-    {
+    this.mouse.on('doubleClick', () => {
       this.doubleClick()
     })
 
-    this.mouse.on('scroll', () =>
-    {
+    this.mouse.on('scroll', () => {
       this.scroll()
     })
     this.onLoad()
   }
 
-  setShader(eShader)
-  {
+  setShader(eShader) {
     this.shader = ShaderUtility.getShader(eShader)
     if (debug) {
-      console.log("setting shader: ", this.shader);
+      console.log("setting shader: ", this.shader)
     }
-    
+
     this.controls.setShader()
     this.screen.setShader()
   }
 
-  setKeyMappings()
-  {
+  setKeyMappings() {
     this.keyboard.addMapping("Space", "togglePlay")
     this.keyboard.addMapping("Comma", "seekStart")
     this.keyboard.addMapping("Period", "seekEnd")
@@ -124,48 +113,40 @@ export default class Experience
     this.keyboard.addMapping("Digit5", "toggleArm5")
   }
 
-  resize()
-  {
+  resize() {
     this.camera.resize()
     this.renderer.resize()
     this.screen.resize()
   }
-  
-  update()
-  {
+
+  update() {
     this.renderer.update()
     this.screen.update()
     this.stats.update()
   }
 
-  mousemove()
-  {
+  mousemove() {
     this.screen.mousemove()
   }
 
-  touchmove()
-  {
+  touchmove() {
     this.screen.touchmove()
   }
 
-  doubleClick()
-  {
+  doubleClick() {
     this.renderer.doubleClick()
   }
 
-  scroll()
-  {
+  scroll() {
     this.screen.scroll()
   }
 
-  onLoad()
-  {
+  onLoad() {
     this.renderer.onLoad()
     ExperienceRepo.loadLastExperience(this)
   }
 
-  onBeforeUnload()
-  {
+  onBeforeUnload() {
     this.palettes.save()
   }
 }

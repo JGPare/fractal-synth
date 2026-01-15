@@ -9,7 +9,7 @@ export default class Keyboard extends EventEmitter {
     this.keyMap = {}
 
     parentElement.addEventListener('keydown', (event) => {
-      
+
       if (!this.heldKeys.has(event.code)) {
         this.heldKeys.add(event.code)
         const eventKey = `keydown:${event.code}`
@@ -30,9 +30,8 @@ export default class Keyboard extends EventEmitter {
     })
   }
 
-  addMapping(key, eventName, type="keydown")
-  {
-    this.keyMap[type+":"+key] = eventName
+  addMapping(key, eventName, type = "keydown") {
+    this.keyMap[type + ":" + key] = eventName
   }
 
   isDown(keyCode) {

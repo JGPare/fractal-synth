@@ -1,10 +1,10 @@
 import paper from 'paper'
 import Experience from './Experience'
 
-  /**
-   * 
-   * @param {Experience} experience 
-   */
+/**
+ * 
+ * @param {Experience} experience 
+ */
 export default class CurveEditor {
   constructor(canvasId, outputId, experience) {
 
@@ -29,8 +29,8 @@ export default class CurveEditor {
 
     // Set up coordinate system for easing curves (0-1)
     this.margin = {
-      x : 5,
-      y : 40
+      x: 5,
+      y: 40
     }
     this.width = paper.view.size.width - 2 * this.margin.x
     this.height = paper.view.size.height - 2 * this.margin.y
@@ -63,7 +63,7 @@ export default class CurveEditor {
   toEasing(point) {
     return new paper.Point(
       (point.x - this.margin.x) / this.width,
-      1 - (point.y*this.yScale - this.margin.y) / this.height  // Flip Y axis
+      1 - (point.y * this.yScale - this.margin.y) / this.height  // Flip Y axis
     )
   }
 
@@ -104,10 +104,10 @@ export default class CurveEditor {
     // Bind this context for the drag handler
     const self = this
     circle.onMouseDrag = function (event) {
-      if (isXlock){
+      if (isXlock) {
         this.position.y = event.point.y
       }
-      else{
+      else {
         this.position = event.point
       }
       self.updateCurve()
@@ -162,10 +162,10 @@ export default class CurveEditor {
     this.curve.strokeColor = '#768daa'
     this.curve.strokeWidth = 3
     this.curve.strokeCap = 'round'
-    
+
     // Make the curve clickable for adding segments
     const self = this
-    this.curve.onClick = function(event) {
+    this.curve.onClick = function (event) {
       self.addSegmentAtPoint(event.point)
     }
 
@@ -195,28 +195,28 @@ export default class CurveEditor {
     // Find the closest point on the curve to where user clicked
     const offset = this.curve.getNearestPoint(clickPoint)
     const location = this.curve.getNearestLocation(clickPoint)
-    
+
     // Convert the offset (parameter t) to determine which segment was clicked
     let segmentIndex = Math.floor(location.offset / this.curve.length * this.segments.length)
     segmentIndex = Math.max(0, Math.min(segmentIndex, this.segments.length - 1))
-    
+
     // Get the point where we want to split
     const splitPoint = offset
     const easingSplitPoint = this.toEasing(splitPoint)
-    
+
     // Create new control points around the split point
     const cp1Offset = 0.1
     const cp2Offset = 0.1
-    
+
     const newCP1 = this.toScreen(new paper.Point(
-      Math.max(0, Math.min(1, easingSplitPoint.x - cp1Offset)), 
+      Math.max(0, Math.min(1, easingSplitPoint.x - cp1Offset)),
       Math.max(0, Math.min(1, easingSplitPoint.y - cp1Offset))
     ))
     const newCP2 = this.toScreen(new paper.Point(
-      Math.max(0, Math.min(1, easingSplitPoint.x + cp2Offset)), 
+      Math.max(0, Math.min(1, easingSplitPoint.x + cp2Offset)),
       Math.max(0, Math.min(1, easingSplitPoint.y + cp2Offset))
     ))
-    
+
     // Insert the new control points and anchor at the right position in the array
     const insertIndex = (segmentIndex + 1) * 3 - 1
 
@@ -224,10 +224,10 @@ export default class CurveEditor {
     const newAnchor = this.createControlPoint(splitPoint, true)
     const newControl1 = this.createControlPoint(newCP1)
     const newControl2 = this.createControlPoint(newCP2)
-    
+
     // Insert into controlPoints array
     this.controlPoints.splice(insertIndex, 0, newControl1, newAnchor, newControl2)
-    
+
     // Update segments array
     const newSegment = {
       anchor1: splitPoint,
@@ -235,9 +235,9 @@ export default class CurveEditor {
       control2: newCP2,
       anchor2: this.controlPoints[insertIndex + 3] ? this.controlPoints[insertIndex + 3].position : splitPoint
     }
-    
+
     this.segments.splice(segmentIndex + 1, 0, newSegment)
-    
+
     // Rebuild the curve
     this.updateCurve()
   }

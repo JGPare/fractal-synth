@@ -1,7 +1,6 @@
 
 
-export default class Channel 
-{
+export default class Channel {
   constructor(params) {
     this.name = params.name
     // ease string passed to gsap
@@ -14,17 +13,14 @@ export default class Channel
     this.onSetDuration = null
   }
 
-  setDuration(duration)
-  {
+  setDuration(duration) {
     this.duration = duration
-    if (this.onSetDuration)
-    {
+    if (this.onSetDuration) {
       this.onSetDuration(duration)
     }
   }
 
-  setEase(ease, params = {})
-  {
+  setEase(ease, params = {}) {
     this.ease = ease
   }
 }

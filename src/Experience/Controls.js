@@ -298,7 +298,7 @@ export default class Controls {
 
     this.keyboard.on('toggleArm1', () => {
       this.channels[0].on = !this.channels[0].on
-      this.channelCheckboxes[0].checked = this.channels[0].on 
+      this.channelCheckboxes[0].checked = this.channels[0].on
     })
     this.keyboard.on('toggleArm2', () => {
       this.channels[1].on = !this.channels[1].on
@@ -510,15 +510,14 @@ export default class Controls {
     return card
   }
 
-  turnOnActiveChannels()
-  {
+  turnOnActiveChannels() {
     for (let i = 0; i < this.channels.length; i++) {
-      const channel = this.channels[i];
-      if (channel.active){
+      const channel = this.channels[i]
+      if (channel.active) {
         channel.on = true
         this.channelCheckboxes[i].checked = true
-        console.log("onActiveChecked");
-        
+        console.log("onActiveChecked")
+
       }
     }
   }
@@ -556,8 +555,7 @@ export default class Controls {
    * 
    * @param {NumberInput} input 
    */
-  clearInputAnimation(input)
-  {
+  clearInputAnimation(input) {
     input.startVal = input.endVal = input.getValue()
     this.setInputElementInactive(input)
   }
@@ -727,8 +725,8 @@ export default class Controls {
 
       channelCheckbox.addEventListener('change', (event) => {
         channel.on = channelCheckbox.checked
-        console.log("event changed checked");
-        
+        console.log("event changed checked")
+
       })
 
       channelProgressSlider.addEventListener('input', (event) => {
@@ -752,27 +750,27 @@ export default class Controls {
       const channelProgressSlider = this.channelProgressSliders[i]
 
       channelCheckbox.checked = channel.on
-      console.log("set ui checked");
-      
+      console.log("set ui checked")
+
       channelDuration.value = channel.duration
       channelEase.value = channel.ease
     }
   }
 
-  setChannelAsActive(i){
+  setChannelAsActive(i) {
     this.channels[i].active = true
     this.channelProgressSliders[i].classList.add("timeline-slider-has-content")
     this.channelProgressSliders[i].classList.remove("timeline-slider-default")
-    this.channelNumberContainers[i].classList.add(`control-ease-channel-on-${i+1}`)
-    this.channelNumberContainers[i].classList.remove(`control-ease-channel-${i+1}`)
+    this.channelNumberContainers[i].classList.add(`control-ease-channel-on-${i + 1}`)
+    this.channelNumberContainers[i].classList.remove(`control-ease-channel-${i + 1}`)
   }
 
-  setChannelAsInactive(i){
+  setChannelAsInactive(i) {
     this.channels[i].active = false
     this.channelProgressSliders[i].classList.remove("timeline-slider-has-content")
     this.channelProgressSliders[i].classList.add("timeline-slider-default")
-    this.channelNumberContainers[i].classList.remove(`control-ease-channel-on-${i+1}`)
-    this.channelNumberContainers[i].classList.add(`control-ease-channel-${i+1}`)
+    this.channelNumberContainers[i].classList.remove(`control-ease-channel-on-${i + 1}`)
+    this.channelNumberContainers[i].classList.add(`control-ease-channel-${i + 1}`)
   }
 
   lockPaletteInput() {

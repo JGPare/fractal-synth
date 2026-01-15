@@ -23,8 +23,8 @@ export default class ExperienceRepo {
 
     experienceSnapshot.shader = this.getShaderSnapshot(experience.shader)
     experienceSnapshot.channels = this.getChannelSnapshot(experience.channels)
-    const thumbnail = experience.screen.captureImage('image/jpeg', 0.05);
-    
+    const thumbnail = experience.screen.captureImage('image/jpeg', 0.05)
+
     experience.projectList.updateOrAddProject(name, thumbnail)
 
     if (debug) {
@@ -40,8 +40,7 @@ export default class ExperienceRepo {
    * 
    * @param {ProjectList} projectList 
    */
-  static saveProjectList(projectList)
-  {
+  static saveProjectList(projectList) {
     localStorage.setItem("projects", JSON.stringify(projectList.getSnapshot()))
   }
 
@@ -100,10 +99,10 @@ export default class ExperienceRepo {
       console.log("loaded snapshot:", experienceSnapshot)
       console.log(name)
     }
-    if (experienceSnapshot){
+    if (experienceSnapshot) {
       this.setShaderFromSnapshot(experience, experienceSnapshot.shader)
       this.setChannelsFromSnapshot(experience, experienceSnapshot.channels)
-  
+
       experience.controls.setName(name)
       experience.controls.setShader()
     }
@@ -130,7 +129,7 @@ export default class ExperienceRepo {
     if (name) {
       this.loadExperience(name, experience)
       this.loadProjectList(experience)
-      console.log(experience.projectList);
+      console.log(experience.projectList)
     }
   }
 

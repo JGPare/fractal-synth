@@ -28,16 +28,16 @@ export default class ShaderUtility {
         break
       case eShaders.noise:
         shader = noiseShaders.noise
-        break;
+        break
       case eShaders.circularWaves:
         shader = noiseShaders.circularWaves
-        break;
+        break
       case eShaders.linearWaves:
         shader = noiseShaders.linearWaves
-        break;
+        break
       case eShaders.fibonacci:
         shader = noiseShaders.fibonacci
-        break;
+        break
       default:
         break
     }
@@ -46,8 +46,7 @@ export default class ShaderUtility {
     return shader.clone()
   }
 
-  static addStandardParameters(shader)
-  {
+  static addStandardParameters(shader) {
     shader.addGroup("Mirror", standardParameters.Mirror)
     shader.addGroup("Color", standardParameters.Color)
   }

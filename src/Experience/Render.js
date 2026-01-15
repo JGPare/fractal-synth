@@ -1,10 +1,8 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
 
-export default class Render 
-{
-  constructor() 
-  {
+export default class Render {
+  constructor() {
     this.experience = new Experience()
     this.debug = this.experience.debug
     this.canvas = this.experience.canvas
@@ -14,8 +12,7 @@ export default class Render
     this.mouse = this.experience.mouse
 
     // Debug
-    if (this.debug.active)
-    {
+    if (this.debug.active) {
       this.debugFolder = this.debug.ui.addFolder('Renderer')
       this.debugFolder.close()
     }
@@ -23,39 +20,32 @@ export default class Render
     this.setInstance()
   }
 
-  setInstance()
-  {
+  setInstance() {
     this.instance = new THREE.WebGLRenderer({
-      canvas : this.canvas
+      canvas: this.canvas
     })
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)
   }
 
-  resize()
-  {
+  resize() {
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)
   }
-  update()
-  {
+  update() {
     this.instance.render(this.scene, this.camera.instance)
   }
 
-  onLoad()
-  {
+  onLoad() {
     this.mouse = this.experience.mouse
   }
 
   doubleClick() {
-    if (!document.fullscreenElement) 
-    {
+    if (!document.fullscreenElement) {
       this.instance.domElement.requestFullscreen()
-    } 
-    else if (document.fullscreenElement) 
-    {
-      if (document.exitFullscreen)
-      {
+    }
+    else if (document.fullscreenElement) {
+      if (document.exitFullscreen) {
         document.exitFullscreen()
       }
     }
