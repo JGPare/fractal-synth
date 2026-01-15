@@ -1,16 +1,19 @@
-import Controls from "./Controls.js"
 import Experience from "./Experience.js"
 import Project from "./Project.js"
 import ProjectList from "./ProjectList.js"
-import ShaderMaterial from "./ShaderMaterial.js"
 import Shader from "./Shaders/Shader.js"
-import Timeline from "./Utils/Timeline.js"
+import Controls from "./Controls.js"
+import Channel from "./Channel.js"
 
 const debug = true
 
 export default class ExperienceRepo {
+  // ============================================================
+  // SAVE OPERATIONS
+  // ============================================================
+
   /**
-   * Save experience snapshot
+   * @param {string} name
    * @param {Experience} experience
    */
   static saveExperience(name, experience) {
@@ -37,59 +40,26 @@ export default class ExperienceRepo {
   }
 
   /**
-   * 
-   * @param {ProjectList} projectList 
+   * @param {ProjectList} projectList
    */
   static saveProjectList(projectList) {
     localStorage.setItem("projects", JSON.stringify(projectList.getSnapshot()))
   }
 
   /**
-   * 
-   * @param {Shader} shader 
+   * @param {string} name
    */
-  static getShaderSnapshot(shader) {
-    const shaderSnapshot = shader.getSnapshot()
-    return shaderSnapshot
+  static deleteExperience(name) {
+    localStorage.removeItem(name)
   }
 
-  /**
-   * Get controls snapshot
-   * @param {Controls} controls
-   */
-  static getControlsSnapshot(controls) {
-    const snapshot = {
-      name: controls.getName(),
-      paletteIndex: controls.paletteIndex,
-      initialValues: controls.initialValues,
-      finalValues: controls.finalValues
-    }
-    return snapshot
-  }
+  // ============================================================
+  // LOAD OPERATIONS
+  // ============================================================
 
   /**
-   * 
-   * @param {[Channel]} channels 
-   * @returns {Object}
-   */
-  static getChannelSnapshot(channels) {
-    const channelSnapshot = []
-
-    for (const channel of channels) {
-      channelSnapshot.push({
-        duration: channel.duration,
-        ease: channel.ease,
-        on: channel.on
-      })
-    }
-
-    return channelSnapshot
-  }
-
-  /**
-   * 
-   * @param {*} name 
-   * @param {Experience} experience 
+   * @param {string} name
+   * @param {Experience} experience
    */
   static loadExperience(name, experience) {
     const experienceSnapshot = JSON.parse(localStorage.getItem(name))
@@ -108,8 +78,7 @@ export default class ExperienceRepo {
   }
 
   /**
-   * 
-   * @param {Experience} experience 
+   * @param {Experience} experience
    */
   static loadProjectList(experience) {
     experience.projectList.clear()
@@ -120,8 +89,7 @@ export default class ExperienceRepo {
   }
 
   /**
-   * 
-   * @param {Experience} experience 
+   * @param {Experience} experience
    */
   static loadLastExperience(experience) {
     const name = localStorage.getItem("lastExperience")
@@ -132,18 +100,58 @@ export default class ExperienceRepo {
     }
   }
 
+  // ============================================================
+  // SNAPSHOT GETTERS
+  // ============================================================
+
   /**
-   * 
-   * @param {string} name 
+   * @param {Shader} shader
+   * @returns {Object}
    */
-  static deleteExperience(name) {
-    localStorage.removeItem(name)
+  static getShaderSnapshot(shader) {
+    const shaderSnapshot = shader.getSnapshot()
+    return shaderSnapshot
   }
 
   /**
-   * 
-   * @param {Experience} experience 
-   * @param {Object} shaderSnapshot 
+   * @param {Controls} controls
+   * @returns {Object}
+   */
+  static getControlsSnapshot(controls) {
+    const snapshot = {
+      name: controls.getName(),
+      paletteIndex: controls.paletteIndex,
+      initialValues: controls.initialValues,
+      finalValues: controls.finalValues
+    }
+    return snapshot
+  }
+
+  /**
+   * @param {Channel[]} channels
+   * @returns {Object[]}
+   */
+  static getChannelSnapshot(channels) {
+    const channelSnapshot = []
+
+    for (const channel of channels) {
+      channelSnapshot.push({
+        duration: channel.duration,
+        ease: channel.ease,
+        on: channel.on
+      })
+    }
+
+    return channelSnapshot
+  }
+
+  // ============================================================
+  // SNAPSHOT SETTERS
+  // ============================================================
+
+  /**
+   * @param {Experience} experience
+   * @param {Object} shaderSnapshot
    */
   static setShaderFromSnapshot(experience, shaderSnapshot) {
     experience.setShader(shaderSnapshot.eShader)
@@ -154,6 +162,10 @@ export default class ExperienceRepo {
     shader.setInputs()
   }
 
+  /**
+   * @param {Experience} experience
+   * @param {Object[]} channelsSnapshot
+   */
   static setChannelsFromSnapshot(experience, channelsSnapshot) {
     if (!channelsSnapshot) return
     if (debug) {
@@ -164,7 +176,6 @@ export default class ExperienceRepo {
       const channelSnap = channelsSnapshot[i]
       const channel = experience.channels[i]
       if (channel && channelSnap) {
-
         channel.duration = channelSnap.duration
         channel.ease = channelSnap.ease
         channel.on = false
