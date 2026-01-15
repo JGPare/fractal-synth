@@ -27,20 +27,29 @@ let instance = null
 let debug = false
 
 export default class Experience {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
+  /**
+   * @param {HTMLCanvasElement} canvas
+   */
   constructor(canvas) {
-    // Singleton
     if (instance) {
       return instance
     }
     instance = this
-
-    // Global
     window.experience = this
-
-    // Options
     this.canvas = canvas
 
-    // Setup
+    this.initComponents()
+    this.initEventListeners()
+    this.setShader(eShaders.mandle)
+    this.setKeyMappings()
+    this.onLoad()
+  }
+
+  initComponents() {
     this.projectList = new ProjectList()
     this.keyboard = new Keyboard()
     this.timeline = new Timeline(this)
@@ -56,15 +65,12 @@ export default class Experience {
     this.screen = new Screen()
     this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
     this.channels = Array.from({ length: 5 }, () => new Channel({ name: "Sin", ease: "sine", duration: 25, on: false }))
-
     this.controls = new Controls()
     this.stats = new StatsPanel()
-
     this.shader = null
-    this.setShader(eShaders.mandle)
+  }
 
-    this.setKeyMappings()
-
+  initEventListeners() {
     this.sizes.on('resize', () => {
       this.resize()
     })
@@ -89,15 +95,20 @@ export default class Experience {
     this.mouse.on('scroll', () => {
       this.scroll()
     })
-    this.onLoad()
   }
 
+  // ============================================================
+  // SHADER & KEYBOARD SETUP
+  // ============================================================
+
+  /**
+   * @param {number} eShader
+   */
   setShader(eShader) {
     this.shader = ShaderUtility.getShader(eShader)
     if (debug) {
       console.log("setting shader: ", this.shader)
     }
-
     this.controls.setShader()
     this.screen.setShader()
   }
@@ -112,6 +123,10 @@ export default class Experience {
     this.keyboard.addMapping("Digit4", "toggleArm4")
     this.keyboard.addMapping("Digit5", "toggleArm5")
   }
+
+  // ============================================================
+  // EVENT HANDLERS
+  // ============================================================
 
   resize() {
     this.camera.resize()
@@ -140,6 +155,10 @@ export default class Experience {
   scroll() {
     this.screen.scroll()
   }
+
+  // ============================================================
+  // LIFECYCLE
+  // ============================================================
 
   onLoad() {
     this.renderer.onLoad()
