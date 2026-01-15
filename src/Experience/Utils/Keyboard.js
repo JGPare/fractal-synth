@@ -27,8 +27,8 @@ export default class Keyboard extends EventEmitter {
 
     parentElement.addEventListener('keyup', (event) => {
       this.heldKeys.delete(event.code)
-      const eventKey = `keydown:${event.code}`
-      this.trigger(`keyup:${event.code}`)
+      const eventKey = `keyup:${event.code}`
+      this.trigger(eventKey)
       if (this.keyMap[eventKey]) {
         this.trigger(this.keyMap[eventKey])
       }
