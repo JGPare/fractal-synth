@@ -1,6 +1,10 @@
 import EventEmitter from './EventEmitter.js'
 
 export default class Mouse extends EventEmitter {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   constructor() {
     super()
 
@@ -14,18 +18,31 @@ export default class Mouse extends EventEmitter {
     this.touchPointDistance = null
     this.doubleClickDelta = 400
     this.target = null
-
     this.touchOnly = false
+
     const canvasOverlayElement = document.getElementById('viewer')
     const canvas = document.getElementById('main-canvas')
 
     this.addHandlesToElement(canvas)
     this.addHandlesToElement(canvasOverlayElement)
-
   }
 
+  // ============================================================
+  // EVENT BINDING
+  // ============================================================
+
+  /**
+   * @param {HTMLElement} element
+   */
   addHandlesToElement(element) {
-    // mouse events
+    this.addMouseHandlers(element)
+    this.addTouchHandlers(element)
+  }
+
+  /**
+   * @param {HTMLElement} element
+   */
+  addMouseHandlers(element) {
     element.addEventListener('mousedown', (event) => {
       this.target = event.target
       if (event.button === 0) {
@@ -60,9 +77,12 @@ export default class Mouse extends EventEmitter {
       this.scrollDeltaY = event.deltaY
       this.trigger('scroll')
     })
+  }
 
-    // touch events
-
+  /**
+   * @param {HTMLElement} element
+   */
+  addTouchHandlers(element) {
     element.addEventListener('touchstart', (event) => {
       this.touchOnly = true
       this.clickHeld = true
@@ -73,39 +93,57 @@ export default class Mouse extends EventEmitter {
       }
     })
 
-    element.addEventListener('touchend', (event) => {
+    element.addEventListener('touchend', () => {
       this.clickHeld = false
       this.touchPointDistance = null
     })
 
     element.addEventListener('touchmove', (event) => {
       if (event.touches.length > 1) {
-        const touch1 = event.touches[0]
-        const touch2 = event.touches[1]
-        const xDistance = touch1.clientX - touch2.clientX
-        const yDistance = touch1.clientY - touch2.clientY
-        const newDistance = xDistance ** 2 + yDistance ** 2
-        const newX = (touch1.clientX + touch2.clientX) / 2
-        const newY = (touch1.clientY + touch2.clientY) / 2
-        this.deltaX = this.x - newX
-        this.deltaY = this.y - newY
-        this.x = newX
-        this.y = newY
-        if (this.touchPointDistance != null) {
-          this.scrollDeltaY = -(newDistance - this.touchPointDistance) / 20
-          this.trigger('scroll')
-          this.trigger('touchmove')
-        }
-        this.touchPointDistance = newDistance
+        this.handleMultiTouch(event)
       }
       else {
-        this.deltaX = this.x - event.touches[0].clientX
-        this.deltaY = this.y - event.touches[0].clientY
-        this.x = event.touches[0].clientX
-        this.y = event.touches[0].clientY
-        this.trigger('touchmove')
-        this.touchPointDistance = null
+        this.handleSingleTouch(event)
       }
     })
+  }
+
+  // ============================================================
+  // TOUCH HANDLERS
+  // ============================================================
+
+  /**
+   * @param {TouchEvent} event
+   */
+  handleMultiTouch(event) {
+    const touch1 = event.touches[0]
+    const touch2 = event.touches[1]
+    const xDistance = touch1.clientX - touch2.clientX
+    const yDistance = touch1.clientY - touch2.clientY
+    const newDistance = xDistance ** 2 + yDistance ** 2
+    const newX = (touch1.clientX + touch2.clientX) / 2
+    const newY = (touch1.clientY + touch2.clientY) / 2
+    this.deltaX = this.x - newX
+    this.deltaY = this.y - newY
+    this.x = newX
+    this.y = newY
+    if (this.touchPointDistance != null) {
+      this.scrollDeltaY = -(newDistance - this.touchPointDistance) / 20
+      this.trigger('scroll')
+      this.trigger('touchmove')
+    }
+    this.touchPointDistance = newDistance
+  }
+
+  /**
+   * @param {TouchEvent} event
+   */
+  handleSingleTouch(event) {
+    this.deltaX = this.x - event.touches[0].clientX
+    this.deltaY = this.y - event.touches[0].clientY
+    this.x = event.touches[0].clientX
+    this.y = event.touches[0].clientY
+    this.trigger('touchmove')
+    this.touchPointDistance = null
   }
 }
