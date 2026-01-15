@@ -1,21 +1,26 @@
-import Shader from "./Shaders/Shader"
-import Palette from "./Utils/Palette"
-
 export default class Project {
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
   /**
-   * 
-   * @param {String} name 
+   * @param {string} name
+   * @param {string|null} image
+   * @param {string|null} lastModified
    */
   constructor(name, image = null, lastModified = null) {
     this.name = name
     this.image = image
-    this.lastModified = lastModified ? Date.now() : Date.parse(lastModified)
+    this.lastModified = lastModified ? Date.parse(lastModified) : Date.now()
   }
 
-  setImage(image) {
-    this.image = image
-  }
+  // ============================================================
+  // SNAPSHOT
+  // ============================================================
 
+  /**
+   * @returns {Object}
+   */
   getSnapshot() {
     return {
       name: this.name,
@@ -24,8 +29,18 @@ export default class Project {
     }
   }
 
+  // ============================================================
+  // MUTATORS
+  // ============================================================
+
+  /**
+   * @param {string} image
+   */
+  setImage(image) {
+    this.image = image
+  }
+
   updateModified() {
     this.lastModified = Date.now()
   }
-
 }
