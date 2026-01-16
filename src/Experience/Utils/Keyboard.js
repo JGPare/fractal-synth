@@ -17,7 +17,8 @@ export default class Keyboard extends EventEmitter {
     parentElement.addEventListener('keydown', (event) => {
       if (!this.heldKeys.has(event.code)) {
         this.heldKeys.add(event.code)
-        const eventKey = `keydown:${event.code}`
+        const fullKey = this.buildKeyString(event)
+        const eventKey = `keydown:${fullKey}`
         this.trigger(eventKey)
         if (this.keyMap[eventKey]) {
           this.trigger(this.keyMap[eventKey])
@@ -27,7 +28,8 @@ export default class Keyboard extends EventEmitter {
 
     parentElement.addEventListener('keyup', (event) => {
       this.heldKeys.delete(event.code)
-      const eventKey = `keyup:${event.code}`
+      const fullKey = this.buildKeyString(event)
+      const eventKey = `keyup:${fullKey}`
       this.trigger(eventKey)
       if (this.keyMap[eventKey]) {
         this.trigger(this.keyMap[eventKey])
@@ -54,5 +56,18 @@ export default class Keyboard extends EventEmitter {
    */
   isDown(keyCode) {
     return this.heldKeys.has(keyCode)
+  }
+
+  /**
+   * @param {KeyboardEvent} event
+   * @returns {string}
+   */
+  buildKeyString(event) {
+    let key = ''
+    if (event.ctrlKey || event.metaKey) key += 'Ctrl+'
+    if (event.shiftKey) key += 'Shift+'
+    if (event.altKey) key += 'Alt+'
+    key += event.code
+    return key
   }
 }
