@@ -3,7 +3,7 @@
 export const eShaders = {
   mandle: 0,
   julia: 1,
-  sinJulia: 2,
+  doubleJulia: 2,
   burningShip: 3,
   neuton: 4,
   phoenix: 5,

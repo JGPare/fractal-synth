@@ -17,8 +17,8 @@ export default class ShaderUtility {
       case eShaders.phoenix:
         shader = mandleShaders.phoenix
         break
-      case eShaders.sinJulia:
-        shader = mandleShaders.sinJulia
+      case eShaders.doubleJulia:
+        shader = mandleShaders.doubleJulia
         break
       case eShaders.neuton:
         shader = mandleShaders.neuton

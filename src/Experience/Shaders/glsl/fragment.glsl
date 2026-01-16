@@ -4,7 +4,7 @@
 // Modes
 #define MANDLE 0
 #define JULIA 1
-#define SIN_JULIA 2
+#define DOUBLE_JULIA 2
 #define BURNING_SHIP 3
 #define NEUTON 4
 #define PHOENIX 5
@@ -137,7 +137,7 @@ float mandle(vec2 uv, int maxIters) {
 float julia(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
-  vec2 zn = vec2(uv.x, uv.y);
+  vec2 zn = warpUv(uv, 0.001 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   float mZ = dot(zn, zn);
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(zn, uPower) + c;
@@ -146,13 +146,22 @@ float julia(vec2 uv, int maxIters) {
   return float(i) + velocityDistort(mZ - 4.0);
 }
 
-float sinJulia(vec2 uv, int maxIters) {
+float doubleJulia(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
-  vec2 zn = warpUv(uv, 0.001 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
+    zn = complexPow(zn, uPower) + c;
+    mZ = dot(zn, zn);
+  }
+  vec2 newUv = uv * zn;
+  zn = newUv;
+  mZ = dot(zn, zn);
+  float iter2Float = exp(6.8 * uIters2);
+  int maxIters2 = int(iter2Float);
+  for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
     zn = complexPow(zn, uPower) + c;
     mZ = dot(zn, zn);
   }
@@ -161,7 +170,7 @@ float sinJulia(vec2 uv, int maxIters) {
 
 float burningShip(vec2 uv, int maxIters) {
   int i;
-  vec2 zn = vec2(uv.x, uv.y);
+  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
   float mZprev;
@@ -173,7 +182,8 @@ float burningShip(vec2 uv, int maxIters) {
   return float(i) + velocityDistort(mZ - 4.0);
 }
 
-float newton(vec2 uv, int maxIters) {
+// put a Neuton in
+float neuton(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
   vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
@@ -242,14 +252,14 @@ float getEscape(vec2 uv, int iterations) {
     case JULIA:
       escape = julia(uv, iterations);
       break;
-    case SIN_JULIA:
-      escape = sinJulia(uv, iterations);
+    case DOUBLE_JULIA:
+      escape = doubleJulia(uv, iterations);
       break;
     case BURNING_SHIP:
       escape = burningShip(uv, iterations);
       break;
     case NEUTON:
-      escape = newton(uv, iterations);
+      escape = neuton(uv, iterations);
       break;
     case PHOENIX:
       escape = phoenix(uv, iterations);
@@ -400,7 +410,7 @@ vec3 getColor(vec2 uv) {
   switch (uMode) {
     case MANDLE:
     case JULIA:
-    case SIN_JULIA:
+    case DOUBLE_JULIA:
     case BURNING_SHIP:
     case NEUTON:
     case PHOENIX:

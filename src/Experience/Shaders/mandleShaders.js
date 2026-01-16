@@ -9,9 +9,10 @@ import ShaderUtility from "./ShaderUtility"
 
 const mandle = new Shader("Mandle", eShaders.mandle)
 const julia = new Shader("Julia", eShaders.julia)
-const sinJulia = new Shader("Sin Julia", eShaders.sinJulia)
+const doubleJulia = new Shader("Sin Julia", eShaders.doubleJulia)
 const phoenix = new Shader("Phoenix", eShaders.phoenix)
 const neuton = new Shader("Neuton", eShaders.neuton)
+const burningShip = new Shader("Burning Ship", eShaders.burningShip)
 
 const iters = new NumberInput({
   eId: eNumInput.iters,
@@ -85,9 +86,10 @@ const rotation = new NumberInput({
 
 mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
-sinJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+doubleJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 neuton.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
+burningShip.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 
 const cPosX = new NumberInput({
   eId: eNumInput.cPosX,
@@ -110,7 +112,7 @@ const cPosY = new NumberInput({
 })
 
 julia.addGroup("Point", [cPosX, cPosY])
-sinJulia.addGroup("Point", [cPosX, cPosY])
+doubleJulia.addGroup("Point", [cPosX, cPosY])
 phoenix.addGroup("Point", [cPosX, cPosY])
 neuton.addGroup("Point", [cPosX, cPosY])
 
@@ -136,10 +138,10 @@ const velocityDistortionAmount = new NumberInput({
 
 mandle.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 julia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-sinJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
+doubleJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 phoenix.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 neuton.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-
+burningShip.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 
 const sinMag = new NumberInput({
   eId: eNumInput.uSinMag,
@@ -171,14 +173,17 @@ const sinJuliaYCoeff = new NumberInput({
   channelIndex: -1
 })
 
-sinJulia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+julia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+doubleJulia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 phoenix.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 neuton.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+burningShip.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 
 export default {
   julia: julia,
   mandle: mandle,
-  sinJulia: sinJulia,
+  doubleJulia: doubleJulia,
   phoenix: phoenix,
-  neuton: neuton
+  neuton: neuton,
+  burningShip: burningShip,
 }
