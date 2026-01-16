@@ -21,7 +21,7 @@
       <div class="container">
         <div class="logo-container container">
           <h2 class="header-text"> Fractal Synth </h2>
-          <div class="btm-outline"></div>
+          <div class="bottom-outline"></div>
         </div>
         <div class="slider-container">
           <label for="scene-name" class="slider-text"> Scene Name </label>
@@ -37,11 +37,11 @@
         </div>
         <div class="slider-container">
           <p class="sub-header-text"> Fractal </p>
-          <div class="btm-outline"></div>
+          <div class="bottom-outline"></div>
           <select class="control-select select-md" id="mode-select">
             <option value="mandle">Mandlebrot</option>
             <option value="julia">Julia</option>
-            <option value="sinJulia">Sin Julia</option>
+            <option value="doubleJulia">Double Julia</option>
             <option value="burningShip">Burning Ship</option>
             <option value="neuton">Neuton</option>
             <option value="phoenix">Phoenix</option>
@@ -71,7 +71,7 @@
           <canvas id="paper-canvas"></canvas>
         </div>
         <p class="sub-header-text"> Animation Channels </p>
-        <div class="btm-outline"></div>
+        <div class="bottom-outline"></div>
         <div id="channels-container">
           <div>
             <div class="channel-columns">
@@ -93,13 +93,13 @@
               <div class="channel-clear-btn-container">
               </div>
             </div>
-            <div class=" timeline-slider-container">
+            <div class="timeline-slider-container">
               <input type="range" min="0" max="1" step="0.0001" value="0"
-                class="timeline-slider timeline-slider-default" id="timeline-slider-1">
+                class="timeline-slider timeline-slider-default" id="timeline-slider-1" data-channel="1">
             </div>
             <div id="channels">
               <div class="channel-columns">
-                <div class="channel-number-container control-ease-channel-1" id="channel-number-container-1">
+                <div class="channel-number-container channel-color" id="channel-number-container-1" data-channel="1">
                   <p class=""> 1 </p>
                 </div>
                 <div class="channel-checkbox-container">
@@ -127,12 +127,12 @@
                   <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
                 </div>
               </div>
-              <div class=" timeline-slider-container">
+              <div class="timeline-slider-container">
                 <input type="range" min="0" max="1" step="0.0001" value="2"
-                  class="timeline-slider timeline-slider-default" id="timeline-slider-2">
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-2" data-channel="2">
               </div>
               <div class="channel-columns">
-                <div class="channel-number-container control-ease-channel-2" id="channel-number-container-2">
+                <div class="channel-number-container channel-color" id="channel-number-container-2" data-channel="2">
                   <p class=""> 2 </p>
                 </div>
                 <div class="channel-checkbox-container">
@@ -143,7 +143,7 @@
                     class="channel-number-input channel-duration" id="duration-channel-2">
                 </div>
                 <div class="channel-ease-container">
-                  <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-2">
+                  <select class="channel-select-input select-sm w-100 channel-ease" id="ease-select-2">
                     <option value="sine">Sin</option>
                     <option value="none">Linear</option>
                     <option value="power1">Power1</option>
@@ -157,15 +157,15 @@
                   <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
                 </div>
                 <div class="channel-clear-btn-container">
-                  <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+                  <button class="channel-clear-btn w-100" id="clear-tl-2-button">Clear</button>
                 </div>
               </div>
-              <div class=" timeline-slider-container">
+              <div class="timeline-slider-container">
                 <input type="range" min="0" max="1" step="0.0001" value="3"
-                  class="timeline-slider timeline-slider-default" id="timeline-slider-3">
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-3" data-channel="3">
               </div>
               <div class="channel-columns">
-                <div class="channel-number-container control-ease-channel-3" id="channel-number-container-3">
+                <div class="channel-number-container channel-color" id="channel-number-container-3" data-channel="3">
                   <p class=""> 3 </p>
                 </div>
                 <div class="channel-checkbox-container">
@@ -190,15 +190,15 @@
                   <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
                 </div>
                 <div class="channel-clear-btn-container">
-                  <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+                  <button class="channel-clear-btn w-100" id="clear-tl-3-button">Clear</button>
                 </div>
               </div>
-              <div class=" timeline-slider-container">
+              <div class="timeline-slider-container">
                 <input type="range" min="0" max="1" step="0.0001" value="4"
-                  class="timeline-slider timeline-slider-default" id="timeline-slider-4">
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-4" data-channel="4">
               </div>
               <div class="channel-columns">
-                <div class="channel-number-container control-ease-channel-4" id="channel-number-container-4">
+                <div class="channel-number-container channel-color" id="channel-number-container-4" data-channel="4">
                   <p class=""> 4 </p>
                 </div>
                 <div class="channel-checkbox-container">
@@ -223,15 +223,15 @@
                   <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
                 </div>
                 <div class="channel-clear-btn-container">
-                  <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+                  <button class="channel-clear-btn w-100" id="clear-tl-4-button">Clear</button>
                 </div>
               </div>
-              <div class=" timeline-slider-container">
+              <div class="timeline-slider-container">
                 <input type="range" min="0" max="1" step="0.0001" value="5"
-                  class="timeline-slider timeline-slider-default" id="timeline-slider-5">
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-5" data-channel="5">
               </div>
               <div class="channel-columns">
-                <div class="channel-number-container control-ease-channel-5" id="channel-number-container-5">
+                <div class="channel-number-container channel-color" id="channel-number-container-5" data-channel="5">
                   <p class=""> 5 </p>
                 </div>
                 <div class="channel-checkbox-container">
@@ -239,7 +239,7 @@
                 </div>
                 <div class="channel-duration-container">
                   <input type="number" min="1" max="180" step="1" value="15"
-                    class="channel-number-input channel-duration">
+                    class="channel-number-input channel-duration" id="duration-channel-5">
                 </div>
                 <div class="channel-ease-container">
                   <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-5">
@@ -256,7 +256,7 @@
                   <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
                 </div>
                 <div class="channel-clear-btn-container">
-                  <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+                  <button class="channel-clear-btn w-100" id="clear-tl-5-button">Clear</button>
                 </div>
               </div>
             </div>
@@ -287,7 +287,7 @@
         </div>
         <!-- COLORS -->
         <p class="sub-header-text"> Palette </p>
-        <div class="btm-outline"></div>
+        <div class="bottom-outline"></div>
         <div class="slider-container">
           <label for="paletteName" class="slider-text"> Palette Name </label>
           <input class="control-text" id="palette-input" type="text" id="name" required minlength="4" maxlength="20"
@@ -304,7 +304,7 @@
           <button class="control-button three-width-btn default-button" id="new-palette-button">New</button>
           <button class="control-button three-width-btn default-button" id="random-palette-button">Random</button>
         </div>
-        <div class="btm-outline"></div>
+        <div class="bottom-outline"></div>
         <div class="slider-container">
           <p class="slider-text"> Number of Colors </p>
           <div class="dual-input-grid">

@@ -159,7 +159,7 @@ export default class Controls {
    */
   addBreak(parentElement) {
     const breakElem = document.createElement("div")
-    breakElem.setAttribute("class", "btm-outline")
+    breakElem.setAttribute("class", "bottom-outline")
     parentElement.appendChild(breakElem)
   }
 
@@ -188,7 +188,8 @@ export default class Controls {
     easeChannel.setAttribute("max", "5")
     easeChannel.setAttribute("step", "1")
     easeChannel.setAttribute("value", "0")
-    easeChannel.setAttribute("class", `control-ease control-ease-channel-${input.channelIndex + 1}`)
+    easeChannel.setAttribute("class", "control-ease channel-color")
+    easeChannel.setAttribute("data-channel", input.channelIndex + 1)
     easeChannel.setAttribute("id", inputId + "-ease-channel")
 
     input.elements["easeChannel"] = easeChannel
@@ -200,7 +201,8 @@ export default class Controls {
     slider.setAttribute("max", input.max)
     slider.setAttribute("step", input.step)
     slider.setAttribute("value", input.value)
-    slider.setAttribute("class", `control-slider control-ease-channel-${input.channelIndex + 1}`)
+    slider.setAttribute("class", "control-slider channel-color")
+    slider.setAttribute("data-channel", input.channelIndex + 1)
     slider.setAttribute("id", inputId + "-slider")
 
     input.elements["slider"] = slider
@@ -227,14 +229,12 @@ export default class Controls {
     })
 
     easeChannel.addEventListener('change', (event) => {
-
-      const on = easeChannel.classList.contains(`control-ease-channel-on-${input.channelIndex + 1}`) ? "-on" : ""
-      easeChannel.classList.remove(`control-ease-channel${on}-${input.channelIndex + 1}`)
       const prevIndex = input.channelIndex
       input.setChannelIndex(event.target.value - 1)
+      easeChannel.setAttribute("data-channel", input.channelIndex + 1)
+      slider.setAttribute("data-channel", input.channelIndex + 1)
       this.setTimeline(prevIndex)
       this.clearInputAnimation(input)
-      easeChannel.classList.add(`control-ease-channel-${input.channelIndex + 1}`)
     })
 
     easeChannel.value = input.channelIndex + 1
@@ -585,18 +585,17 @@ export default class Controls {
    */
   setInputElementActive(input) {
     const easeChannel = input.elements.easeChannel
-    easeChannel.classList.remove(`control-ease-channel-${input.channelIndex + 1}`)
-    easeChannel.classList.add(`control-ease-channel-on-${input.channelIndex + 1}`)
+    easeChannel.classList.remove("channel-color")
+    easeChannel.classList.add("channel-color-active")
   }
 
   /**
-   * 
-   * @param {NumberInput} input 
+   * @param {NumberInput} input
    */
   setInputElementInactive(input) {
     const easeChannel = input.elements.easeChannel
-    easeChannel.classList.add(`control-ease-channel-${input.channelIndex + 1}`)
-    easeChannel.classList.remove(`control-ease-channel-on-${input.channelIndex + 1}`)
+    easeChannel.classList.add("channel-color")
+    easeChannel.classList.remove("channel-color-active")
   }
 
   /**
@@ -828,8 +827,8 @@ export default class Controls {
     this.channels[i].active = true
     this.channelProgressSliders[i].classList.add("timeline-slider-has-content")
     this.channelProgressSliders[i].classList.remove("timeline-slider-default")
-    this.channelNumberContainers[i].classList.add(`control-ease-channel-on-${i + 1}`)
-    this.channelNumberContainers[i].classList.remove(`control-ease-channel-${i + 1}`)
+    this.channelNumberContainers[i].classList.add("channel-color-active")
+    this.channelNumberContainers[i].classList.remove("channel-color")
   }
 
   /**
@@ -839,8 +838,8 @@ export default class Controls {
     this.channels[i].active = false
     this.channelProgressSliders[i].classList.remove("timeline-slider-has-content")
     this.channelProgressSliders[i].classList.add("timeline-slider-default")
-    this.channelNumberContainers[i].classList.remove(`control-ease-channel-on-${i + 1}`)
-    this.channelNumberContainers[i].classList.add(`control-ease-channel-${i + 1}`)
+    this.channelNumberContainers[i].classList.remove("channel-color-active")
+    this.channelNumberContainers[i].classList.add("channel-color")
   }
 
   lockPaletteInput() {

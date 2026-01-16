@@ -576,9 +576,6 @@ select:disabled {
   grid-template-areas: "easeArea slider number";
 }
 
-.ctrl {
-  justify-self: stretch;
-}
 
 /* SELECT INPUTS */
 .control-select {
@@ -672,27 +669,23 @@ select:disabled {
   outline-style: groove;
 }
 
-.control-ease-channel-0 {
-  background-color: color-mix(in srgb, var(--clr-channel-0), black 30%);
-}
-.control-ease-channel-1 {
-  background-color: color-mix(in srgb, var(--clr-channel-1), black 30%);
-}
-.control-ease-channel-2 {
-  background-color: color-mix(in srgb, var(--clr-channel-2), black 30%);
-}
-.control-ease-channel-3 {
-  background-color: color-mix(in srgb, var(--clr-channel-3), black 30%);
-}
-.control-ease-channel-4 {
-  background-color: color-mix(in srgb, var(--clr-channel-4), black 30%);
-}
-.control-ease-channel-5 {
-  background-color: color-mix(in srgb, var(--clr-channel-5), black 30%);
+/* Channel color variables via data attribute */
+[data-channel="0"] { --ch-clr: var(--clr-channel-0); --ch-clr-focus: var(--clr-channel-focused-0); }
+[data-channel="1"] { --ch-clr: var(--clr-channel-1); --ch-clr-focus: var(--clr-channel-focused-1); }
+[data-channel="2"] { --ch-clr: var(--clr-channel-2); --ch-clr-focus: var(--clr-channel-focused-2); }
+[data-channel="3"] { --ch-clr: var(--clr-channel-3); --ch-clr-focus: var(--clr-channel-focused-3); }
+[data-channel="4"] { --ch-clr: var(--clr-channel-4); --ch-clr-focus: var(--clr-channel-focused-4); }
+[data-channel="5"] { --ch-clr: var(--clr-channel-5); --ch-clr-focus: var(--clr-channel-focused-5); }
+
+.channel-color {
+  background-color: color-mix(in srgb, var(--ch-clr), black 30%);
 }
 
+.channel-color-active {
+  background-color: color-mix(in srgb, var(--ch-clr-focus), black 30%);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
 
-/* Add the keyframes animation */
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 1px rgba(255, 255, 255, 0.1),
@@ -702,37 +695,6 @@ select:disabled {
     box-shadow: 0 0 3px rgba(255, 255, 255, 0.3),
                 0 0 5px currentColor;
   }
-}
-
-/* Apply to the "on" classes */
-.control-ease-channel-on-0 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-0), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.control-ease-channel-on-1 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-1), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.control-ease-channel-on-2 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-2), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.control-ease-channel-on-3 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-3), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.control-ease-channel-on-4 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-4), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.control-ease-channel-on-5 {
-  background-color: color-mix(in srgb, var(--clr-channel-focused-5), black 30%);
-  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 /* ============================================================================
@@ -807,57 +769,16 @@ select:disabled {
   transition: background-color 0.2s ease;
 }
 
+/* Timeline slider colors use data-channel CSS variables */
 .timeline-slider-default::-webkit-slider-thumb {
-  box-shadow: -607px 0 0 607px var(--clr-default-input);
+  background: var(--ch-clr, var(--clr-default-input));
+  box-shadow: -607px 0 0 607px var(--ch-clr, var(--clr-default-input));
 }
 
 .timeline-slider-has-content::-webkit-slider-thumb {
-  box-shadow: -607px 0 0 607px var(--clr-highlight-input);
+  background: var(--ch-clr-focus, var(--clr-highlight-input));
+  box-shadow: -607px 0 0 607px var(--ch-clr-focus, var(--clr-highlight-input));
 }
-
-#timeline-slider-1.timeline-slider-default::-webkit-slider-thumb {
-  background: var(--clr-channel-1);
-  box-shadow: -617px 0 0 607px var(--clr-channel-1);
-}
-#timeline-slider-2.timeline-slider-default::-webkit-slider-thumb {
-  background: var(--clr-channel-2);
-  box-shadow: -607px 0 0 607px var(--clr-channel-2);
-}
-#timeline-slider-3.timeline-slider-default::-webkit-slider-thumb {
-  background: var(--clr-channel-3);
-  box-shadow: -607px 0 0 607px var(--clr-channel-3);
-}
-#timeline-slider-4.timeline-slider-default::-webkit-slider-thumb {
-  background: var(--clr-channel-4);
-  box-shadow: -607px 0 0 607px var(--clr-channel-4);
-}
-#timeline-slider-5.timeline-slider-default::-webkit-slider-thumb {
-  background: var(--clr-channel-5);
-  box-shadow: -607px 0 0 607px var(--clr-channel-5);
-}
-
-#timeline-slider-1.timeline-slider-has-content::-webkit-slider-thumb {
-  background: var(--clr-channel-focused-1);
-  box-shadow: -617px 0 0 607px var(--clr-channel-focused-1);
-}
-#timeline-slider-2.timeline-slider-has-content::-webkit-slider-thumb {
-  background: var(--clr-channel-focused-2);
-  box-shadow: -607px 0 0 607px var(--clr-channel-focused-2);
-}
-#timeline-slider-3.timeline-slider-has-content::-webkit-slider-thumb {
-  background: var(--clr-channel-focused-3);
-  box-shadow: -607px 0 0 607px var(--clr-channel-focused-3);
-}
-#timeline-slider-4.timeline-slider-has-content::-webkit-slider-thumb {
-  background: var(--clr-channel-focused-4);
-  box-shadow: -607px 0 0 607px var(--clr-channel-focused-4);
-}
-#timeline-slider-5.timeline-slider-has-content::-webkit-slider-thumb {
-  background: var(--clr-channel-focused-5);
-  box-shadow: -607px 0 0 607px var(--clr-channel-focused-5);
-}
-
-
 
 .timeline-slider::-moz-range-thumb {
   width: var(--slider-height);
@@ -872,7 +793,7 @@ select:disabled {
    DECORATIVE ELEMENTS
    ============================================================================ */
 
-.btm-outline {
+.bottom-outline {
   height: 0.1rem;
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
