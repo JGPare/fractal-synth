@@ -67,6 +67,8 @@ export default class Controls {
     this.sceneName = document.getElementById('scene-name')
     this.loaderElement = document.getElementById('loader')
     this.viewerElement = document.getElementById('viewer')
+    this.mainGrid = document.getElementById('main-grid')
+    this.expandBtn = document.getElementById('fullscreen-btn')
     this.modeSelect = document.getElementById('mode-select')
     this.paletteSelect = document.getElementById('palette-select')
     this.numberOfColorsSlider = document.getElementById('number-of-colors')
@@ -288,6 +290,7 @@ export default class Controls {
     this.linkRandomPaletteButton()
     this.linkDeletePaletteButton()
     this.linkChannels()
+    this.linkExpandButton()
   }
 
   linkModeSelect() {
@@ -324,6 +327,21 @@ export default class Controls {
 
     this.resetShader.addEventListener('click', () => {
       this.experience.setShader(this.modeIndex)
+    })
+  }
+
+  linkExpandButton() {
+    this.expandBtn.addEventListener('click', () => {
+      this.mainGrid.classList.toggle('expanded')
+    })
+
+    document.addEventListener('mousemove', (e) => {
+      if (!this.mainGrid.classList.contains('expanded')) return
+
+      const cornerSize = 100
+      const inCorner = (window.innerWidth - e.clientX < cornerSize) && (window.innerHeight - e.clientY < cornerSize)
+
+      this.expandBtn.classList.toggle('visible', inCorner)
     })
   }
 
