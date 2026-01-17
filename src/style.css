@@ -227,6 +227,20 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-template-areas: "ui-l center ui-r";
   width: 100%;
   height: 100%;
+  transition: grid-template-columns 0.4s ease;
+}
+
+/* Expanded mode - hide sidebars */
+#main-grid.expanded {
+  grid-template-columns: 0 1fr 0;
+}
+
+#main-grid.expanded #ui-grid-l,
+#main-grid.expanded #ui-grid-r {
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
 }
 
 /* LEFT SIDEBAR */
@@ -275,8 +289,53 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 #viewer {
+  position: relative;
   grid-area: viewer;
   border: 0.1rem solid #686868;
+}
+
+/* Fullscreen button */
+.fullscreen-btn {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.fullscreen-btn:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Expanded mode - hide button until hover in corner */
+#main-grid.expanded .fullscreen-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover zone in bottom-right corner to reveal button */
+#main-grid.expanded .fullscreen-btn.visible {
+  opacity: 0.7;
+  pointer-events: auto;
+}
+
+#main-grid.expanded .fullscreen-btn.visible:hover {
+  opacity: 1;
 }
 
 #timeline {
