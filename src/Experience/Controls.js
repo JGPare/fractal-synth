@@ -68,6 +68,7 @@ export default class Controls {
     this.loaderElement = document.getElementById('loader')
     this.viewerElement = document.getElementById('viewer')
     this.mainGrid = document.getElementById('main-grid')
+    this.centerGrid = document.getElementById('center-grid')
     this.expandBtn = document.getElementById('fullscreen-btn')
     this.modeSelect = document.getElementById('mode-select')
     this.paletteSelect = document.getElementById('palette-select')
@@ -332,7 +333,17 @@ export default class Controls {
 
   linkExpandButton() {
     this.expandBtn.addEventListener('click', () => {
-      this.mainGrid.classList.toggle('expanded')
+      const isExpanded = this.mainGrid.classList.contains('expanded')
+
+      if (isExpanded) {
+        this.mainGrid.classList.remove('expanded')
+        setTimeout(() => {
+          this.centerGrid.classList.remove('expanded')
+        }, 400)
+      } else {
+        this.mainGrid.classList.add('expanded')
+        this.centerGrid.classList.add('expanded')
+      }
     })
 
     document.addEventListener('mousemove', (e) => {
