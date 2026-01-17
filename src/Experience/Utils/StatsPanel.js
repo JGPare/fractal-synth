@@ -9,7 +9,7 @@ export default class StatsPanel {
     const dom = this.stats.dom
     dom.style.position = 'absolute'
     dom.style.top = '0'
-    dom.style.left = viewerElem.getBoundingClientRect().x + 'px'
+    dom.style.left = '0'
 
     dom.style.zIndex = '1000'
     viewerElem.appendChild(dom)

@@ -17,7 +17,7 @@
   --ui-grid-l: 18%;
   --ui-grid-r: 25%;
   --ease-channel-grid: 13%;
-  --number-slider-grid: 72%;
+  --number-slider-grid: 58%;
   --number-value-grid: 15%;
   --slider-grid: 80%;
   --number-grid: 20%;
@@ -639,9 +639,10 @@ select:disabled {
 }
 
 .number-input-grid {
-  grid-template-columns: var(--ease-channel-grid) var(--number-slider-grid) var(--number-value-grid);
+  grid-template-columns: var(--ease-channel-grid) auto var(--number-slider-grid) auto var(--number-value-grid);
   display: grid;
-  grid-template-areas: "easeArea slider number";
+  grid-template-areas: "easeArea startBtn slider endBtn number";
+  gap: 0.25rem;
 }
 
 
@@ -682,7 +683,7 @@ select:disabled {
   border-radius: 5px;
   border-width: 0;
   text-align: center;
-  margin: 0 0.25rem;
+  margin: 0 0;
   background-color: var(--clr-bg-input-dark);
 }
 
@@ -735,6 +736,31 @@ select:disabled {
   outline-width: 1px;
   outline-color: var(--clr-border-focus);
   outline-style: groove;
+}
+
+/* SET VALUE BUTTONS */
+.set-value-btn {
+  width: 1rem;
+  height: var(--slider-height);
+  border: none;
+  border-radius: 3px;
+  background-color: var(--clr-bg-input-dark);
+  color: var(--clr-font-main);
+  font-size: 0.5rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+  padding: 0;
+}
+
+.set-value-btn:hover:not(:disabled) {
+  opacity: 1;
+  background-color: var(--clr-default-input);
+}
+
+.set-value-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
 }
 
 /* Channel color variables via data attribute */

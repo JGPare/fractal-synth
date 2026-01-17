@@ -218,24 +218,51 @@ export default class Controls {
     value.value = slider.value
     input.elements["value"] = value
 
+    // Start/End buttons (disabled when no channel assigned)
+    const startBtn = document.createElement("button")
+    startBtn.setAttribute("class", "set-value-btn")
+    startBtn.setAttribute("title", "Set start value")
+    startBtn.textContent = "▼"
+    startBtn.disabled = input.channelIndex < 0
+
+    const endBtn = document.createElement("button")
+    endBtn.setAttribute("class", "set-value-btn")
+    endBtn.setAttribute("title", "Set end value")
+    endBtn.textContent = "▼"
+    endBtn.disabled = input.channelIndex < 0
+
+    startBtn.addEventListener('click', () => {
+      input.startVal = input.value
+      this.setTimeline(input.channelIndex)
+      this.setInputElementActive(input)
+    })
+
+    endBtn.addEventListener('click', () => {
+      input.endVal = input.value
+      this.setTimeline(input.channelIndex)
+      this.setInputElementActive(input)
+    })
+
     // handles
-    slider.addEventListener('input', (event) => {
+    slider.addEventListener('input', () => {
       if (value.value > slider.max) value.value = slider.max
       if (value.value < slider.min) value.value = slider.min
       value.value = slider.value
       input.setValue(slider.value)
     })
 
-    value.addEventListener('change', (event) => {
+    value.addEventListener('change', () => {
       slider.value = value.value
       input.setValue(slider.value)
     })
 
-    easeChannel.addEventListener('change', (event) => {
+    easeChannel.addEventListener('change', () => {
       const prevIndex = input.channelIndex
-      input.setChannelIndex(event.target.value - 1)
+      input.setChannelIndex(easeChannel.value - 1)
       easeChannel.setAttribute("data-channel", input.channelIndex + 1)
       slider.setAttribute("data-channel", input.channelIndex + 1)
+      startBtn.disabled = input.channelIndex < 0
+      endBtn.disabled = input.channelIndex < 0
       this.setTimeline(prevIndex)
       this.clearInputAnimation(input)
     })
@@ -245,7 +272,9 @@ export default class Controls {
     container.appendChild(label)
     container.appendChild(grid)
     grid.appendChild(easeChannel)
+    grid.appendChild(startBtn)
     grid.appendChild(slider)
+    grid.appendChild(endBtn)
     grid.appendChild(value)
 
     parentElement.appendChild(container)
