@@ -347,9 +347,11 @@ vec3 getCircularWavesColor(vec2 uv) {
 }
 
 vec3 getLinearWavesColor(vec2 uv) {
-  uv = warpUv(uv, uSinMag, vec2(uSinFreqX, uSinFreqY), vec2(0., 0.));
-  float val1 = abs(sin(uv.x * uIters) + sin(uv.x * uIters * 0.6 + PI / 2.) + sin(uv.x * uIters * 0.1 + 3. * PI / 2.));
-  float val2 = abs(sin(uv.y * uPower) + sin(uv.y * uPower * 0.6 + PI / 2.) + sin(uv.y * uPower * 0.1 + 3. * PI / 2.));
+  uv = warpUv(uv, uSinMag*10., vec2(uSinFreqX, uSinFreqY), vec2(0., 0.));
+  float par1 = uIters*10.;
+  float par2 = uPower*10.;
+  float val1 = abs(sin(uv.x * par1) + sin(uv.x * par1 * 0.6 + PI / 2.) + sin(uv.x * par1 * 0.1 + 3. * PI / 2.));
+  float val2 = abs(sin(uv.y * par2) + sin(uv.y * par2 * 0.6 + PI / 2.) + sin(uv.y * par2 * 0.1 + 3. * PI / 2.));
   float val3 = abs(uCposX);
   vec3 mixedColor = getMixedColor(val1 + val2 + val3, int(10. * uCposY));
   return mixedColor;

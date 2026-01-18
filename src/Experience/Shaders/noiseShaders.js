@@ -26,7 +26,7 @@ const iters = new NumberInput({
 const power = new NumberInput({
   eId: eNumInput.power,
   name: "Density",
-  value: 2,
+  value: 10,
   min: -50,
   max: 50,
   step: 0.01,
@@ -79,7 +79,7 @@ const posY = new NumberInput({
 const zoom = new NumberInput({
   eId: eNumInput.zoom,
   name: "Zoom",
-  value: 0.2,
+  value: 20,
   min: 0,
   max: 1,
   step: 0.01,
@@ -104,9 +104,9 @@ fibonacci.addGroup("Core", [scale1, scale2, posX, posY, zoom, rotation])
 const cPosX = new NumberInput({
   eId: eNumInput.cPosX,
   name: "Const Position X",
-  value: 1,
-  min: -2,
-  max: 3,
+  value: 2,
+  min: -5,
+  max: 5,
   step: 0.0001,
   channelIndex: -1
 })
@@ -115,8 +115,8 @@ const cPosY = new NumberInput({
   eId: eNumInput.cPosY,
   name: "Const Position Y",
   value: 0.5,
-  min: -2,
-  max: 2,
+  min: -5,
+  max: 5,
   step: 0.0001,
   channelIndex: -1
 })
