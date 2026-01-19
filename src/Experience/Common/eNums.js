@@ -11,6 +11,7 @@ export const eShaders = {
   circularWaves: 7,
   linearWaves: 8,
   fibonacci: 9,
+  sphinx: 10,
 }
 
 // must match with shader 

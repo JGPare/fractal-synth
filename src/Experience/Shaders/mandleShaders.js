@@ -11,6 +11,7 @@ const mandle = new Shader("Mandle", eShaders.mandle)
 const julia = new Shader("Julia", eShaders.julia)
 const doubleJulia = new Shader("Sin Julia", eShaders.doubleJulia)
 const phoenix = new Shader("Phoenix", eShaders.phoenix)
+const sphinx = new Shader("Sphinx", eShaders.sphinx)
 const neuton = new Shader("Neuton", eShaders.neuton)
 const burningShip = new Shader("Burning Ship", eShaders.burningShip)
 
@@ -88,6 +89,7 @@ mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 doubleJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+sphinx.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 neuton.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 burningShip.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
 
@@ -114,6 +116,7 @@ const cPosY = new NumberInput({
 julia.addGroup("Point", [cPosX, cPosY])
 doubleJulia.addGroup("Point", [cPosX, cPosY])
 phoenix.addGroup("Point", [cPosX, cPosY])
+sphinx.addGroup("Point", [cPosX, cPosY])
 neuton.addGroup("Point", [cPosX, cPosY])
 
 const velocityDistortionDirection = new NumberInput({
@@ -140,6 +143,7 @@ mandle.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDis
 julia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 doubleJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 phoenix.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
+sphinx.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 neuton.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 burningShip.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
 
@@ -176,6 +180,7 @@ const sinJuliaYCoeff = new NumberInput({
 julia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 doubleJulia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 phoenix.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
+sphinx.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 neuton.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 burningShip.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])
 
@@ -186,4 +191,5 @@ export default {
   phoenix: phoenix,
   neuton: neuton,
   burningShip: burningShip,
+  sphinx: sphinx,
 }

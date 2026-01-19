@@ -38,6 +38,9 @@ export default class ShaderUtility {
       case eShaders.fibonacci:
         shader = noiseShaders.fibonacci
         break
+      case eShaders.sphinx:
+        shader = mandleShaders.sphinx
+        break
       default:
         break
     }

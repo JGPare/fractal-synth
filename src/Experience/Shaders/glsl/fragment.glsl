@@ -12,6 +12,7 @@
 #define CIRCULAR_WAVES 7
 #define LINEAR_WAVES 8
 #define FIBONACCI 9
+#define SPHINX 10
 
 // Must match uNumInput eNum!
 #define uIters uFloatPar[0]
@@ -226,6 +227,32 @@ float phoenix(vec2 uv, int maxIters) {
   return float(log(abs(dot(d1, d1)))) + velocityDistort(dot(d - d2, d - d2));
 }
 
+float sphinx(vec2 uv, int maxIters) {
+ 
+ vec2 c = vec2(uCposX, uCposY);
+  int i;
+  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 z0 = zn;
+  float mZ = dot(zn, zn);
+  for (i = 0; mZ < 4.0 && i < maxIters; i++) {
+    zn = complexPow(zn, uPower) + c;
+    mZ = dot(zn, zn);
+  }
+  vec2 newUv = vec2(log(abs(mZ)),log(abs(dot(uv-zn,uv-zn))));
+  zn = newUv;
+  mZ = dot(zn, zn);
+  float iter2Float = exp(6.8 * uIters2);
+  int maxIters2 = int(iter2Float);
+  for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
+    zn = complexPow(zn, uPower) + c;
+    mZ = dot(zn, zn);
+  }
+
+  float escape = float(i) + velocityDistort(mZ - 4.0);
+
+  return escape;
+}
+
 float myNoise(vec2 uv) {
   vec2 p = vec2(uSinFreqX, uSinFreqY);
   return cnoise(uv * uCposX) + cnoise(uv * uCposY) + cnoise(p);
@@ -263,6 +290,8 @@ float getEscape(vec2 uv, int iterations) {
       break;
     case PHOENIX:
       escape = phoenix(uv, iterations);
+    case SPHINX:
+      escape = sphinx(uv, iterations);
       break;
   }
   return escape;
@@ -358,16 +387,25 @@ vec3 getLinearWavesColor(vec2 uv) {
 }
 
 vec3 getFibonacciColor(vec2 uv) {
-  uv = rotate(uv, PI / 4., vec2(0.));
-  float stagger1 = floor(sin(uv.x * 3. * uCposX + 2. * PI / 3.) + sin(uv.x * 2. + PI / 3.) + sin(uv.x * 1.) + uv.x / 5.);
-  float stagger2 = floor(cos(uv.y * 10. * uCposY + 2. * PI / 3.) + cos(uv.y * 2. + PI / 3.) + cos(uv.y * 1.) + uv.y / 5.);
-  vec2 focus = vec2(uSinFreqX * stagger1, uSinFreqY * stagger2);
-  uv *= focus;
-  float gridSize = 2.;
-  uv = floor(uv * gridSize) / gridSize;
-  float val = abs(uv.x) + abs(uv.y) + uIters;
-  vec3 mixedColor = getMixedColor(val, int(2.));
+   
+  float iterFloat = exp(6.8 * uIters);
+  int iterations = int(iterFloat);
+  float iterFrac = fract(iterFloat);
+
+  float escape1 = phoenix(uv, iterations);
+  float escape2 = doubleJulia(uv, iterations);
+
+  float escape = mix(escape1, escape2, 0.5);
+
+  vec3 mixedColor = getMixedColor(escape, iterations);
+  if (iterations < 50) {
+    float escapeCeil = getEscape(uv, iterations + 1);
+    vec3 mixedColorCeil = getMixedColor(escapeCeil, iterations + 1);
+    mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);
+  }
+
   return mixedColor;
+
 }
 
 vec3 getWavesFractalColor(vec2 uv) {
@@ -416,6 +454,7 @@ vec3 getColor(vec2 uv) {
     case BURNING_SHIP:
     case NEUTON:
     case PHOENIX:
+    case SPHINX:
       mixedColor = getEscapeFractalColor(uv);
       break;
     case NOISE:
