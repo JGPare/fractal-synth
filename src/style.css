@@ -234,6 +234,10 @@ input[type="range"]::-webkit-slider-runnable-track {
   z-index: 500;
 }
 
+#menu-bar[hidden] {
+  display: none;
+}
+
 .menu-title {
   font-size: 0.9rem;
   font-weight: 500;
@@ -315,6 +319,10 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 /* Expanded mode - hide sidebars with transform */
+#main-grid.expanded {
+  height: 100%;
+}
+
 #main-grid.expanded #ui-grid-l {
   transform: translateX(-100%);
   opacity: 0;
@@ -370,7 +378,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-template-areas:
     "viewer"
     "timeline";
-  height: 100vh;
+  height: 100%;
   grid-column: 2;
 }
 

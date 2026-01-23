@@ -69,6 +69,7 @@ export default class Controls {
     this.loaderCloseBtn = document.getElementById('loader-close-btn')
     this.viewerElement = document.getElementById('viewer')
     this.mainGrid = document.getElementById('main-grid')
+    this.menuBar = document.getElementById('menu-bar')
     this.centerGrid = document.getElementById('center-grid')
     this.expandBtn = document.getElementById('fullscreen-btn')
     this.modeSelect = document.getElementById('mode-select')
@@ -346,11 +347,13 @@ export default class Controls {
 
       if (isExpanded) {
         this.mainGrid.classList.remove('expanded')
+        this.menuBar.hidden = false
         setTimeout(() => {
           this.centerGrid.classList.remove('expanded')
         }, 400)
       } else {
         this.mainGrid.classList.add('expanded')
+        this.menuBar.hidden = true
         this.centerGrid.classList.add('expanded')
       }
     })
