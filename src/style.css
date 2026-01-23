@@ -21,6 +21,7 @@
   --number-value-grid: 15%;
   --slider-grid: 80%;
   --number-grid: 20%;
+  --menu-bar-size: 1.75rem;
   
   /* Spacing */
   --input-margin: 0.1rem;
@@ -217,6 +218,89 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 /* ============================================================================
+   MENU BAR
+   ============================================================================ */
+
+#menu-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background-color: var(--clr-bg-main);
+  border-bottom: 1px solid var(--clr-border);
+  height: var(--menu-bar-size);
+  padding: 0 0.5rem;
+  z-index: 500;
+}
+
+.menu-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0 1rem 0 0.25rem;
+  color: var(--clr-font-main);
+}
+
+.menu-dropdown {
+  position: relative;
+}
+
+.menu-dropdown-btn {
+  background: transparent;
+  border: none;
+  color: var(--clr-font-main);
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  border-radius: 0.2rem;
+  transition: background-color 0.15s ease;
+}
+
+.menu-dropdown-btn:hover {
+  background-color: var(--clr-bg-secondary);
+}
+
+.menu-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background-color: var(--clr-bg-main);
+  border: 1px solid var(--clr-border);
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 600;
+  padding: 0.25rem 0;
+}
+
+.menu-dropdown:hover .menu-dropdown-content {
+  display: block;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--clr-font-main);
+  padding: 0.4rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.15s ease;
+}
+
+.menu-item:hover {
+  background-color: var(--clr-bg-secondary);
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: var(--clr-border);
+  margin: 0.25rem 0;
+}
+
+/* ============================================================================
    LAYOUT - MAIN GRID
    ============================================================================ */
 
@@ -226,7 +310,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-template-columns: var(--ui-grid-l) var(--view-grid) var(--ui-grid-r);
   grid-template-areas: "ui-l center ui-r";
   width: 100%;
-  height: 100%;
+  height: calc(100% - var(--menu-bar-size));
 }
 
 /* Expanded mode - hide sidebars with transform */
@@ -973,7 +1057,7 @@ select:disabled {
 
 .projects-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   padding: 1rem;
 }
