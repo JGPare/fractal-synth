@@ -9,7 +9,7 @@ import ShaderUtility from './Shaders/ShaderUtility'
 
 const debugObj = {}
 
-const defaultSceneName = "MyScene"
+const defaultProjectName = "NewProject"
 
 export default class Controls {
   // ============================================================
@@ -45,6 +45,7 @@ export default class Controls {
     this.shaderUniforms = this.shaderMaterial.getUniforms()
     this.palettes = this.experience.palettes
     this.palette = this.palettes.getPaletteByIndex(0)
+    this.projectName = defaultProjectName
   }
 
   initState() {
@@ -64,7 +65,7 @@ export default class Controls {
   }
 
   getElements() {
-    this.sceneName = document.getElementById('scene-name')
+    this.projectNameElem = document.getElementById('project-name')
     this.loaderElement = document.getElementById('loader')
     this.loaderCloseBtn = document.getElementById('loader-close-btn')
     this.viewerElement = document.getElementById('viewer')
@@ -312,23 +313,31 @@ export default class Controls {
   // ============================================================
 
   linkUI() {
-    this.linkModeSelect()
+
+    this.linkProjectInfo()
     this.linkKeyboardEvents()
     this.linkTimeline()
     this.linkDualInputs()
-    this.linkPaletteSelect()
-    this.linkPaletteInput()
-    this.setPaletteInputFromSelect()
-    this.linkNewPaletteButton()
-    this.linkRandomPaletteButton()
-    this.linkDeletePaletteButton()
+    this.linkPalette()
+
     this.linkChannels()
     this.linkExpandButton()
     this.linkLoaderClose()
     this.linkMenuBar()
+
   }
 
-  linkModeSelect() {
+  linkProjectInfo() {
+    
+    this.projectNameElem.addEventListener('change', (event) => {
+      console.log("hit");
+      
+      ExperienceRepo.deleteExperience(this.projectName)
+      this.projectList.deleteProject(this.projectName)
+      this.projectName = this.projectNameElem.value
+      ExperienceRepo.saveExperience(this.projectName, this.experience)
+    })
+
     this.modeSelect.addEventListener('change', (event) => {
       this.modeIndex = event.target.selectedIndex
       this.experience.setShader(this.modeIndex)
@@ -388,7 +397,7 @@ export default class Controls {
 
   linkMenuBar() {
     this.menuSave.addEventListener('click', () => {
-      ExperienceRepo.saveExperience(this.sceneName.value, this.experience)
+      ExperienceRepo.saveExperience(this.projectName, this.experience)
     })
 
     this.menuLoad.addEventListener('click', () => {
@@ -396,12 +405,13 @@ export default class Controls {
     })
 
     this.menuDelete.addEventListener('click', () => {
-      ExperienceRepo.deleteExperience(this.sceneName.value)
-      this.projectList.deleteProject(this.sceneName.value)
+      ExperienceRepo.deleteExperience(this.projectName)
+      this.projectList.deleteProject(this.projectName)
       ExperienceRepo.saveProjectList(this.projectList)
       this.timeline.renewAll()
       this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
-      this.sceneName.value = defaultSceneName
+      this.projectNameElem.value = defaultProjectName
+      this.projectName = defaultProjectName
     })
 
     this.menuResetShader.addEventListener('click', () => {
@@ -587,7 +597,7 @@ export default class Controls {
   }
 
   // ============================================================
-  // PROJECT/SCENE MANAGEMENT
+  // PROJECT MANAGEMENT
   // ============================================================
 
   openLoadView() {
@@ -766,6 +776,17 @@ export default class Controls {
   // ============================================================
   // PALETTE OPERATIONS
   // ============================================================
+
+  linkPalette() {
+    this.linkPaletteSelect()
+    this.linkPaletteInput()
+
+    this.setPaletteInputFromSelect()
+
+    this.linkNewPaletteButton()
+    this.linkRandomPaletteButton()
+    this.linkDeletePaletteButton()
+  }
 
   linkPaletteSelect() {
     this.setPaletteSelectOptions()
@@ -1023,14 +1044,15 @@ export default class Controls {
    * @param {string} name
    */
   setName(name) {
-    this.sceneName.value = name
+    this.projectNameElem.value = name
+    this.projectName = name
   }
 
   /**
    * @returns {string}
    */
   getName() {
-    return this.sceneName.value
+    return this.projectName
   }
 
   /**
