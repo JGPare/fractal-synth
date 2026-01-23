@@ -99,6 +99,12 @@ export default class Controls {
     this.channelProgressSliders = document.querySelectorAll('input.timeline-slider')
     this.channelClearBtns = document.querySelectorAll('button.channel-clear-btn')
 
+    // Menu bar items
+    this.menuSave = document.getElementById('menu-save')
+    this.menuLoad = document.getElementById('menu-load')
+    this.menuDelete = document.getElementById('menu-delete')
+    this.menuResetShader = document.getElementById('menu-reset-shader')
+    this.menuClearAnimations = document.getElementById('menu-clear-animations')
   }
 
   // ============================================================
@@ -323,6 +329,7 @@ export default class Controls {
     this.linkChannels()
     this.linkExpandButton()
     this.linkLoaderClose()
+    this.linkMenuBar()
   }
 
   linkModeSelect() {
@@ -401,6 +408,37 @@ export default class Controls {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !this.loaderElement.hidden) {
         this.closeLoadView()
+      }
+    })
+  }
+
+  linkMenuBar() {
+    this.menuSave.addEventListener('click', () => {
+      ExperienceRepo.saveExperience(this.sceneName.value, this.experience)
+    })
+
+    this.menuLoad.addEventListener('click', () => {
+      this.openLoadView()
+    })
+
+    this.menuDelete.addEventListener('click', () => {
+      ExperienceRepo.deleteExperience(this.sceneName.value)
+      this.projectList.deleteProject(this.sceneName.value)
+      ExperienceRepo.saveProjectList(this.projectList)
+      this.timeline.renewAll()
+      this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
+      this.sceneName.value = defaultSceneName
+    })
+
+    this.menuResetShader.addEventListener('click', () => {
+      this.experience.setShader(this.modeIndex)
+    })
+
+    this.menuClearAnimations.addEventListener('click', () => {
+      for (let i = 0; i < this.channels.length; i++) {
+        this.timeline.renew(i)
+        this.clearChannelInputs(i)
+        this.setChannelAsInactive(i)
       }
     })
   }
