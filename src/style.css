@@ -210,7 +210,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-size: var(--font-height3);
   font-weight: 400;
   padding-top: var(--input-text-top-padding);
-  padding-bottom: 0;
+  padding-bottom: 0.2rem;
 }
 
 .slider-text {
@@ -341,7 +341,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   position: relative;
   grid-area: ui-l;
   background-color: var(--clr-bg-main);
-  padding: 1rem;
+  padding: 0.5rem;
   display: grid;
   grid-template-rows: 8fr 1fr;
   grid-template-areas:
@@ -353,7 +353,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 #ui-grid-l::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 
 #ui-grid-l::-webkit-scrollbar-track {
@@ -527,7 +527,27 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-template-areas:
     "controls"
     "footer";
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+#ui-grid-r::-webkit-scrollbar {
+  width: 8px;
+}
+
+#ui-grid-r::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+#ui-grid-r::-webkit-scrollbar-thumb {
+  background: #5c6d84cc;
+  border-radius: 4px;
+}
+
+#ui-grid-r::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-default-input);
 }
 
 #controls-grid {
@@ -590,7 +610,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 #channels-container {
   background-color: var(--clr-bg-secondary);
-  padding: 0 0.4rem 0.1rem 0.4rem;
+  padding: 0.4rem;
   margin: 0.3rem 0 0 0;
   border-radius: 0.3rem;
 }
@@ -710,8 +730,8 @@ input.channel-checkbox {
 .colorpicker {
   width: 100%;
   height: 22px;
-  padding: 0rem;
-  margin: 0.2rem;
+  padding: 0;
+  margin: 0.2rem 0;
   border-radius: 0.2rem;
   border: 1px solid #d3d3d3cc;
 }
