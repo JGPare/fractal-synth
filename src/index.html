@@ -44,26 +44,15 @@
     <!-- LEFT GRID -->
     <div id="ui-grid-l">
       <div class="container">
-        <div class="logo-container container">
-          <h2 class="header-text"> Fractal Synth </h2>
-          <div class="bottom-outline"></div>
-        </div>
         <div class="slider-container">
           <label for="scene-name" class="slider-text"> Scene Name </label>
-          <!-- <ul id="project-list"></ul> -->
           <input class="control-text" id="scene-name" type="text" name="sceneName" value="MyScene" minlength="4"
-            maxlength="20" size="20" />
-        </div>
-        <!-- PROJECT CONTROLS -->
-        <div class="button-container">
-          <button class="control-button three-width-btn default-button" id="delete-scene-button">Delete</button>
-          <button class="control-button three-width-btn default-button" id="save-scene-button">Save</button>
-          <button class="control-button three-width-btn default-button" id="load-scene-button">Load</button>
+            maxlength="20" size="20" readonly />
         </div>
         <div class="slider-container">
           <p class="sub-header-text"> Fractal </p>
           <div class="bottom-outline"></div>
-          <select class="control-select select-md" id="mode-select">
+          <select class="control-select select-md w-100" id="mode-select">
             <option value="mandle">Mandlebrot</option>
             <option value="julia">Julia</option>
             <option value="doubleJulia">Double Julia</option>
@@ -76,7 +65,6 @@
             <option value="fibonacci">Fibonacci</option>
             <option value="sphinx">Sphinx</option>
           </select>
-          <button class="control-button four-width-btn default-button" id="reset-shader">Reset</button>
         </div>
         <div class="container" id="left-inputs">
         </div>

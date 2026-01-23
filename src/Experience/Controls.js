@@ -74,10 +74,7 @@ export default class Controls {
     this.modeSelect = document.getElementById('mode-select')
     this.paletteSelect = document.getElementById('palette-select')
     this.numberOfColorsSlider = document.getElementById('number-of-colors')
-    this.deleteSceneButton = document.getElementById('delete-scene-button')
-    this.saveSceneButton = document.getElementById('save-scene-button')
-    this.loadSceneButton = document.getElementById('load-scene-button')
-    this.playTimelineButton = document.getElementById('play-timeline-button')
+        this.playTimelineButton = document.getElementById('play-timeline-button')
     this.pauseTimelineButton = document.getElementById('pause-timeline-button')
     this.setStartTimelineButton = document.getElementById('set-start-timeline-button')
     this.setEndTimelineButton = document.getElementById('set-end-timeline-button')
@@ -89,7 +86,6 @@ export default class Controls {
     this.timelineSelectSlider = document.getElementById('timeline-select-slider')
     this.colorsContainer = document.getElementById('colors-container')
     this.paperCanvas = document.getElementById('paper-canvas')
-    this.resetShader = document.getElementById('reset-shader')
     this.paletteInput = document.getElementById('palette-input')
     this.channelCheckboxes = document.querySelectorAll('input.channel-checkbox')
     this.channelDurations = document.querySelectorAll('input.channel-duration')
@@ -316,7 +312,6 @@ export default class Controls {
 
   linkUI() {
     this.linkModeSelect()
-    this.linkSceneButtons()
     this.linkKeyboardEvents()
     this.linkTimeline()
     this.linkDualInputs()
@@ -344,31 +339,7 @@ export default class Controls {
     })
   }
 
-  linkSceneButtons() {
-    this.deleteSceneButton.addEventListener('click', () => {
-      ExperienceRepo.deleteExperience(this.sceneName.value)
-      this.projectList.deleteProject(this.sceneName.value)
-      ExperienceRepo.saveProjectList(this.projectList)
-      this.timeline.renewAll()
-      this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
-      this.sceneName.value = defaultSceneName
-    })
-
-    this.saveSceneButton.addEventListener('click', () => {
-      console.log("save scene")
-      ExperienceRepo.saveExperience(this.sceneName.value, this.experience)
-    })
-
-    this.loadSceneButton.addEventListener('click', () => {
-      console.log("load scene")
-      this.openLoadView()
-    })
-
-    this.resetShader.addEventListener('click', () => {
-      this.experience.setShader(this.modeIndex)
-    })
-  }
-
+  
   linkExpandButton() {
     this.expandBtn.addEventListener('click', () => {
       const isExpanded = this.mainGrid.classList.contains('expanded')

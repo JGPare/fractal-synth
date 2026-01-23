@@ -200,6 +200,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-size: var(--font-height1);
 }
 
+ /* unused rn */
 .header-text {
   font-size: var(--font-height2);
   font-weight: 400;
@@ -334,9 +335,8 @@ input[type="range"]::-webkit-slider-runnable-track {
   background-color: var(--clr-bg-main);
   padding: 1rem;
   display: grid;
-  grid-template-rows: calc(var(--font-height2)*1.5) 8fr 1fr;
+  grid-template-rows: 8fr 1fr;
   grid-template-areas:
-    "header"
     "controls"
     "footer";
   overflow-y: auto;
@@ -541,10 +541,6 @@ input[type="range"]::-webkit-slider-runnable-track {
   outline: none;
 }
 
-.logo-container {
-  grid-area: header;
-  position: relative;
-}
 
 .select-container {
   grid-area: controls;
@@ -720,10 +716,6 @@ input.channel-checkbox {
   width: 31%;
 }
 
-.four-width-btn {
-  width: 22%;
-}
-
 .control-button {
   padding: 0.2rem;
   border-radius: 0.2rem;
@@ -826,10 +818,6 @@ select:disabled {
 
 #fractal-select {
   margin-bottom: 0.5rem;
-}
-
-#mode-select {
-  width: 74%;
 }
 
 /* NUMBER INPUTS */
