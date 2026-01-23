@@ -183,27 +183,47 @@ float burningShip(vec2 uv, int maxIters) {
   return float(i) + velocityDistort(mZ - 4.0);
 }
 
-// put a Neuton in
+
 float neuton(vec2 uv, int maxIters) {
-  vec2 c = vec2(uCposX, uCposY);
   int i;
   vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
-  vec2 z0 = zn;
-  float mZ = dot(zn, zn);
-  for (i = 0; mZ < 4.0 && i < maxIters; i++) {
-    zn = complexPow(zn, uPower) + c;
-    mZ = dot(zn, zn);
+  float n = uPower;
+  float tolerance = 0.000001;
+
+  for (i = 0; i < maxIters; i++) {
+    // Newton's method: z = z - f(z) / f'(z)
+    // For f(z) = z^n - 1, f'(z) = n * z^(n-1)
+    vec2 zn_pow = complexPow(zn, n);           // z^n
+    vec2 zn_pow_m1 = complexPow(zn, n - 1.0);  // z^(n-1)
+
+    // f(z) = z^n - c (using c parameter for offset)
+    vec2 c = vec2(uCposX, uCposY);
+    vec2 f = zn_pow - c;
+
+    // f'(z) = n * z^(n-1)
+    vec2 fp = n * zn_pow_m1;
+
+    // Complex division: f / fp
+    float denom = dot(fp, fp);
+    if (denom < 0.0000001) break;
+
+    vec2 quotient = vec2(
+      (f.x * fp.x + f.y * fp.y) / denom,
+      (f.y * fp.x - f.x * fp.y) / denom
+    );
+
+    vec2 znew = zn - quotient;
+
+    // Check for convergence
+    float diff = length(znew - zn);
+    if (diff < tolerance) break;
+
+    zn = znew;
   }
-  vec2 newUv = uv * zn;
-  zn = newUv;
-  mZ = dot(zn, zn);
-  float iter2Float = exp(6.8 * uIters2);
-  int maxIters2 = int(iter2Float);
-  for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
-    zn = complexPow(zn, uPower) + c;
-    mZ = dot(zn, zn);
-  }
-  return float(i) + velocityDistort(mZ - 4.0);
+
+  // Color based on angle to determine which root and iteration count
+  float angle = atan(zn.y, zn.x);
+  return float(i) + velocityDistort(abs(angle));
 }
 
 float phoenix(vec2 uv, int maxIters) {
@@ -228,29 +248,30 @@ float phoenix(vec2 uv, int maxIters) {
 }
 
 float sphinx(vec2 uv, int maxIters) {
- 
+
  vec2 c = vec2(uCposX, uCposY);
   int i;
   vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
+
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(zn, uPower) + c;
     mZ = dot(zn, zn);
   }
-  vec2 newUv = vec2(log(abs(mZ)),log(abs(dot(uv-zn,uv-zn))));
-  zn = newUv;
-  mZ = dot(zn, zn);
+
+  vec2 newUv = uv * zn;
   float iter2Float = exp(6.8 * uIters2);
   int maxIters2 = int(iter2Float);
+
+  zn = newUv;
+  mZ = dot(zn, zn);
+
   for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
     zn = complexPow(zn, uPower) + c;
     mZ = dot(zn, zn);
   }
-
-  float escape = float(i) + velocityDistort(mZ - 4.0);
-
-  return escape;
+  return float(i) + velocityDistort(mZ - 4.0);
 }
 
 float myNoise(vec2 uv) {
