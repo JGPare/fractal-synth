@@ -302,6 +302,31 @@ input[type="range"]::-webkit-slider-runnable-track {
   border: 0.1rem solid #686868;
 }
 
+#loader {
+  grid-area: viewer;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--clr-bg-secondary);
+}
+
+#loader::-webkit-scrollbar {
+  width: 8px;
+}
+
+#loader::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+#loader::-webkit-scrollbar-thumb {
+  background: #5c6d84cc;
+  border-radius: 4px;
+}
+
+#loader::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-default-input);
+}
+
 /* Fullscreen button */
 .fullscreen-btn {
   position: absolute;
