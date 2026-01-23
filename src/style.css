@@ -7,7 +7,7 @@
   --slider-height: 0.9rem;
   --font-height1: 1rem;
   --font-height2: 2rem;
-  --font-height3: 1.5rem;
+  --font-height3: 1.2rem;
   --number-box-width: 3.5rem;
   --number-ease-box-width: 2.5rem;
   --ease-box-width: 2rem;
@@ -210,10 +210,10 @@ input[type="range"]::-webkit-slider-runnable-track {
   font-size: var(--font-height3);
   font-weight: 400;
   padding-top: var(--input-text-top-padding);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0rem;
 }
 
-.slider-text {
+.label-text {
   padding-top: var(--input-text-top-padding);
   padding-bottom: var(--input-text-btm-padding);
 }
@@ -801,7 +801,7 @@ select:disabled {
   margin-bottom: auto;
   justify-content: space-between;
   display: flex;
-  padding: 0.25rem 0rem;
+  padding: 0.25rem 0rem 0 0;
 }
 
 /* ============================================================================

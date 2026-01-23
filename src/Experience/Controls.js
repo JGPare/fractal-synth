@@ -180,11 +180,11 @@ export default class Controls {
     const inputId = input.getId()
 
     const container = document.createElement("div")
-    container.setAttribute("class", "slider-text")
+    container.setAttribute("class", "label-text")
 
     const label = document.createElement("label")
     label.textContent = input.name
-    label.setAttribute("class", "slider-text")
+    label.setAttribute("class", "label-text")
     label.setAttribute("for", inputId)
 
     const grid = document.createElement("div")
@@ -330,8 +330,6 @@ export default class Controls {
   linkProjectInfo() {
     
     this.projectNameElem.addEventListener('change', (event) => {
-      console.log("hit");
-      
       ExperienceRepo.deleteExperience(this.projectName)
       this.projectList.deleteProject(this.projectName)
       this.projectName = this.projectNameElem.value
