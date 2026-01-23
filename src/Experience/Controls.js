@@ -66,6 +66,7 @@ export default class Controls {
   getElements() {
     this.sceneName = document.getElementById('scene-name')
     this.loaderElement = document.getElementById('loader')
+    this.loaderCloseBtn = document.getElementById('loader-close-btn')
     this.viewerElement = document.getElementById('viewer')
     this.mainGrid = document.getElementById('main-grid')
     this.centerGrid = document.getElementById('center-grid')
@@ -321,6 +322,7 @@ export default class Controls {
     this.linkDeletePaletteButton()
     this.linkChannels()
     this.linkExpandButton()
+    this.linkLoaderClose()
   }
 
   linkModeSelect() {
@@ -382,6 +384,24 @@ export default class Controls {
       const inCorner = (window.innerWidth - e.clientX < cornerSize) && (window.innerHeight - e.clientY < cornerSize)
 
       this.expandBtn.classList.toggle('visible', inCorner)
+    })
+  }
+
+  linkLoaderClose() {
+    this.loaderCloseBtn.addEventListener('click', () => {
+      this.closeLoadView()
+    })
+
+    this.loaderElement.addEventListener('click', (e) => {
+      if (e.target === this.loaderElement) {
+        this.closeLoadView()
+      }
+    })
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !this.loaderElement.hidden) {
+        this.closeLoadView()
+      }
     })
   }
 
@@ -572,10 +592,16 @@ export default class Controls {
   }
 
   createProjectCards() {
-    this.loaderElement.innerHTML = ""
-    const projectsContainer = document.createElement('div')
+    const modal = this.loaderElement.querySelector('.modal')
+    const existingContainer = modal.querySelector('.projects-container')
+    if (existingContainer) {
+      existingContainer.innerHTML = ""
+    }
+    const projectsContainer = existingContainer || document.createElement('div')
     projectsContainer.className = "projects-container"
-    this.loaderElement.appendChild(projectsContainer)
+    if (!existingContainer) {
+      modal.appendChild(projectsContainer)
+    }
     console.log("projects:", this.projectList)
 
     this.projectList.projects.forEach(project => {
