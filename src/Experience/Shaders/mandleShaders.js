@@ -119,9 +119,9 @@ phoenix.addGroup("Point", [cPosX, cPosY])
 sphinx.addGroup("Point", [cPosX, cPosY])
 neuton.addGroup("Point", [cPosX, cPosY])
 
-const velocityDistortionDirection = new NumberInput({
-  eId: eNumInput.velDistortionDir,
-  name: "Velocity Distortion Direction",
+const velocityDirection = new NumberInput({
+  eId: eNumInput.velDir,
+  name: "Velocity Direction",
   value: 0,
   min: -1,
   max: 1,
@@ -129,9 +129,9 @@ const velocityDistortionDirection = new NumberInput({
   channelIndex: -1
 })
 
-const velocityDistortionAmount = new NumberInput({
-  eId: eNumInput.velDistortionMag,
-  name: "Velocity Distortion Amount",
+const velocityAmount = new NumberInput({
+  eId: eNumInput.velMag,
+  name: "Velocity Amount",
   value: 0.5,
   min: 0,
   max: 5,
@@ -139,13 +139,13 @@ const velocityDistortionAmount = new NumberInput({
   channelIndex: -1
 })
 
-mandle.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-julia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-doubleJulia.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-phoenix.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-sphinx.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-neuton.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
-burningShip.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
+mandle.addGroup("Velocity", [velocityDirection, velocityAmount])
+julia.addGroup("Velocity", [velocityDirection, velocityAmount])
+doubleJulia.addGroup("Velocity", [velocityDirection, velocityAmount])
+phoenix.addGroup("Velocity", [velocityDirection, velocityAmount])
+sphinx.addGroup("Velocity", [velocityDirection, velocityAmount])
+neuton.addGroup("Velocity", [velocityDirection, velocityAmount])
+burningShip.addGroup("Velocity", [velocityDirection, velocityAmount])
 
 const sinMag = new NumberInput({
   eId: eNumInput.uSinMag,

@@ -274,7 +274,22 @@ export default class Controls {
 
     easeChannel.value = input.channelIndex + 1
 
-    container.appendChild(label)
+    // Header row
+    const headerRow = document.createElement("div")
+    headerRow.setAttribute("class", "number-input-header")
+
+    const channelHeader = document.createElement("span")
+    channelHeader.textContent = "#"
+    channelHeader.setAttribute("class", "number-input-header-item")
+
+    const labelWrapper = document.createElement("span")
+    labelWrapper.setAttribute("class", "number-input-label-wrapper")
+    labelWrapper.appendChild(label)
+
+    headerRow.appendChild(channelHeader)
+    headerRow.appendChild(labelWrapper)
+
+    container.appendChild(headerRow)
     container.appendChild(grid)
     grid.appendChild(easeChannel)
     grid.appendChild(startBtn)

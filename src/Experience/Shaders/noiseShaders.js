@@ -126,8 +126,8 @@ circularWaves.addGroup("Point", [cPosX, cPosY])
 linearWaves.addGroup("Point", [cPosX, cPosY])
 fibonacci.addGroup("Point", [cPosX, cPosY])
 
-const velocityDistortionDirection = new NumberInput({
-  eId: eNumInput.velDistortionDir,
+const velocityDirection = new NumberInput({
+  eId: eNumInput.velDir,
   name: "UV scale",
   value: 0,
   min: -5,
@@ -136,8 +136,8 @@ const velocityDistortionDirection = new NumberInput({
   channelIndex: -1
 })
 
-const velocityDistortionAmount = new NumberInput({
-  eId: eNumInput.velDistortionMag,
+const velocityAmount = new NumberInput({
+  eId: eNumInput.velMag,
   name: "Mix UV",
   value: -1,
   min: 0,
@@ -146,7 +146,7 @@ const velocityDistortionAmount = new NumberInput({
   channelIndex: -1
 })
 
-noise.addGroup("Velocity Distortion", [velocityDistortionDirection, velocityDistortionAmount])
+noise.addGroup("Velocity", [velocityDirection, velocityAmount])
 
 const sinMag = new NumberInput({
   eId: eNumInput.uSinMag,

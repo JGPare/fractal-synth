@@ -815,6 +815,27 @@ select:disabled {
   grid-template-areas: "slider number";
 }
 
+.number-input-header {
+  display: grid;
+  grid-template-columns: var(--ease-channel-grid) auto var(--number-slider-grid) auto var(--number-value-grid);
+  gap: 0.25rem;
+  margin-bottom: 0.1rem;
+}
+
+.number-input-header-item {
+  text-align: center;
+  color: var(--clr-font-main);
+  opacity: 0.7;
+  padding: 0 0.25rem 0 0;
+
+}
+
+.number-input-label-wrapper {
+  text-align: left;
+  grid-column: 3;
+  padding: 0 0 0 0.25rem;
+}
+
 .number-input-grid {
   grid-template-columns: var(--ease-channel-grid) auto var(--number-slider-grid) auto var(--number-value-grid);
   display: grid;

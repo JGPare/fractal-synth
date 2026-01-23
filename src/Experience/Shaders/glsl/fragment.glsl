@@ -22,8 +22,8 @@
 #define uZoom uFloatPar[4]
 #define uCposX uFloatPar[5]
 #define uCposY uFloatPar[6]
-#define uVelDistortionDir uFloatPar[7]
-#define uVelDistortionMag uFloatPar[8]
+#define uVelDir uFloatPar[7]
+#define uVelMag uFloatPar[8]
 #define uMirrorFoldsX uFloatPar[9]
 #define uMirrorFoldsY uFloatPar[10]
 #define uMirrorOffsetX uFloatPar[11]
@@ -85,7 +85,7 @@ vec4 permute(vec4 x) {
 
 float velocityDistort(float velocity) {
   float minVel = min(velocity, float(uPaletteLen * 10));
-  return minVel * uVelDistortionDir * uVelDistortionMag;
+  return minVel * uVelDir * uVelMag;
 }
 
 float cnoise(vec2 P) {
@@ -311,6 +311,7 @@ float getEscape(vec2 uv, int iterations) {
       break;
     case PHOENIX:
       escape = phoenix(uv, iterations);
+      break;
     case SPHINX:
       escape = sphinx(uv, iterations);
       break;
