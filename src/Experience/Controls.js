@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
-import ExperienceRepo from './Repo/ExperienceRepo'
+import ProjectRepo from './Repo/ProjectRepo'
 import NumberInput from './Inputs/NumberInput'
 import Shader from './Shaders/Shader'
 import { eShaders } from './Common/eNums'
@@ -345,10 +345,10 @@ export default class Controls {
   linkProjectInfo() {
     
     this.projectNameElem.addEventListener('change', (event) => {
-      ExperienceRepo.deleteProject(this.projectName)
+      ProjectRepo.deleteProject(this.projectName)
       this.projectList.deleteProject(this.projectName)
       this.projectName = this.projectNameElem.value
-      ExperienceRepo.saveProject(this.projectName, this.experience)
+      ProjectRepo.saveProject(this.projectName, this.experience)
     })
 
     this.modeSelect.addEventListener('change', (event) => {
@@ -410,7 +410,7 @@ export default class Controls {
 
   linkMenuBar() {
     this.menuSave.addEventListener('click', () => {
-      ExperienceRepo.saveProject(this.projectName, this.experience)
+      ProjectRepo.saveProject(this.projectName, this.experience)
     })
 
     this.menuLoad.addEventListener('click', () => {
@@ -418,9 +418,9 @@ export default class Controls {
     })
 
     this.menuDelete.addEventListener('click', () => {
-      ExperienceRepo.deleteProject(this.projectName)
+      ProjectRepo.deleteProject(this.projectName)
       this.projectList.deleteProject(this.projectName)
-      ExperienceRepo.saveProjectList(this.projectList)
+      ProjectRepo.saveProjectList(this.projectList)
       this.timeline.renewAll()
       this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
       this.projectNameElem.value = defaultProjectName
@@ -665,7 +665,7 @@ export default class Controls {
     card.appendChild(name)
 
     card.addEventListener('click', () => {
-      ExperienceRepo.loadProject(project.name, this.experience)
+      ProjectRepo.loadProject(project.name, this.experience)
       this.closeLoadView()
     })
 

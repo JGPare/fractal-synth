@@ -10,7 +10,7 @@ import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
 import ShaderMaterial from './ShaderMaterial.js'
 import Timeline from './Utils/Timeline.js'
-import ExperienceRepo from './Repo/ExperienceRepo.js'
+import ProjectRepo from './Repo/ProjectRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
 import CurveEditor from './CurveEditor.js'
@@ -168,7 +168,7 @@ export default class Experience {
 
   onLoad() {
     this.renderer.onLoad()
-    ExperienceRepo.loadLastProject(this)
+    ProjectRepo.loadLastProject(this)
   }
 
   onBeforeUnload() {

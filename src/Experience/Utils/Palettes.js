@@ -1,6 +1,6 @@
 import Palette from './Palette'
-import Storage from './Storage'
 import defaultPalettes from '../Common/defaultPalettes.js'
+import PaletteRepo from '../Repo/PaletteRepo.js'
 
 export default class Palettes {
   // ============================================================
@@ -13,11 +13,7 @@ export default class Palettes {
 
   load() {
     this.palettes = this.readDefaultPalettes()
-    const palettes = Storage.getPalettes()
-
-    palettes.forEach(palette => {
-      this.addPalette(palette)
-    })
+    PaletteRepo.loadPalettes(this)
   }
 
   /**
@@ -107,4 +103,20 @@ export default class Palettes {
   save() {
     Storage.setPalettes(this.palettes)
   }
+
+  // ============================================================
+  // SNAPSHOT
+  // ============================================================
+
+  getSnapshot() {
+    const palettesSnapshot = []
+    for (const palette of palettes) {
+      if (!palette.locked) {
+        const paletteSnapshot = palette.getSnapshot()
+        palettesSnapshot.push(paletteSnapshot)
+      }
+    }
+    return palettesSnapshot
+  }
+
 }

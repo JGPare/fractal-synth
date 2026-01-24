@@ -7,7 +7,7 @@ import Channel from "../Channel.js"
 
 const debug = true
 
-export default class ExperienceRepo {
+export default class ProjectRepo {
   // ============================================================
   // SAVE OPERATIONS
   // ============================================================

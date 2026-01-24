@@ -170,4 +170,19 @@ export default class Palette {
   removeColor(index = this.palette.length - 1) {
     this.palette.pop(index)
   }
+
+  // ============================================================
+  // SNAPSHOT
+  // ============================================================
+
+  getSnapshot() {
+    const paletteSnapshot = {}
+    paletteSnapshot.name = palette.name
+    paletteSnapshot.length = palette.displayLength
+    paletteSnapshot.colorHexes = []
+    for (const color of palette.palette) {
+      paletteSnapshot.colorHexes.push(color.getHex())
+    }
+    return paletteSnapshot
+  }
 }
