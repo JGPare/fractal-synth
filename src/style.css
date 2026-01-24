@@ -10,13 +10,14 @@
   --font-height3: 1.2rem;
   --number-box-width: 3.5rem;
   --number-ease-box-width: 2.5rem;
-  --ease-box-width: 2rem;
-  
+  --ease-box-width: 1.25rem;
+
   /* Grid Layout */
   --view-grid: 57%;
   --ui-grid-l: 18%;
   --ui-grid-r: 25%;
-  --ease-channel-grid: 13%;
+  --ease-channel-grid: 8%;
+  --arm-channel-grid: 5%;
   --number-slider-grid: 58%;
   --number-value-grid: 15%;
   --slider-grid: 80%;
@@ -810,14 +811,15 @@ select:disabled {
 
 /* INPUT GRIDS */
 .dual-input-grid {
-  grid-template-columns: var(--slider-grid) var(--number-grid);
+  grid-template-columns: auto 16%;
   display: grid;
   grid-template-areas: "slider number";
+  gap: 0.25rem;
 }
 
 .number-input-header {
   display: grid;
-  grid-template-columns: var(--ease-channel-grid) auto var(--number-slider-grid) auto var(--number-value-grid);
+  grid-template-columns: var(--ease-channel-grid) var(--arm-channel-grid) auto var(--arm-channel-grid) var(--number-value-grid);
   gap: 0.25rem;
   margin-bottom: 0.1rem;
 }
@@ -833,11 +835,11 @@ select:disabled {
 .number-input-label-wrapper {
   text-align: left;
   grid-column: 3;
-  padding: 0 0 0 0.25rem;
+  padding: 0 0 0 0;
 }
 
 .number-input-grid {
-  grid-template-columns: var(--ease-channel-grid) auto var(--number-slider-grid) auto var(--number-value-grid);
+  grid-template-columns: var(--ease-channel-grid) var(--arm-channel-grid) auto var(--arm-channel-grid) var(--number-value-grid);
   display: grid;
   grid-template-areas: "easeArea startBtn slider endBtn number";
   gap: 0.25rem;
