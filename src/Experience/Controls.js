@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import Experience from "./Experience"
-import ExperienceRepo from './ExperienceRepo'
+import ExperienceRepo from './Repo/ExperienceRepo'
 import NumberInput from './Inputs/NumberInput'
 import Shader from './Shaders/Shader'
 import { eShaders } from './Common/eNums'
@@ -345,10 +345,10 @@ export default class Controls {
   linkProjectInfo() {
     
     this.projectNameElem.addEventListener('change', (event) => {
-      ExperienceRepo.deleteExperience(this.projectName)
+      ExperienceRepo.deleteProject(this.projectName)
       this.projectList.deleteProject(this.projectName)
       this.projectName = this.projectNameElem.value
-      ExperienceRepo.saveExperience(this.projectName, this.experience)
+      ExperienceRepo.saveProject(this.projectName, this.experience)
     })
 
     this.modeSelect.addEventListener('change', (event) => {
@@ -410,7 +410,7 @@ export default class Controls {
 
   linkMenuBar() {
     this.menuSave.addEventListener('click', () => {
-      ExperienceRepo.saveExperience(this.projectName, this.experience)
+      ExperienceRepo.saveProject(this.projectName, this.experience)
     })
 
     this.menuLoad.addEventListener('click', () => {
@@ -418,7 +418,7 @@ export default class Controls {
     })
 
     this.menuDelete.addEventListener('click', () => {
-      ExperienceRepo.deleteExperience(this.projectName)
+      ExperienceRepo.deleteProject(this.projectName)
       this.projectList.deleteProject(this.projectName)
       ExperienceRepo.saveProjectList(this.projectList)
       this.timeline.renewAll()
@@ -665,7 +665,7 @@ export default class Controls {
     card.appendChild(name)
 
     card.addEventListener('click', () => {
-      ExperienceRepo.loadExperience(project.name, this.experience)
+      ExperienceRepo.loadProject(project.name, this.experience)
       this.closeLoadView()
     })
 

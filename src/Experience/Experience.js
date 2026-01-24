@@ -10,7 +10,7 @@ import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
 import ShaderMaterial from './ShaderMaterial.js'
 import Timeline from './Utils/Timeline.js'
-import ExperienceRepo from './ExperienceRepo.js'
+import ExperienceRepo from './Repo/ExperienceRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
 import CurveEditor from './CurveEditor.js'
@@ -66,8 +66,10 @@ export default class Experience {
     this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
     this.channels = Array.from({ length: 5 }, () => new Channel({ name: "Sin", ease: "sine", duration: 25, on: false }))
     this.controls = new Controls()
-    this.stats = new StatsPanel()
     this.shader = null
+    if (debug){
+      this.stats = new StatsPanel()
+    }
   }
 
   initEventListeners() {
@@ -76,7 +78,9 @@ export default class Experience {
     })
 
     this.time.on('tick', () => {
-      this.stats.update()
+      if (debug){
+        this.stats.update()
+      }
       this.update()
     })
 
@@ -137,7 +141,9 @@ export default class Experience {
   update() {
     this.renderer.update()
     this.screen.update()
-    this.stats.update()
+    if (debug){
+      this.stats.update()
+    }
   }
 
   mousemove() {
@@ -162,7 +168,7 @@ export default class Experience {
 
   onLoad() {
     this.renderer.onLoad()
-    ExperienceRepo.loadLastExperience(this)
+    ExperienceRepo.loadLastProject(this)
   }
 
   onBeforeUnload() {
