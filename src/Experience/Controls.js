@@ -429,6 +429,14 @@ export default class Controls {
       ProjectRepo.newProject(this.experience)
     })
 
+    
+    this.menuCopy.addEventListener('click', () => {
+      this.projectList.currentProjectID = 0
+      this.projectList.currentProjectName = this.projectList.currentProjectName + '_' + 'copy'
+      this.projectNameElem.value = this.projectList.currentProjectName
+      ProjectRepo.saveProject(this.projectList.currentProjectID, this.projectList.currentProjectName, this.experience)
+    })
+
     this.menuLoad.addEventListener('click', () => {
       this.openLoadView()
     })
