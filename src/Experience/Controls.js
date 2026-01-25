@@ -9,8 +9,6 @@ import ShaderUtility from './Shaders/ShaderUtility'
 
 const debugObj = {}
 
-const defaultProjectName = "NewProject"
-
 export default class Controls {
   // ============================================================
   // INITIALIZATION
@@ -41,11 +39,11 @@ export default class Controls {
     this.channels = this.experience.channels
     this.channel = this.experience.channels[0]
     this.projectList = this.experience.projectList
+    this.project = this.experience.project
     this.shader = this.experience.shader
     this.shaderUniforms = this.shaderMaterial.getUniforms()
     this.palettes = this.experience.palettes
     this.palette = this.palettes.getPaletteByIndex(0)
-    this.projectName = defaultProjectName
   }
 
   initState() {
@@ -99,8 +97,12 @@ export default class Controls {
 
     // Menu bar items
     this.menuSave = document.getElementById('menu-save')
+    this.menuNew = document.getElementById('menu-new')
+    this.menuCopy = document.getElementById('menu-copy')
     this.menuLoad = document.getElementById('menu-load')
     this.menuDelete = document.getElementById('menu-delete')
+    this.menuImport = document.getElementById('menu-import')
+    this.menuExport = document.getElementById('menu-export')
     this.menuResetShader = document.getElementById('menu-reset-shader')
     this.menuClearAnimations = document.getElementById('menu-clear-animations')
   }
@@ -108,6 +110,13 @@ export default class Controls {
   // ============================================================
   // SHADER CONTROLS
   // ============================================================
+
+  setProject()
+  {
+    this.projectNameElem.value = this.projectList.currentProjectName
+    this.setShader()
+  }
+
 
   setShader() {
     if (this.experience.shader) {
@@ -345,10 +354,11 @@ export default class Controls {
   linkProjectInfo() {
     
     this.projectNameElem.addEventListener('change', (event) => {
-      ProjectRepo.deleteProject(this.projectName)
-      this.projectList.deleteProject(this.projectName)
-      this.projectName = this.projectNameElem.value
-      ProjectRepo.saveProject(this.projectName, this.experience)
+      const projectID = this.projectList.currentProjectID
+      const newName = this.projectNameElem.value
+      ProjectRepo.deleteProject(projectID)
+      this.projectList.deleteProject(projectID)
+      ProjectRepo.saveProject(projectID, newName, this.experience)
     })
 
     this.modeSelect.addEventListener('change', (event) => {
@@ -410,7 +420,13 @@ export default class Controls {
 
   linkMenuBar() {
     this.menuSave.addEventListener('click', () => {
-      ProjectRepo.saveProject(this.projectName, this.experience)
+      console.log(this.projectList.currentProjectID);
+      
+      ProjectRepo.saveProject(this.projectList.currentProjectID, this.projectList.currentProjectName, this.experience)
+    })
+
+    this.menuNew.addEventListener('click', () => {
+      ProjectRepo.newProject(this.experience)
     })
 
     this.menuLoad.addEventListener('click', () => {
@@ -418,13 +434,10 @@ export default class Controls {
     })
 
     this.menuDelete.addEventListener('click', () => {
-      ProjectRepo.deleteProject(this.projectName)
-      this.projectList.deleteProject(this.projectName)
+      ProjectRepo.deleteProject(this.projectList.currentProjectID)
+      this.projectList.deleteProject(this.projectList.currentProjectID)
       ProjectRepo.saveProjectList(this.projectList)
-      this.timeline.renewAll()
-      this.experience.shader = ShaderUtility.getShader(this.shader.eShader)
-      this.projectNameElem.value = defaultProjectName
-      this.projectName = defaultProjectName
+      ProjectRepo.newProject(this.experience)
     })
 
     this.menuResetShader.addEventListener('click', () => {
@@ -437,6 +450,23 @@ export default class Controls {
         this.clearChannelInputs(i)
         this.setChannelAsInactive(i)
       }
+    })
+
+    this.menuExport.addEventListener('click', () => {
+      ProjectRepo.exportProject(this.projectList.currentProjectName, this.experience)
+    })
+
+    this.menuImport.addEventListener('click', () => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json'
+      input.onchange = async (e) => {
+        const file = e.target.files[0]
+        if (file) {
+          await ProjectRepo.importProject(file, this.experience)
+        }
+      }
+      input.click()
     })
   }
 
@@ -637,7 +667,6 @@ export default class Controls {
     if (!existingContainer) {
       modal.appendChild(projectsContainer)
     }
-    console.log("projects:", this.projectList)
 
     this.projectList.projects.forEach(project => {
       projectsContainer.appendChild(this.createProjectCard(project))
@@ -665,7 +694,7 @@ export default class Controls {
     card.appendChild(name)
 
     card.addEventListener('click', () => {
-      ProjectRepo.loadProject(project.name, this.experience)
+      ProjectRepo.loadProject(project.id, this.experience)
       this.closeLoadView()
     })
 
@@ -682,7 +711,6 @@ export default class Controls {
       if (channel.active) {
         channel.on = true
         this.channelCheckboxes[i].checked = true
-        console.log("onActiveChecked")
       }
     }
   }
@@ -943,7 +971,6 @@ export default class Controls {
       const channelProgressSlider = this.channelProgressSliders[i]
 
       channelCheckbox.checked = channel.on
-      console.log("set ui checked")
 
       channelDuration.value = channel.duration
       channelEase.value = channel.ease
@@ -1056,16 +1083,8 @@ export default class Controls {
   /**
    * @param {string} name
    */
-  setName(name) {
-    this.projectNameElem.value = name
-    this.projectName = name
-  }
-
-  /**
-   * @returns {string}
-   */
-  getName() {
-    return this.projectName
+  setName() {
+    this.projectNameElem.value = this.projectList.currentProjectName
   }
 
   /**

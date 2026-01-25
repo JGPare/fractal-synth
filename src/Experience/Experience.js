@@ -168,6 +168,7 @@ export default class Experience {
 
   onLoad() {
     this.renderer.onLoad()
+    ProjectRepo.loadProjectList(this)
     ProjectRepo.loadLastProject(this)
   }
 

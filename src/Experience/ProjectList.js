@@ -1,5 +1,8 @@
 import Project from "./Project"
 
+const defaultProjectName = "NewProject"
+const defaultProjectID = 0
+
 export default class ProjectList {
   // ============================================================
   // INITIALIZATION
@@ -10,6 +13,9 @@ export default class ProjectList {
    */
   constructor(projects = []) {
     this.projects = projects
+    this.currentProject = null
+    this.currentProjectName = defaultProjectName
+    this.currentProjectID = defaultProjectID
   }
 
   // ============================================================
@@ -38,35 +44,61 @@ export default class ProjectList {
     this.projects.push(project)
   }
 
-  /**
-   * @param {string} name
-   * @param {string} thumbnail
-   */
-  updateOrAddProject(name, thumbnail) {
-    let found = false
+  setCurrentProject(id) {
+    
     this.projects.forEach(project => {
-      if (project.name == name) {
-        project.updateModified()
-        project.setImage(thumbnail)
-        found = true
+      if (project.id == id) {
+        this.currentProject = project
+        this.currentProjectName = project.name
+        this.currentProjectID = project.id
       }
     })
-    if (!found) {
-      this.projects.push(new Project(name, thumbnail))
-    }
   }
 
   /**
+   * @param {int} id
    * @param {string} name
+   * @param {string} thumbnail
    */
-  deleteProject(name) {
+  updateOrAddProject(id, name, thumbnail) {
+    let found = false
+    let projectID = 0
+    this.projects.forEach(project => {
+      if (project.id == id) {
+        project.updateModified()
+        project.setImage(thumbnail)
+        found = true
+        projectID = project.id
+      }
+      else{
+        projectID = Math.max(projectID,project.id)
+      }
+    })
+    if (!found) {
+      console.log("new project")
+      projectID += 1
+      this.projects.push(new Project(projectID, name, thumbnail))
+    }
+    return projectID
+  }
+
+  /**
+   * @param {int} id
+   */
+  deleteProject(id) {
     for (let i = 0; i < this.projects.length; i++) {
       const project = this.projects[i]
-      if (name == project.name) {
+      if (id == project.id) {
         this.projects.splice(i, 1)
         break
       }
     }
+    this.setDefaultProject()
+  }
+
+  setDefaultProject() {
+    this.currentProjectName = defaultProjectName
+    this.currentProjectID = defaultProjectID
   }
 
   clear() {

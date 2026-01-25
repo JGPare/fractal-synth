@@ -4,11 +4,13 @@ export default class Project {
   // ============================================================
 
   /**
+   * @param {int} index
    * @param {string} name
    * @param {string|null} image
    * @param {string|null} lastModified
    */
-  constructor(name, image = null, lastModified = null) {
+  constructor(id, name, image = null, lastModified = null) {
+    this.id = id
     this.name = name
     this.image = image
     this.lastModified = lastModified ? Date.parse(lastModified) : Date.now()
@@ -23,6 +25,7 @@ export default class Project {
    */
   getSnapshot() {
     return {
+      id: this.id,
       name: this.name,
       image: this.image,
       lastModified: this.lastModified.toString()

@@ -4,6 +4,7 @@ import ProjectList from "../ProjectList.js"
 import Shader from "../Shaders/Shader.js"
 import Controls from "../Controls.js"
 import Channel from "../Channel.js"
+import { eShaders } from "../Common/eNums.js"
 
 const debug = true
 
@@ -13,29 +14,35 @@ export default class ProjectRepo {
   // ============================================================
 
   /**
+   * @param {int} id
    * @param {string} name
    * @param {Experience} experience
    */
-  static saveProject(name, experience) {
+  static saveProject(id, name, experience) {
     const projectSnapshot = {}
 
     projectSnapshot.name = name
     if (debug) {
       console.log(experience.shader)
     }
-
     projectSnapshot.shader = this.getShaderSnapshot(experience.shader)
     projectSnapshot.channels = this.getChannelSnapshot(experience.channels)
     const thumbnail = experience.screen.captureImage('image/jpeg', 0.05)
+    console.log("input id: ",id);
+    
+    const actualId = experience.projectList.updateOrAddProject(id, name, thumbnail)
+    projectSnapshot.id = actualId
+    experience.projectList.setCurrentProject(actualId)
 
-    experience.projectList.updateOrAddProject(name, thumbnail)
+    console.log("projectList after save",experience.projectList);
+    
 
     if (debug) {
       console.log("snapshot:", projectSnapshot)
     }
 
-    localStorage.setItem(name, JSON.stringify(projectSnapshot))
-    localStorage.setItem("lastExperience", name)
+    localStorage.setItem("project" + projectSnapshot.id, JSON.stringify(projectSnapshot))
+    localStorage.setItem("lastProject", id)
     this.saveProjectList(experience.projectList)
   }
 
@@ -46,11 +53,14 @@ export default class ProjectRepo {
     localStorage.setItem("projects", JSON.stringify(projectList.getSnapshot()))
   }
 
-  /**
-   * @param {string} name
+    /**
+   * @param {Experience} experience
    */
-  static deleteProject(name) {
-    localStorage.removeItem(name)
+  static newProject(experience)
+  {
+    experience.setShader(eShaders.mandle)
+    experience.projectList.setDefaultProject()
+    experience.controls.setProject()
   }
 
   // ============================================================
@@ -58,22 +68,28 @@ export default class ProjectRepo {
   // ============================================================
 
   /**
-   * @param {string} name
+   * @param {int} id
    * @param {Experience} experience
    */
-  static loadProject(name, experience) {
-    const projectSnapshot = JSON.parse(localStorage.getItem(name))
+  static loadProject(id, experience) {
+    const projectSnapshot = JSON.parse(localStorage.getItem("project"+id))
 
     if (debug) {
       console.log("loaded snapshot:", projectSnapshot)
-      console.log(name)
     }
     if (projectSnapshot) {
+
+      console.log(projectSnapshot);
+
+      experience.projectList.setCurrentProject(projectSnapshot.id)
+
+      console.log(experience.projectList.currentProject);
+      
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
       this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
 
-      experience.controls.setName(name)
-      experience.controls.setShader()
+      
+      experience.controls.setProject()
     }
   }
 
@@ -82,22 +98,43 @@ export default class ProjectRepo {
    */
   static loadProjectList(experience) {
     experience.projectList.clear()
-    const projectList = JSON.parse(localStorage.projects)
-    projectList.forEach(projectSnapshot => {
-      experience.projectList.addProject(new Project(projectSnapshot.name, projectSnapshot.image, projectSnapshot.lastModified))
-    })
+    if (localStorage.projects){
+      const projectList = JSON.parse(localStorage.projects)
+      let i = 1
+      console.log(projectList);
+      
+      projectList.forEach(projectSnapshot => {
+        const id = projectSnapshot.id ? projectSnapshot.id : i
+        experience.projectList.addProject(new Project(id, projectSnapshot.name, projectSnapshot.image, projectSnapshot.lastModified))
+        i++
+      })
+    }
   }
 
   /**
    * @param {Experience} experience
    */
   static loadLastProject(experience) {
-    const name = localStorage.getItem("lastExperience")
-    if (name) {
-      this.loadProject(name, experience)
-      this.loadProjectList(experience)
-      console.log(experience.projectList)
+    // this.deleteAllStorage()
+    const id = localStorage.getItem("lastProject")
+    if (id) {
+      this.loadProject(id, experience)
     }
+  }
+
+  // ============================================================
+  // DELETE OPERATIONS
+  // ============================================================
+
+  /**
+   * @param {int} id
+   */
+  static deleteProject(id) {
+    localStorage.removeItem("project"+id)
+  }
+
+  static deleteAllStorage() {
+    localStorage.clear()
   }
 
   // ============================================================
@@ -111,20 +148,6 @@ export default class ProjectRepo {
   static getShaderSnapshot(shader) {
     const shaderSnapshot = shader.getSnapshot()
     return shaderSnapshot
-  }
-
-  /**
-   * @param {Controls} controls
-   * @returns {Object}
-   */
-  static getControlsSnapshot(controls) {
-    const snapshot = {
-      name: controls.getName(),
-      paletteIndex: controls.paletteIndex,
-      initialValues: controls.initialValues,
-      finalValues: controls.finalValues
-    }
-    return snapshot
   }
 
   /**
@@ -184,9 +207,64 @@ export default class ProjectRepo {
         }
       }
     }
+    
+    experience.controls.setAllTimelines()
 
     if (debug) {
       console.log(experience.channels[0])
+    }
+  }
+
+  // ============================================================
+  // EXPORT/IMPORT OPERATIONS
+  // ============================================================
+
+  /**
+   * Export project as JSON file download
+   * @param {string} name
+   * @param {Experience} experience
+   */
+  static exportProject(name, experience) {
+    const projectSnapshot = {
+      name: name,
+      shader: this.getShaderSnapshot(experience.shader),
+      channels: this.getChannelSnapshot(experience.channels)
+    }
+
+    const json = JSON.stringify(projectSnapshot, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${name}.json`
+    a.click()
+
+    URL.revokeObjectURL(url)
+  }
+
+  /**
+   * Import project from JSON file
+   * @param {File} file
+   * @param {Experience} experience
+   * @returns {Promise<void>}
+   */
+  static async importProject(file, experience) {
+    const text = await file.text()
+    const projectSnapshot = JSON.parse(text)
+
+    if (debug) {
+      console.log("imported snapshot:", projectSnapshot)
+    }
+
+    if (projectSnapshot) {
+      this.setShaderFromSnapshot(experience, projectSnapshot.shader)
+      this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
+
+      const name = projectSnapshot.name || file.name.replace('.json', '')
+      experience.projectList.setDefaultProject()
+      experience.projectList.currentProjectName = name
+      experience.controls.setProject()
     }
   }
 }

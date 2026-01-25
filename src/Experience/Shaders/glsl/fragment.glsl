@@ -356,7 +356,7 @@ vec3 getEscapeFractalColor(vec2 uv) {
   float iterFrac = fract(iterFloat);
   float escape = getEscape(uv, iterations);
   vec3 mixedColor = getMixedColor(escape, iterations);
-  if (iterations < 50) {
+  if (iterations < 200) {
     float escapeCeil = getEscape(uv, iterations + 1);
     vec3 mixedColorCeil = getMixedColor(escapeCeil, iterations + 1);
     mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);

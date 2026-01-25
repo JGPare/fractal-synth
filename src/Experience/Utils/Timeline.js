@@ -5,7 +5,7 @@ import { eNumInput } from '../Common/eNums.js'
 
 gsap.registerPlugin(CustomEase)
 
-const debug = true
+const debug = false
 
 export default class Timeline extends EventEmitter {
   // ============================================================

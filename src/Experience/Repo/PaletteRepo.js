@@ -27,7 +27,10 @@ export default class PaletteRepo {
    */
   static loadPalettes(palettes) {
     const palettesSnapshot = JSON.parse(localStorage.getItem('palettes'))
-    this.setPalettesFromSnapshot(palettes, palettesSnapshot)
+    if (palettesSnapshot){
+
+      this.setPalettesFromSnapshot(palettes, palettesSnapshot)
+    }
   }
 
   // ============================================================
