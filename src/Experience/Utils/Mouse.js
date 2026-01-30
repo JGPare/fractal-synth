@@ -1,4 +1,5 @@
 import EventEmitter from './EventEmitter.js'
+import Experience from '../Experience.js'
 
 export default class Mouse extends EventEmitter {
   // ============================================================
@@ -7,6 +8,8 @@ export default class Mouse extends EventEmitter {
 
   constructor() {
     super()
+
+    this.settings = new Experience().settings
 
     this.clickHeld = false
     this.lastClick = Date.now()
@@ -74,7 +77,7 @@ export default class Mouse extends EventEmitter {
     })
 
     element.addEventListener('wheel', (event) => {
-      this.scrollDeltaY = event.deltaY
+      this.scrollDeltaY = event.deltaY * this.settings.scrollZoomSpeed
       this.trigger('scroll')
     })
   }

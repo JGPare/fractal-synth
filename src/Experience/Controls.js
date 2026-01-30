@@ -444,6 +444,7 @@ export default class Controls {
     const zoomSpeedValue = document.getElementById('scroll-zoom-speed-value')
     zoomSpeedSlider.addEventListener('input', () => {
       zoomSpeedValue.textContent = zoomSpeedSlider.value + '%'
+      this.experience.settings.scrollZoomSpeed = zoomSpeedSlider.value / 100
     })
   }
 

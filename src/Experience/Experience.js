@@ -13,6 +13,7 @@ import Timeline from './Utils/Timeline.js'
 import ProjectRepo from './Repo/ProjectRepo.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
+import Settings from './Utils/Settings.js'
 import CurveEditor from './CurveEditor.js'
 import Project from './Project.js'
 import ShaderUtility from './Shaders/ShaderUtility.js'
@@ -60,6 +61,7 @@ export default class Experience {
     this.palettes = new Palettes()
     this.camera = new Camera()
     this.renderer = new Render()
+    this.settings = new Settings()
     this.mouse = new Mouse()
     this.shaderMaterial = new ShaderMaterial()
     this.screen = new Screen()
