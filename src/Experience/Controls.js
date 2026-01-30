@@ -439,6 +439,12 @@ export default class Controls {
         this.closeSettingsView()
       }
     })
+
+    const zoomSpeedSlider = document.getElementById('scroll-zoom-speed')
+    const zoomSpeedValue = document.getElementById('scroll-zoom-speed-value')
+    zoomSpeedSlider.addEventListener('input', () => {
+      zoomSpeedValue.textContent = zoomSpeedSlider.value + '%'
+    })
   }
 
   openSettingsView() {
