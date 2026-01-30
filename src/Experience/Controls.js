@@ -105,6 +105,9 @@ export default class Controls {
     this.menuExport = document.getElementById('menu-export')
     this.menuResetShader = document.getElementById('menu-reset-shader')
     this.menuClearAnimations = document.getElementById('menu-clear-animations')
+    this.settingsBtn = document.getElementById('settings-btn')
+    this.settingsElement = document.getElementById('settings')
+    this.settingsCloseBtn = document.getElementById('settings-close-btn')
   }
 
   // ============================================================
@@ -348,6 +351,7 @@ export default class Controls {
     this.linkExpandButton()
     this.linkLoaderClose()
     this.linkMenuBar()
+    this.linkSettings()
 
   }
 
@@ -415,7 +419,38 @@ export default class Controls {
       if (e.key === 'Escape' && !this.loaderElement.hidden) {
         this.closeLoadView()
       }
+      if (e.key === 'Escape' && !this.settingsElement.hidden) {
+        this.closeSettingsView()
+      }
     })
+  }
+
+  linkSettings() {
+    this.settingsBtn.addEventListener('click', () => {
+      this.openSettingsView()
+    })
+
+    this.settingsCloseBtn.addEventListener('click', () => {
+      this.closeSettingsView()
+    })
+
+    this.settingsElement.addEventListener('click', (e) => {
+      if (e.target === this.settingsElement) {
+        this.closeSettingsView()
+      }
+    })
+  }
+
+  openSettingsView() {
+    this.viewerElement.hidden = true
+    this.settingsElement.hidden = false
+    this.canvas.hidden = true
+  }
+
+  closeSettingsView() {
+    this.viewerElement.hidden = false
+    this.settingsElement.hidden = true
+    this.canvas.hidden = false
   }
 
   linkMenuBar() {

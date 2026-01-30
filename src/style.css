@@ -306,6 +306,28 @@ input[type="range"]::-webkit-slider-runnable-track {
   margin: 0.25rem 0;
 }
 
+.menu-settings-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--clr-font-main);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.2rem;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+}
+
+.menu-settings-btn:hover {
+  background-color: var(--clr-bg-secondary);
+}
+
+.settings-container {
+  padding: 1.5rem;
+}
+
 /* ============================================================================
    LAYOUT - MAIN GRID
    ============================================================================ */
@@ -428,6 +450,10 @@ input[type="range"]::-webkit-slider-runnable-track {
   overflow-x: hidden;
 }
 
+.modal:has(.modal-header) {
+  padding-top: 0;
+}
+
 .modal::-webkit-scrollbar {
   width: 8px;
 }
@@ -446,6 +472,21 @@ input[type="range"]::-webkit-slider-runnable-track {
   background: var(--clr-default-input);
 }
 
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: color-mix(in srgb, var(--clr-bg-secondary), black 15%);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.modal-title {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--clr-font-main);
+}
+
 .modal-close-btn {
   position: absolute;
   top: 0.5rem;
@@ -461,6 +502,11 @@ input[type="range"]::-webkit-slider-runnable-track {
   cursor: pointer;
   z-index: 10;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.modal-header .modal-close-btn {
+  position: static;
+  flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
