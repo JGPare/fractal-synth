@@ -460,6 +460,13 @@ export default class Controls {
       zoomSpeedValue.textContent = zoomSpeedSlider.value + '%'
       this.experience.settings.scrollZoomSpeed = zoomSpeedSlider.value / 100
     })
+
+    const exportFpsSlider = document.getElementById('export-fps')
+    const exportFpsValue = document.getElementById('export-fps-value')
+    exportFpsSlider.addEventListener('input', () => {
+      exportFpsValue.textContent = exportFpsSlider.value
+      this.experience.settings.exportFps = parseInt(exportFpsSlider.value)
+    })
   }
 
   openSettingsView() {
@@ -503,7 +510,7 @@ export default class Controls {
         this.projectList.currentProjectName,
         this.experience,
         duration,
-        30,
+        this.experience.settings.exportFps,
         (progress) => {
           const pct = Math.round(progress * 100)
           this.exportVideoStatus.textContent = 'Recording ' + pct + '%'
