@@ -467,6 +467,11 @@ export default class Controls {
       exportFpsValue.textContent = exportFpsSlider.value
       this.experience.settings.exportFps = parseInt(exportFpsSlider.value)
     })
+
+    const exportResSelect = document.getElementById('export-resolution')
+    exportResSelect.addEventListener('change', () => {
+      this.experience.settings.exportResolution = exportResSelect.value
+    })
   }
 
   openSettingsView() {

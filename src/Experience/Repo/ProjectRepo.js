@@ -302,8 +302,22 @@ export default class ProjectRepo {
     }
 
     const totalFrames = Math.round(duration * fps)
-    const width = canvas.width
-    const height = canvas.height
+
+    const resolutions = {
+      '720p':  { width: 1280, height: 720 },
+      '1080p': { width: 1920, height: 1080 },
+      '1440p': { width: 2560, height: 1440 },
+      '4k':    { width: 3840, height: 2160 },
+    }
+    const res = resolutions[experience.settings.exportResolution]
+    const width = res ? res.width : canvas.width
+    const height = res ? res.height : canvas.height
+
+    const savedWidth = canvas.width
+    const savedHeight = canvas.height
+    experience.renderer.instance.setSize(width, height)
+    experience.renderer.instance.setPixelRatio(1)
+    experience.screen.shaderUniforms.uAspect.value = width / height
 
     const target = new BufferTarget()
     const output = new Output({
@@ -398,6 +412,11 @@ export default class ProjectRepo {
 
       if (onProgress) onProgress(1)
     } finally {
+      // Restore renderer size
+      experience.renderer.instance.setSize(savedWidth, savedHeight)
+      experience.renderer.instance.setPixelRatio(experience.sizes.pixelRatio)
+      experience.screen.shaderUniforms.uAspect.value = savedWidth / savedHeight
+
       // Restore timeline state
       for (let i = 0; i < channels.length; i++) {
         const tl = timeline.tls[i]
