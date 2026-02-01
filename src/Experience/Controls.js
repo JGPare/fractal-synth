@@ -663,6 +663,7 @@ export default class Controls {
       this.setChannelAsActive(index)
       this.timeline.fromToTimeline(this.channelProgressSliders[index], index)
       this.timeline.setDuration(channel.duration, index)
+      this.timeline.setEase(channel.ease, "inOut", index)
     }
     else {
       this.setChannelAsInactive(index)
