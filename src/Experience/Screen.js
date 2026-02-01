@@ -121,4 +121,9 @@ export default class Screen {
     this.experience.renderer.instance.render(this.scene, this.experience.camera.instance)
     return this.canvas.toDataURL(format, quality)
   }
+
+  captureBlob(format = 'image/png', quality = 1.0) {
+    this.experience.renderer.instance.render(this.scene, this.experience.camera.instance)
+    return new Promise(resolve => this.canvas.toBlob(resolve, format, quality))
+  }
 }

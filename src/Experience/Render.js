@@ -25,7 +25,8 @@ export default class Render {
 
   setInstance() {
     this.instance = new THREE.WebGLRenderer({
-      canvas: this.canvas
+      canvas: this.canvas,
+      preserveDrawingBuffer: true
     })
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)

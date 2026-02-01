@@ -1,34 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shader patterns</title>
-    
-  <script type="module" crossorigin src="./assets/index-831e0e6d.js"></script>
-  <link rel="stylesheet" href="./assets/index-11069655.css">
-</head>
-<body>
-    <canvas class="webgl"></canvas>
-    
 
-    <div class="flashContainer" id="flash">
-        <p class="flashText normal"> DOUBLE CLICK TO ENTER/LEAVE FULLSCREEN </p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Shader patterns</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap" rel="stylesheet">
+  
+  <script type="module" crossorigin src="./assets/index-4e8592d6.js"></script>
+  <link rel="stylesheet" href="./assets/index-fcfd645f.css">
+</head>
+
+<body>
+  <div class="webgl-container">
+    <canvas class="webgl" id="main-canvas"></canvas>
+  </div>
+  <!-- MENU BAR -->
+  <nav id="menu-bar">
+    <span class="menu-title">Fractal Synth</span>
+    <div class="menu-dropdown">
+      <button class="menu-dropdown-btn">File</button>
+      <div class="menu-dropdown-content">
+        <button class="menu-item" id="menu-new">New</button>
+        <button class="menu-item" id="menu-save">Save</button>
+        <button class="menu-item" id="menu-copy">Copy</button>
+        <button class="menu-item" id="menu-load">Load</button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" id="menu-import">Import</button>
+        <button class="menu-item" id="menu-export">Export</button>
+        <button class="menu-item" id="menu-export-image">Export Image</button>
+        <button class="menu-item" id="menu-export-video">Export Video</button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" id="menu-delete">Delete</button>
+      </div>
     </div>
-    <div class="container">
-        <div class="column">
-            <div class="slider-container">
-                <p class="normal"> VARIABLE DETAIL </p>
-                <input type="range" min="1" max="100" value="100" class="mySlider" id="leftSlider"> 
-            </div>
-        </div>
-        <div class="column right-align">
-            <div class="slider-container">
-                <p class="normal"> CONSTANT DETAIL </p>
-                <input type="range" min="10" max="100" value="100" class="mySlider" id="rightSlider"> 
-            </div>
-        </div>
+    <div class="menu-dropdown">
+      <button class="menu-dropdown-btn">Edit</button>
+      <div class="menu-dropdown-content">
+        <button class="menu-item" id="menu-reset-shader">Reset Shader</button>
+        <button class="menu-item" id="menu-clear-animations">Clear all Animations</button>
+      </div>
     </div>
-   
+    <button class="menu-settings-btn" id="settings-btn" aria-label="Settings">&#9881;</button>
+  </nav>
+  <div id="main-grid">
+    <!-- LEFT GRID -->
+    <div id="ui-grid-l">
+      <div class="container">
+        <div class="slider-container">
+          <p class="sub-header-text"> Project </p>
+          <div class="bottom-outline"></div>
+          <label for="project-name" class="label-text"> Project Name </label>
+          <input class="control-text" id="project-name" type="text" name="projectName" value="NewProject" minlength="4"
+            maxlength="20" size="20"/>
+        </div>
+        <p class="label-text"> Mode </p>
+        <div class="slider-container">
+          <select class="control-select select-md w-100" id="mode-select">
+            <option value="mandle">Mandlebrot</option>
+            <option value="julia">Julia</option>
+            <option value="doubleJulia">Double Julia</option>
+            <option value="burningShip">Burning Ship</option>
+            <option value="neuton">Neuton</option>
+            <option value="phoenix">Phoenix</option>
+            <option value="noise">Noise</option>
+            <option value="circularWaves">Circular Waves</option>
+            <option value="linearWaves">Linear Waves</option>
+            <option value="fibonacci">Fibonacci</option>
+            <option value="sphinx">Sphinx</option>
+          </select>
+          <p class="sub-header-text"> Parameters </p>
+          <div class="bottom-outline"></div>
+        </div>
+        <div class="container" id="left-inputs">
+        </div>
+      </div>
+    </div>
+    <!-- CENTER -->
+    <div id="center-grid">
+      <div id="viewer">
+        <button class="fullscreen-btn" id="fullscreen-btn" aria-label="Toggle fullscreen">⛶</button>
+      </div>
+    </div>
+    <!-- RIGHT GRID -->
+    <div id="ui-grid-r">
+      <div id="controls-grid">
+        <div>
+          <canvas id="paper-canvas"></canvas>
+        </div>
+        <p class="sub-header-text"> Animation Channels </p>
+        <div class="bottom-outline"></div>
+        <div id="channels-container">
+          <div>
+            <div class="channel-columns">
+              <div class="channel-number-container">
+                <p class=""> # </p>
+              </div>
+              <div class="channel-checkbox-container">
+                <p class=""> Arm </p>
+              </div>
+              <div class="channel-duration-container">
+                <p class=""> Duration </p>
+              </div>
+              <div class="channel-ease-container">
+                <p class=""> Ease </p>
+              </div>
+              <div class="channel-offset-container">
+                <p class=""> Offset </p>
+              </div>
+              <div class="channel-clear-btn-container">
+              </div>
+            </div>
+            <div class="timeline-slider-container">
+              <input type="range" min="0" max="1" step="0.0001" value="0"
+                class="timeline-slider timeline-slider-default" id="timeline-slider-1" data-channel="1">
+            </div>
+            <div id="channels">
+              <div class="channel-columns">
+                <div class="channel-number-container channel-color" id="channel-number-container-1" data-channel="1">
+                  <p class=""> 1 </p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <input type="checkbox" class="channel-checkbox" id="option1" name="choices" value="on">
+                </div>
+                <div class="channel-duration-container">
+                  <input type="number" min="1" max="180" step="1" value="15"
+                    class="channel-number-input channel-duration" id="duration-channel-1">
+                </div>
+                <div class="channel-ease-container">
+                  <select class="channel-select-input select-sm w-100 channel-ease" id="ease-select-1">
+                    <option value="sine">Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                    <option value="power2">Power2</option>
+                    <option value="power3">Power3</option>
+                    <option value="circ">Circ</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div class="channel-offset-container">
+                  <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+                </div>
+                <div class="channel-clear-btn-container">
+                  <button class="channel-clear-btn w-100" id="clear-tl-1-button">Clear</button>
+                </div>
+              </div>
+              <div class="timeline-slider-container">
+                <input type="range" min="0" max="1" step="0.0001" value="2"
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-2" data-channel="2">
+              </div>
+              <div class="channel-columns">
+                <div class="channel-number-container channel-color" id="channel-number-container-2" data-channel="2">
+                  <p class=""> 2 </p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <input type="checkbox" class="channel-checkbox" id="option2" name="choices" value="on">
+                </div>
+                <div class="channel-duration-container">
+                  <input type="number" min="1" max="180" step="1" value="15"
+                    class="channel-number-input channel-duration" id="duration-channel-2">
+                </div>
+                <div class="channel-ease-container">
+                  <select class="channel-select-input select-sm w-100 channel-ease" id="ease-select-2">
+                    <option value="sine">Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                    <option value="power2">Power2</option>
+                    <option value="power3">Power3</option>
+                    <option value="circ">Circ</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div class="channel-offset-container">
+                  <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+                </div>
+                <div class="channel-clear-btn-container">
+                  <button class="channel-clear-btn w-100" id="clear-tl-2-button">Clear</button>
+                </div>
+              </div>
+              <div class="timeline-slider-container">
+                <input type="range" min="0" max="1" step="0.0001" value="3"
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-3" data-channel="3">
+              </div>
+              <div class="channel-columns">
+                <div class="channel-number-container channel-color" id="channel-number-container-3" data-channel="3">
+                  <p class=""> 3 </p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <input type="checkbox" class="channel-checkbox" id="option3" name="choices" value="on">
+                </div>
+                <div class="channel-duration-container">
+                  <input type="number" min="1" max="180" step="1" value="15"
+                    class="channel-number-input channel-duration" id="duration-channel-3">
+                </div>
+                <div class="channel-ease-container">
+                  <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-3">
+                    <option value="sine">Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                    <option value="power2">Power2</option>
+                    <option value="power3">Power3</option>
+                    <option value="circ">Circ</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div class="channel-offset-container">
+                  <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+                </div>
+                <div class="channel-clear-btn-container">
+                  <button class="channel-clear-btn w-100" id="clear-tl-3-button">Clear</button>
+                </div>
+              </div>
+              <div class="timeline-slider-container">
+                <input type="range" min="0" max="1" step="0.0001" value="4"
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-4" data-channel="4">
+              </div>
+              <div class="channel-columns">
+                <div class="channel-number-container channel-color" id="channel-number-container-4" data-channel="4">
+                  <p class=""> 4 </p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <input type="checkbox" class="channel-checkbox" id="option4" name="choices" value="on">
+                </div>
+                <div class="channel-duration-container">
+                  <input type="number" min="1" max="180" step="1" value="15"
+                    class="channel-number-input channel-duration" id="duration-channel-4">
+                </div>
+                <div class="channel-ease-container">
+                  <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-4">
+                    <option value="sine">Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                    <option value="power2">Power2</option>
+                    <option value="power3">Power3</option>
+                    <option value="circ">Circ</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div class="channel-offset-container">
+                  <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+                </div>
+                <div class="channel-clear-btn-container">
+                  <button class="channel-clear-btn w-100" id="clear-tl-4-button">Clear</button>
+                </div>
+              </div>
+              <div class="timeline-slider-container">
+                <input type="range" min="0" max="1" step="0.0001" value="5"
+                  class="timeline-slider timeline-slider-default" id="timeline-slider-5" data-channel="5">
+              </div>
+              <div class="channel-columns">
+                <div class="channel-number-container channel-color" id="channel-number-container-5" data-channel="5">
+                  <p class=""> 5 </p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <input type="checkbox" class="channel-checkbox" id="option5" name="choices" value="on">
+                </div>
+                <div class="channel-duration-container">
+                  <input type="number" min="1" max="180" step="1" value="15"
+                    class="channel-number-input channel-duration" id="duration-channel-5">
+                </div>
+                <div class="channel-ease-container">
+                  <select class="channel-select-input channel-ease select-sm w-100" id="ease-select-5">
+                    <option value="sine">Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                    <option value="power2">Power2</option>
+                    <option value="power3">Power3</option>
+                    <option value="circ">Circ</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div class="channel-offset-container">
+                  <input type="number" min="1" max="180" step="1" value="0" class="channel-number-input">
+                </div>
+                <div class="channel-clear-btn-container">
+                  <button class="channel-clear-btn w-100" id="clear-tl-5-button">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="timeline">
+            <div id="timeline-button-container">
+              <button class="timeline-button default-button tooltip-enabled" id="seek-start-timeline-button"
+                data-tooltip="Seek to Start [,]">⏮</button>
+              <button class="timeline-button default-button tooltip-enabled" id="play-timeline-button"
+                data-tooltip="Play">▶</button>
+              <button class="timeline-button default-button tooltip-enabled" id="pause-timeline-button"
+                data-tooltip="Pause">⏸</button>
+              <button class="timeline-button default-button tooltip-enabled" id="seek-end-timeline-button"
+                data-tooltip="Seek to End [.]">⏭</button>
+              <button class="timeline-button default-button tooltip-enabled" id="set-start-timeline-button"
+                data-tooltip="Set Start Points on Armed">▲</button>
+              <button class="timeline-button default-button tooltip-enabled" id="set-end-timeline-button"
+                data-tooltip="Set End Points on Armed">▼</button>
+            </div>
+          </div>
+        </div>
+        <!-- COLORS -->
+        <p class="sub-header-text"> Palette </p>
+        <div class="bottom-outline"></div>
+        <div class="slider-container">
+          <label for="paletteName" class="label-text"> Palette Name </label>
+          <input class="control-text" id="palette-input" type="text" id="name" required minlength="4" maxlength="20"
+            size="20" />
+        </div>
+        <div class="slider-container">
+          <label for="paletteSelect" class="label-text"> Select Palette </label>
+          <div>
+            <select class="control-select select-md w-75" id="palette-select"></select>
+          </div>
+        </div>
+        <div class="button-container">
+          <button class="control-button three-width-btn default-button" id="delete-palette-button">Delete</button>
+          <button class="control-button three-width-btn default-button" id="new-palette-button">New</button>
+          <button class="control-button three-width-btn default-button" id="random-palette-button">Random</button>
+        </div>
+        <div class="bottom-outline"></div>
+        <div class="slider-container">
+          <p class="label-text"> Number of Colors </p>
+          <div class="dual-input-grid">
+            <input type="range" min="2" max="10" step="1" value="6" class="control-slider" id="number-of-colors">
+            <input type="number" min="2" max="10" step="1" value="6" class="control-number control-number-dual">
+          </div>
+        </div>
+        <div id="colors-container">
+          <!-- inserted via JS here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODALS -->
+  <div id="loader" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" id="loader-close-btn">&times;</button>
+        <span class="modal-title">Load</span>
+      </div>
+      <div class="projects-container">
+      </div>
+    </div>
+  </div>
+  <div id="settings" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" id="settings-close-btn">&times;</button>
+        <span class="modal-title">Settings</span>
+      </div>
+      <div class="settings-container">
+        <div class="settings-row">
+          <label for="scroll-zoom-speed" class="label-text">Scroll Zoom Speed</label>
+          <input type="range" min="10" max="500" step="10" value="100"
+            class="control-slider" id="scroll-zoom-speed">
+          <span class="settings-value" id="scroll-zoom-speed-value">100%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="video-export" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" id="video-export-close-btn">&times;</button>
+        <span class="modal-title">Export Video</span>
+      </div>
+      <div class="settings-container">
+        <div class="settings-row">
+          <label for="video-export-duration" class="label-text">Duration (seconds)</label>
+          <input type="number" min="1" max="300" step="1" value="5"
+            class="control-number" id="video-export-duration">
+        </div>
+        <div class="settings-row" id="video-export-progress-row" hidden>
+          <label class="label-text">Progress</label>
+          <div style="flex:1; background:#333; height:8px; border-radius:4px; overflow:hidden;">
+            <div id="video-export-progress-bar" style="width:0%; height:100%; background:#5af; transition:width 0.1s;"></div>
+          </div>
+          <span class="settings-value" id="video-export-progress-text">0%</span>
+        </div>
+        <div class="button-container" style="margin-top:12px;">
+          <button class="control-button default-button" id="video-export-start-btn" style="flex:1;">Export</button>
+          <button class="control-button default-button" id="video-export-cancel-btn" style="flex:1;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </body>
+
 </html>

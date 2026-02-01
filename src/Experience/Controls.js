@@ -50,8 +50,6 @@ export default class Controls {
     this.numberOfColors = 5
     this.numberOfChannels = 5
     this.modeIndex = eShaders.mandle
-    this.settingStart = false
-    this.settingEnd = false
     this.loopTimeline = false
     this.videoArmed = false
     this.videoExportAbortController = null
@@ -78,12 +76,9 @@ export default class Controls {
     this.numberOfColorsSlider = document.getElementById('number-of-colors')
         this.playTimelineButton = document.getElementById('play-timeline-button')
     this.pauseTimelineButton = document.getElementById('pause-timeline-button')
-    this.setStartTimelineButton = document.getElementById('set-start-timeline-button')
-    this.setEndTimelineButton = document.getElementById('set-end-timeline-button')
     this.seekStartTimelineButton = document.getElementById('seek-start-timeline-button')
     this.seekEndTimelineButton = document.getElementById('seek-end-timeline-button')
     // this.loopTimelineButton = document.getElementById('loop-timeline-button')
-    this.masterDurationSlider = document.getElementById('master-duration')
     this.colorOffsetSlider = document.getElementById('color-offset')
     this.timelineSelectSlider = document.getElementById('timeline-select-slider')
     this.colorsContainer = document.getElementById('colors-container')
@@ -642,40 +637,6 @@ export default class Controls {
       this.globalPlay = false
       const timelineSelections = this.getTimelineSelection()
       this.timeline.pauseTimelinesSelect(timelineSelections)
-    })
-
-    this.setStartTimelineButton.addEventListener('click', (event) => {
-      this.toggleSelectButtonElement(this.setStartTimelineButton)
-      for (let i = 0; i < this.channels.length; i++) {
-        if (this.channels[i].on) {
-          this.timeline.pause(i)
-          if (this.settingStart) {
-            this.shader.setStartValFromUniforms(i)
-            this.setTimeline(i)
-            this.settingStart = false
-          }
-          else {
-            this.settingStart = true
-          }
-        }
-      }
-    })
-
-    this.setEndTimelineButton.addEventListener('click', (event) => {
-      this.toggleSelectButtonElement(this.setEndTimelineButton)
-      for (let i = 0; i < this.channels.length; i++) {
-        if (this.channels[i].on) {
-          this.timeline.pause(i)
-          if (this.settingEnd) {
-            this.shader.setEndValFromUniforms(i)
-            this.setTimeline(i)
-            this.settingEnd = false
-          }
-          else {
-            this.settingEnd = true
-          }
-        }
-      }
     })
 
     this.seekStartTimelineButton.addEventListener('click', (event) => {
