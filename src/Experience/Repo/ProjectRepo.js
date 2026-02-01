@@ -5,7 +5,7 @@ import Shader from "../Shaders/Shader.js"
 import Controls from "../Controls.js"
 import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
-import { Muxer, ArrayBufferTarget } from 'mp4-muxer'
+import { Output, Mp4OutputFormat, BufferTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
 
 const debug = false
 
@@ -305,20 +305,18 @@ export default class ProjectRepo {
     const width = canvas.width
     const height = canvas.height
 
-    const target = new ArrayBufferTarget()
-    const muxer = new Muxer({
-      target,
-      video: {
-        codec: 'avc',
-        width,
-        height
-      },
-      fastStart: 'in-memory'
+    const target = new BufferTarget()
+    const output = new Output({
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      target
     })
+    const videoSource = new EncodedVideoPacketSource('avc')
+    output.addVideoTrack(videoSource, { frameRate: fps })
+    await output.start()
 
     let encoderError = null
     const encoder = new VideoEncoder({
-      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      output: (chunk, meta) => videoSource.add(EncodedPacket.fromEncodedChunk(chunk), meta),
       error: (e) => { encoderError = e }
     })
 
@@ -385,7 +383,7 @@ export default class ProjectRepo {
       }
 
       await encoder.flush()
-      muxer.finalize()
+      await output.finalize()
 
       const blob = new Blob([target.buffer], { type: 'video/mp4' })
       const url = URL.createObjectURL(blob)
