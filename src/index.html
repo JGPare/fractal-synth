@@ -297,8 +297,9 @@
                 id="export-image-btn" data-tooltip="Export Image (PNG)">📷</button>
               <button class="timeline-button default-button tooltip-enabled"
                 id="arm-video-btn" data-tooltip="Arm Video Export">⏺</button>
-              <input type="number" min="1" max="300" step="1" value="5"
-                class="channel-number-input" id="export-video-duration"
+              <label for="export-video-duration" class="label-text">Recording Duration:</label>
+              <input type="number" min="1" max="300" step="1" value="30"
+                class="control-number" id="export-video-duration"
                 title="Video duration (seconds)">
               <span class="label-text" id="export-video-status"></span>
             </div>
