@@ -5,6 +5,7 @@ import Shader from "../Shaders/Shader.js"
 import Controls from "../Controls.js"
 import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
+import { Muxer, ArrayBufferTarget } from 'mp4-muxer'
 
 const debug = false
 
@@ -254,6 +255,156 @@ export default class ProjectRepo {
       experience.projectList.setDefaultProject()
       experience.projectList.currentProjectName = name
       experience.controls.setProject()
+    }
+  }
+
+  // ============================================================
+  // IMAGE / VIDEO EXPORT
+  // ============================================================
+
+  /**
+   * Export the current canvas as a PNG download
+   * @param {string} name
+   * @param {Experience} experience
+   */
+  static async exportImage(name, experience) {
+    const blob = await experience.screen.captureBlob('image/png', 1.0)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${name}.png`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  /**
+   * Export animation as MP4 video using WebCodecs + mp4-muxer
+   * @param {string} name
+   * @param {Experience} experience
+   * @param {number} duration - seconds
+   * @param {number} fps
+   * @param {function} onProgress - callback(0..1)
+   * @param {AbortSignal} signal - for cancellation
+   */
+  static async exportVideo(name, experience, duration, fps = 30, onProgress, signal) {
+    const timeline = experience.timeline
+    const channels = experience.channels
+    const canvas = experience.canvas
+
+    // Save current timeline state
+    const savedProgress = []
+    const savedPaused = []
+    for (let i = 0; i < channels.length; i++) {
+      const tl = timeline.tls[i]
+      savedProgress.push(tl.progress())
+      savedPaused.push(tl.paused())
+      tl.pause()
+    }
+
+    const totalFrames = Math.round(duration * fps)
+    const width = canvas.width
+    const height = canvas.height
+
+    const target = new ArrayBufferTarget()
+    const muxer = new Muxer({
+      target,
+      video: {
+        codec: 'avc',
+        width,
+        height
+      },
+      fastStart: 'in-memory'
+    })
+
+    let encoderError = null
+    const encoder = new VideoEncoder({
+      output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      error: (e) => { encoderError = e }
+    })
+
+    // Choose AVC level based on coded area (width rounded up to multiple of 16)
+    const codedArea = (Math.ceil(width / 16) * 16) * (Math.ceil(height / 16) * 16)
+    let avcLevel = '42001f' // 3.1 – up to 921,600
+    if (codedArea > 921_600) avcLevel = '420028'   // 4.0 – up to 2,097,152
+    if (codedArea > 2_097_152) avcLevel = '42002a'  // 4.2 – up to 2,228,224
+    if (codedArea > 2_228_224) avcLevel = '420032'  // 5.0 – up to 5,652,480
+    if (codedArea > 5_652_480) avcLevel = '420033'  // 5.1 – up to 9,437,184
+    if (codedArea > 9_437_184) avcLevel = '420034'  // 5.2 – up to 9,437,184 (higher bitrate)
+
+    encoder.configure({
+      codec: `avc1.${avcLevel}`,
+      width,
+      height,
+      bitrate: 5_000_000,
+      framerate: fps
+    })
+
+    try {
+      for (let i = 0; i < totalFrames; i++) {
+        if (signal && signal.aborted) throw new DOMException('Export cancelled', 'AbortError')
+        if (encoderError) throw encoderError
+
+        const time = i / fps
+
+        // Seek all timelines to the current time using progress to avoid timeScale issues
+        for (let ch = 0; ch < channels.length; ch++) {
+          const tl = timeline.tls[ch]
+          const chDuration = parseFloat(channels[ch].duration)
+          if (chDuration > 0 && tl.duration() > 0) {
+            // Compute position within a full yoyo cycle (forward + reverse)
+            const cycleLen = chDuration * 2
+            const cycleTime = time % cycleLen
+            const progress = cycleTime < chDuration
+              ? cycleTime / chDuration
+              : 2 - cycleTime / chDuration
+            tl.progress(progress)
+          }
+        }
+
+        // Render the frame
+        experience.renderer.update()
+
+        const frame = new VideoFrame(canvas, {
+          timestamp: i * (1_000_000 / fps),
+          duration: 1_000_000 / fps
+        })
+
+        const keyFrame = i % (fps * 2) === 0
+        encoder.encode(frame, { keyFrame })
+        frame.close()
+
+        if (onProgress) onProgress(i / totalFrames)
+
+        // Wait for encoder queue to drain to avoid backpressure stalls on large frames
+        while (encoder.encodeQueueSize > 5) {
+          await new Promise(r => setTimeout(r, 10))
+        }
+
+        // Yield to the browser to keep UI responsive
+        if (i % 5 === 0) await new Promise(r => setTimeout(r, 0))
+      }
+
+      await encoder.flush()
+      muxer.finalize()
+
+      const blob = new Blob([target.buffer], { type: 'video/mp4' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${name}.mp4`
+      a.click()
+      URL.revokeObjectURL(url)
+
+      if (onProgress) onProgress(1)
+    } finally {
+      // Restore timeline state
+      for (let i = 0; i < channels.length; i++) {
+        const tl = timeline.tls[i]
+        tl.progress(savedProgress[i])
+        if (!savedPaused[i]) tl.play()
+      }
+
+      if (encoder.state !== 'closed') encoder.close()
     }
   }
 }

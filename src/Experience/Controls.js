@@ -53,6 +53,8 @@ export default class Controls {
     this.settingStart = false
     this.settingEnd = false
     this.loopTimeline = false
+    this.videoArmed = false
+    this.videoExportAbortController = null
   }
 
   initDebug() {
@@ -108,6 +110,12 @@ export default class Controls {
     this.settingsBtn = document.getElementById('settings-btn')
     this.settingsElement = document.getElementById('settings')
     this.settingsCloseBtn = document.getElementById('settings-close-btn')
+
+    // Export controls
+    this.exportImageBtn = document.getElementById('export-image-btn')
+    this.armVideoBtn = document.getElementById('arm-video-btn')
+    this.exportVideoDuration = document.getElementById('export-video-duration')
+    this.exportVideoStatus = document.getElementById('export-video-status')
   }
 
   // ============================================================
@@ -352,6 +360,7 @@ export default class Controls {
     this.linkLoaderClose()
     this.linkMenuBar()
     this.linkSettings()
+    this.linkExportControls()
 
   }
 
@@ -424,6 +433,9 @@ export default class Controls {
       if (e.key === 'Escape' && !this.settingsElement.hidden) {
         this.closeSettingsView()
       }
+      if (e.key === 'Escape' && this.videoExportAbortController) {
+        this.cancelVideoExport()
+      }
     })
   }
 
@@ -460,6 +472,58 @@ export default class Controls {
     this.viewerElement.hidden = false
     this.settingsElement.hidden = true
     this.canvas.hidden = false
+  }
+
+  linkExportControls() {
+    this.exportImageBtn.addEventListener('click', () => {
+      ProjectRepo.exportImage(this.projectList.currentProjectName, this.experience)
+    })
+
+    this.armVideoBtn.addEventListener('click', () => {
+      this.videoArmed = !this.videoArmed
+      this.armVideoBtn.classList.toggle('default-button', !this.videoArmed)
+      this.armVideoBtn.classList.toggle('selected-button', this.videoArmed)
+      this.exportVideoStatus.textContent = this.videoArmed ? 'Armed' : ''
+    })
+  }
+
+  async startVideoExport() {
+    this.videoArmed = false
+    this.armVideoBtn.classList.add('default-button')
+    this.armVideoBtn.classList.remove('selected-button')
+    this.exportVideoStatus.textContent = ''
+
+    const duration = parseFloat(this.exportVideoDuration.value)
+    if (!duration || duration <= 0) return
+
+    this.videoExportAbortController = new AbortController()
+
+    try {
+      await ProjectRepo.exportVideo(
+        this.projectList.currentProjectName,
+        this.experience,
+        duration,
+        30,
+        (progress) => {
+          const pct = Math.round(progress * 100)
+          this.exportVideoStatus.textContent = 'Recording ' + pct + '%'
+        },
+        this.videoExportAbortController.signal
+      )
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error('Video export error:', e)
+    }
+
+    this.exportVideoStatus.textContent = ''
+    this.videoExportAbortController = null
+  }
+
+  cancelVideoExport() {
+    if (this.videoExportAbortController) {
+      this.videoExportAbortController.abort()
+      this.videoExportAbortController = null
+    }
+    this.exportVideoStatus.textContent = ''
   }
 
   linkMenuBar() {
@@ -528,6 +592,9 @@ export default class Controls {
       }
       else {
         this.timeline.playTimelinesSelect(timelineSelections)
+        if (this.videoArmed) {
+          this.startVideoExport()
+        }
       }
       this.globalPlay = !this.globalPlay
     })
@@ -554,6 +621,9 @@ export default class Controls {
       this.globalPlay = true
       const timelineSelections = this.getTimelineSelection()
       this.timeline.playTimelinesSelect(timelineSelections)
+      if (this.videoArmed) {
+        this.startVideoExport()
+      }
     })
 
     this.pauseTimelineButton.addEventListener('click', (event) => {

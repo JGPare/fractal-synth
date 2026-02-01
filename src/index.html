@@ -292,6 +292,16 @@
               <button class="timeline-button default-button tooltip-enabled" id="set-end-timeline-button"
                 data-tooltip="Set End Points on Armed">▼</button>
             </div>
+            <div id="export-controls">
+              <button class="timeline-button default-button tooltip-enabled"
+                id="export-image-btn" data-tooltip="Export Image (PNG)">📷</button>
+              <button class="timeline-button default-button tooltip-enabled"
+                id="arm-video-btn" data-tooltip="Arm Video Export">⏺</button>
+              <input type="number" min="1" max="300" step="1" value="5"
+                class="channel-number-input" id="export-video-duration"
+                title="Video duration (seconds)">
+              <span class="label-text" id="export-video-status"></span>
+            </div>
           </div>
         </div>
         <div class="slider-container">

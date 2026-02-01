@@ -876,6 +876,28 @@ select:disabled {
   padding: 0.25rem 0rem 0 0;
 }
 
+#export-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+}
+
+#export-controls .timeline-button {
+  width: auto;
+  padding: 0.05rem 0.4rem;
+}
+
+#export-video-duration {
+  width: 3rem;
+  height: 1.2rem;
+}
+
+#export-video-status {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
 /* ============================================================================
    CONTROLS & INPUTS
    ============================================================================ */
