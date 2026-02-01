@@ -6,7 +6,7 @@ import Controls from "../Controls.js"
 import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
 
-const debug = true
+const debug = false
 
 export default class ProjectRepo {
   // ============================================================
@@ -28,21 +28,16 @@ export default class ProjectRepo {
     projectSnapshot.shader = this.getShaderSnapshot(experience.shader)
     projectSnapshot.channels = this.getChannelSnapshot(experience.channels)
     const thumbnail = experience.screen.captureImage('image/jpeg', 0.05)
-    console.log("input id: ",id);
-    
     const actualId = experience.projectList.updateOrAddProject(id, name, thumbnail)
     projectSnapshot.id = actualId
     experience.projectList.setCurrentProject(actualId)
-
-    console.log("projectList after save",experience.projectList);
-    
 
     if (debug) {
       console.log("snapshot:", projectSnapshot)
     }
 
     localStorage.setItem("project" + projectSnapshot.id, JSON.stringify(projectSnapshot))
-    localStorage.setItem("lastProject", id)
+    localStorage.setItem("lastProject", actualId)
     this.saveProjectList(experience.projectList)
   }
 
@@ -79,11 +74,7 @@ export default class ProjectRepo {
     }
     if (projectSnapshot) {
 
-      console.log(projectSnapshot);
-
       experience.projectList.setCurrentProject(projectSnapshot.id)
-
-      console.log(experience.projectList.currentProject);
       
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
       this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
@@ -101,8 +92,6 @@ export default class ProjectRepo {
     if (localStorage.projects){
       const projectList = JSON.parse(localStorage.projects)
       let i = 1
-      console.log(projectList);
-      
       projectList.forEach(projectSnapshot => {
         const id = projectSnapshot.id ? projectSnapshot.id : i
         experience.projectList.addProject(new Project(id, projectSnapshot.name, projectSnapshot.image, projectSnapshot.lastModified))

@@ -358,11 +358,13 @@ export default class Controls {
   linkProjectInfo() {
     
     this.projectNameElem.addEventListener('change', (event) => {
-      const projectID = this.projectList.currentProjectID
-      const newName = this.projectNameElem.value
-      ProjectRepo.deleteProject(projectID)
-      this.projectList.deleteProject(projectID)
-      ProjectRepo.saveProject(projectID, newName, this.experience)
+      const project = this.projectList.currentProject
+      if (project) {
+        project.name = this.projectNameElem.value
+        this.projectList.currentProjectName = project.name
+        project.updateModified()
+        ProjectRepo.saveProjectList(this.projectList)
+      }
     })
 
     this.modeSelect.addEventListener('change', (event) => {
@@ -462,8 +464,6 @@ export default class Controls {
 
   linkMenuBar() {
     this.menuSave.addEventListener('click', () => {
-      console.log(this.projectList.currentProjectID);
-      
       ProjectRepo.saveProject(this.projectList.currentProjectID, this.projectList.currentProjectName, this.experience)
     })
 
@@ -834,7 +834,6 @@ export default class Controls {
    */
   setUniformValues(input) {
     if (!input) return
-    console.log("set uniforms with", input.uZoom)
     for (const [key, value] of Object.entries(input)) {
       if (typeof value == Object) {
         this.shaderUniforms[key].value = value.value
@@ -997,7 +996,6 @@ export default class Controls {
 
       channelCheckbox.addEventListener('change', (event) => {
         channel.on = channelCheckbox.checked
-        console.log("event changed checked")
 
       })
 

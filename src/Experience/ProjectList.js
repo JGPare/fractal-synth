@@ -65,6 +65,7 @@ export default class ProjectList {
     let projectID = 0
     this.projects.forEach(project => {
       if (project.id == id) {
+        project.name = name
         project.updateModified()
         project.setImage(thumbnail)
         found = true
@@ -75,7 +76,6 @@ export default class ProjectList {
       }
     })
     if (!found) {
-      console.log("new project")
       projectID += 1
       this.projects.push(new Project(projectID, name, thumbnail))
     }
