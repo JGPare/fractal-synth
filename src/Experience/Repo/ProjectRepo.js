@@ -329,11 +329,14 @@ export default class ProjectRepo {
     if (codedArea > 5_652_480) avcLevel = '420033'  // 5.1 – up to 9,437,184
     if (codedArea > 9_437_184) avcLevel = '420034'  // 5.2 – up to 9,437,184 (higher bitrate)
 
+    // Scale bitrate with pixel count (~4 bits per pixel per frame)
+    const bitrate = Math.max(5_000_000, width * height * fps * 4)
+
     encoder.configure({
       codec: `avc1.${avcLevel}`,
       width,
       height,
-      bitrate: 5_000_000,
+      bitrate,
       framerate: fps
     })
 
