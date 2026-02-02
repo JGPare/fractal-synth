@@ -5,7 +5,7 @@ import Shader from "../Shaders/Shader.js"
 import Controls from "../Controls.js"
 import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
-import { Output, Mp4OutputFormat, BufferTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
+import { Output, Mp4OutputFormat, BufferTarget, StreamTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
 
 const debug = false
 
@@ -313,15 +313,26 @@ export default class ProjectRepo {
     const width = res ? res.width : canvas.width
     const height = res ? res.height : canvas.height
 
-    const savedWidth = canvas.width
-    const savedHeight = canvas.height
     experience.renderer.instance.setSize(width, height)
     experience.renderer.instance.setPixelRatio(1)
     experience.screen.shaderUniforms.uAspect.value = width / height
 
-    const target = new BufferTarget()
+    // Use File System Access API to stream to disk when available, fall back to in-memory buffer
+    let fileHandle = null
+    let writableStream = null
+    let target
+    if (typeof showSaveFilePicker === 'function') {
+      fileHandle = await showSaveFilePicker({
+        suggestedName: `${name}.mp4`,
+        types: [{ description: 'MP4 Video', accept: { 'video/mp4': ['.mp4'] } }]
+      })
+      writableStream = await fileHandle.createWritable()
+      target = new StreamTarget(writableStream, { chunked: true })
+    } else {
+      target = new BufferTarget()
+    }
     const output = new Output({
-      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      format: new Mp4OutputFormat({ fastStart: fileHandle ? 'fragmented' : 'in-memory' }),
       target
     })
     const videoSource = new EncodedVideoPacketSource('avc')
@@ -402,20 +413,24 @@ export default class ProjectRepo {
       await encoder.flush()
       await output.finalize()
 
-      const blob = new Blob([target.buffer], { type: 'video/mp4' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${name}.mp4`
-      a.click()
-      URL.revokeObjectURL(url)
+      if (writableStream) {
+        await writableStream.close()
+      } else {
+        const blob = new Blob([target.buffer], { type: 'video/mp4' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${name}.mp4`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
 
       if (onProgress) onProgress(1)
     } finally {
       // Restore renderer size
-      experience.renderer.instance.setSize(savedWidth, savedHeight)
+      experience.renderer.instance.setSize(experience.sizes.width, experience.sizes.height)
       experience.renderer.instance.setPixelRatio(experience.sizes.pixelRatio)
-      experience.screen.shaderUniforms.uAspect.value = savedWidth / savedHeight
+      experience.screen.shaderUniforms.uAspect.value = experience.sizes.aspect
 
       // Restore timeline state
       for (let i = 0; i < channels.length; i++) {
