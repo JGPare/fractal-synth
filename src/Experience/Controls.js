@@ -232,6 +232,7 @@ export default class Controls {
 
     const value = document.createElement("input")
     value.setAttribute("type", "number")
+    value.setAttribute("step", input.step)
     value.setAttribute("class", "control-number control-number-ease")
     value.setAttribute("id", inputId + "-value")
 

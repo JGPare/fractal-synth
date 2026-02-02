@@ -325,17 +325,38 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 #settings .modal {
-  width: calc(var(--view-grid) - 5%);
+  width: auto;
+  min-width: 20rem;
+  max-width: 30rem;
 }
 
 .settings-container {
-  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: auto 10rem 3.5rem;
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
+  align-items: center;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.settings-container .sub-header-text {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+
+.settings-container .sub-header-text:first-child {
+  margin-top: 0;
+}
+
+.settings-container .bottom-outline {
+  grid-column: 1 / -1;
 }
 
 .settings-row {
-  display: flex;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: center;
-  gap: 0.75rem;
 }
 
 .settings-row .label-text {
@@ -343,13 +364,12 @@ input[type="range"]::-webkit-slider-runnable-track {
   padding: 0;
 }
 
-.settings-row .control-slider {
-  flex: 1;
+.settings-row .control-select {
+  grid-column: 2 / -1;
 }
 
 .settings-value {
-  min-width: 3rem;
-  text-align: right;
+  padding: 0.15rem 0.25rem;
 }
 
 /* ============================================================================
@@ -909,6 +929,14 @@ select:disabled {
   gap: 0.25rem;
 }
 
+.dual-input-grid .control-slider {
+  grid-area: slider;
+}
+
+.dual-input-grid .control-number {
+  grid-area: number;
+}
+
 .number-input-header {
   display: grid;
   grid-template-columns: var(--ease-channel-grid) var(--arm-channel-grid) auto var(--arm-channel-grid) var(--number-value-grid);
@@ -935,6 +963,10 @@ select:disabled {
   display: grid;
   grid-template-areas: "easeArea startBtn slider endBtn number";
   gap: 0.25rem;
+}
+
+.number-input-grid .control-slider {
+  grid-area: slider;
 }
 
 
@@ -965,13 +997,9 @@ select:disabled {
 
 /* NUMBER INPUTS */
 .control-number {
-  grid-area: number;
-  width: var(--number-box-width);
-  height: var(--slider-height);
   border-radius: 5px;
   border-width: 0;
   text-align: center;
-  margin: 0 0;
   background-color: var(--clr-bg-input-dark);
 }
 
@@ -981,12 +1009,23 @@ select:disabled {
   outline-style: groove;
 }
 
+.number-input-grid .control-number {
+  grid-area: number;
+  width: var(--number-box-width);
+  height: var(--slider-height);
+  margin: 0;
+}
+
 .control-number-dual {
   width: var(--number-box-width);
+  height: var(--slider-height);
 }
 
 .control-number-ease {
   width: var(--number-ease-box-width);
+  height: var(--slider-height);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 /* TEXT INPUTS */
@@ -1085,7 +1124,6 @@ select:disabled {
 
 /* CONTROL SLIDERS */
 .control-slider {
-  grid-area: slider;
   appearance: none;
   -webkit-appearance: none;
   width: 100%;

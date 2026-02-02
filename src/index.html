@@ -353,20 +353,24 @@
         <span class="modal-title">Settings</span>
       </div>
       <div class="settings-container">
+        <p class="sub-header-text">General</p>
+        <div class="bottom-outline"></div>
         <div class="settings-row">
           <label for="scroll-zoom-speed" class="label-text">Scroll Zoom Speed</label>
           <input type="range" min="10" max="500" step="10" value="100"
             class="control-slider" id="scroll-zoom-speed">
-          <span class="settings-value" id="scroll-zoom-speed-value">100%</span>
+          <span class="settings-value control-number" id="scroll-zoom-speed-value">100%</span>
         </div>
+        <p class="sub-header-text">Export</p>
+        <div class="bottom-outline"></div>
         <div class="settings-row">
-          <label for="export-fps" class="label-text">Export FPS</label>
+          <label for="export-fps" class="label-text">FPS</label>
           <input type="range" min="15" max="60" step="5" value="30"
             class="control-slider" id="export-fps">
-          <span class="settings-value" id="export-fps-value">30</span>
+          <span class="settings-value control-number" id="export-fps-value">30</span>
         </div>
         <div class="settings-row">
-          <label for="export-resolution" class="label-text">Export Resolution</label>
+          <label for="export-resolution" class="label-text">Resolution</label>
           <select class="control-select select-md" id="export-resolution">
             <option value="native">Native</option>
             <option value="720p">720p (1280×720)</option>
