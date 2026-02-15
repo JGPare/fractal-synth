@@ -37,9 +37,9 @@
 #define uSinMag uFloatPar[19]
 #define uIters2 uFloatPar[20]
 #define uColorScale uFloatPar[21]
-#define spare2 uFloatPar[22]
-#define spare3 uFloatPar[23]
-#define spare4 uFloatPar[24]
+#define uPower2 uFloatPar[22]
+#define uCposX2 uFloatPar[23]
+#define uCposY2 uFloatPar[24]
 
 uniform float uFloatPar[25];
 
@@ -150,7 +150,7 @@ float julia(vec2 uv, int maxIters) {
 float doubleJulia(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
-  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 zn = warpUv(uv, 0.01 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
@@ -160,10 +160,11 @@ float doubleJulia(vec2 uv, int maxIters) {
   vec2 newUv = uv * zn;
   zn = newUv;
   mZ = dot(zn, zn);
+  vec2 c2 = vec2(uCposX2, uCposY2);
   float iter2Float = exp(6.8 * uIters2);
   int maxIters2 = int(iter2Float);
   for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
-    zn = complexPow(zn, uPower) + c;
+    zn = complexPow(zn, uPower2) + c2;
     mZ = dot(zn, zn);
   }
   return float(i) + velocityDistort(mZ - 4.0);

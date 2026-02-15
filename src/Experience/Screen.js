@@ -40,8 +40,9 @@ export default class Screen {
   /**
    * @param {Shader} shader
    */
-  setShader() {
+  updateFromShader() {
     this.shader = this.experience.shader
+    this.zoom = this.shaderUniforms.uFloatPar.value[eNumInput.zoom]
   }
 
   // ============================================================

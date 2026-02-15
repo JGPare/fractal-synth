@@ -45,6 +45,16 @@ const power = new NumberInput({
   channelIndex: -1
 })
 
+const power2 = new NumberInput({
+  eId: eNumInput.power2,
+  name: "Power 2",
+  value: 2,
+  min: -30,
+  max: 30,
+  step: 1,
+  channelIndex: -1
+})
+
 const posX = new NumberInput({
   eId: eNumInput.posX,
   name: "Position X",
@@ -87,11 +97,11 @@ const rotation = new NumberInput({
 
 mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
-doubleJulia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+doubleJulia.addGroup("Core", [iters, iters2, power, power2, posX, posY, zoom, rotation])
 phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 sphinx.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
-neuton.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
-burningShip.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
+neuton.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
+burningShip.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 
 const cPosX = new NumberInput({
   eId: eNumInput.cPosX,
@@ -113,8 +123,28 @@ const cPosY = new NumberInput({
   channelIndex: -1
 })
 
+const cPosX2 = new NumberInput({
+  eId: eNumInput.cPosX2,
+  name: "Const Position X 2",
+  value: -0.75,
+  min: -2,
+  max: 2,
+  step: 0.0001,
+  channelIndex: -1
+})
+
+const cPosY2 = new NumberInput({
+  eId: eNumInput.cPosY2,
+  name: "Const Position Y 2",
+  value: 0.25,
+  min: -2,
+  max: 2,
+  step: 0.0001,
+  channelIndex: -1
+})
+
 julia.addGroup("Point", [cPosX, cPosY])
-doubleJulia.addGroup("Point", [cPosX, cPosY])
+doubleJulia.addGroup("Point", [cPosX, cPosY, cPosX2, cPosY2])
 phoenix.addGroup("Point", [cPosX, cPosY])
 sphinx.addGroup("Point", [cPosX, cPosY])
 neuton.addGroup("Point", [cPosX, cPosY])

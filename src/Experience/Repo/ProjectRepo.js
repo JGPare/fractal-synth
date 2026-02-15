@@ -55,6 +55,7 @@ export default class ProjectRepo {
   static newProject(experience)
   {
     experience.setShader(eShaders.mandle)
+    experience.updateFromShader()
     experience.projectList.setDefaultProject()
     experience.controls.setProject()
   }
@@ -80,7 +81,6 @@ export default class ProjectRepo {
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
       this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
 
-      
       experience.controls.setProject()
     }
   }
@@ -170,9 +170,8 @@ export default class ProjectRepo {
     experience.setShader(shaderSnapshot.eShader)
     const shader = experience.shader
     shader.paletteIndex = shaderSnapshot.paletteIndex
-
     shader.setFromSnapshot(shaderSnapshot)
-    shader.setInputs()
+    experience.updateFromShader()
   }
 
   /**

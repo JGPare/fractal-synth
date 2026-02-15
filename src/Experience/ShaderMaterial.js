@@ -59,6 +59,5 @@ export default class ShaderMaterial {
   setShader(shader) {
     const uniforms = this.material.uniforms
     shader.uFloatPars = uniforms.uFloatPar.value
-    shader.setInputs()
   }
 }

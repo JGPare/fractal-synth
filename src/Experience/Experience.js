@@ -46,6 +46,7 @@ export default class Experience {
     this.initComponents()
     this.initEventListeners()
     this.setShader(eShaders.mandle)
+    this.updateFromShader()
     this.setKeyMappings()
     this.onLoad()
   }
@@ -115,8 +116,14 @@ export default class Experience {
     if (debug) {
       console.log("setting shader: ", this.shader)
     }
-    this.controls.setShader()
-    this.screen.setShader()
+  }
+
+  updateFromShader()
+  {
+    this.shaderMaterial.setShader(this.shader)
+    this.shader.setInputs()
+    this.controls.updateFromShader()
+    this.screen.updateFromShader()
   }
 
   setKeyMappings() {

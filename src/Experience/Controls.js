@@ -21,7 +21,7 @@ export default class Controls {
     this.createColorElements()
     this.getElements()
     this.linkUI()
-    this.setShader()
+    this.updateFromShader()
     this.paperCanvas.hidden = true
   }
 
@@ -120,17 +120,14 @@ export default class Controls {
   setProject()
   {
     this.projectNameElem.value = this.projectList.currentProjectName
-    this.setShader()
+    this.updateFromShader()
   }
 
 
-  setShader() {
+  updateFromShader() {
     if (this.experience.shader) {
       this.shader = this.experience.shader
-      this.shader.setInputs()
-      this.shaderMaterial.setShader(this.shader)
       this.clearControls()
-
       this.setControls(this.shader)
       this.setUIfromShader()
       this.setPaletteFromIndex(this.shader.paletteIndex)
@@ -375,6 +372,7 @@ export default class Controls {
     this.modeSelect.addEventListener('change', (event) => {
       this.modeIndex = event.target.selectedIndex
       this.experience.setShader(this.modeIndex)
+      this.experience.updateFromShader()
     })
 
     this.numberOfColorsSlider.addEventListener('change', (event) => {
@@ -564,6 +562,7 @@ export default class Controls {
 
     this.menuResetShader.addEventListener('click', () => {
       this.experience.setShader(this.modeIndex)
+      this.experience.updateFromShader()
     })
 
     this.menuClearAnimations.addEventListener('click', () => {
