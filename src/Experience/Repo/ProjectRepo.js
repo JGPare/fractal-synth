@@ -360,8 +360,11 @@ export default class ProjectRepo {
 
         const time = i / fps
 
-        // Seek all timelines to the current time using progress to avoid timeScale issues
+        // Seek armed timelines to the current time using progress to avoid timeScale issues
         for (let ch = 0; ch < channels.length; ch++) {
+          // Only animate channels that are armed (channel.on === true)
+          if (!channels[ch].on) continue
+
           const tl = timeline.tls[ch]
           const chDuration = parseFloat(channels[ch].duration)
           if (chDuration > 0 && tl.duration() > 0) {

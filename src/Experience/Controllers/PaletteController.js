@@ -21,7 +21,8 @@ export default class PaletteController extends BaseController {
 
   getElements() {
     this.paletteSelect = document.getElementById('palette-select')
-    this.numberOfColorsSlider = document.getElementById('number-of-colors')
+    this.numberOfColorsSlider = document.getElementById('number-of-colors-slider')
+    this.numberOfColorsNumber = document.getElementById('number-of-colors-number')
     this.colorsContainer = document.getElementById('colors-container')
     this.paletteInput = document.getElementById('palette-input')
   }
@@ -129,9 +130,12 @@ export default class PaletteController extends BaseController {
   }
 
   setNumberOfColors() {
+    console.log(this.numberOfColors);
+    
     this.shaderUniforms.uPaletteLen.value = this.numberOfColors
     this.palette.displayLength = this.numberOfColors
     this.numberOfColorsSlider.value = this.numberOfColors
+    this.numberOfColorsNumber.value = this.numberOfColors
     this.removeColorElements()
     this.createColorElements()
   }
