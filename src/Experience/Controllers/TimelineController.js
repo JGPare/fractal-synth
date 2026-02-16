@@ -92,7 +92,9 @@ export default class TimelineController extends BaseController {
    * @param {number} index - Channel index
    */
   setTimeline(index) {
-    if (!this.shader || index < 0) {
+    // Get fresh shader reference (it may have changed since construction)
+    const shader = this.experience.shader
+    if (!shader || index < 0) {
       return
     }
     this.trigger('timelineSet', [index])

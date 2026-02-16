@@ -184,6 +184,7 @@ export default class ControlsManager extends EventEmitter {
     this.shaderControls.updateFromShader()
     this.timeline.setAllTimelines()
     this.channel.turnOnActiveChannels()
+    this.channel.setChannelUIFromShader()
   }
 
   /**

@@ -179,9 +179,6 @@ export default class ProjectRepo {
    */
   static setChannelsFromSnapshot(experience, channelsSnapshot) {
     if (!channelsSnapshot) return
-    if (debug) {
-      console.log(channelsSnapshot)
-    }
 
     for (let i = 0; i < channelsSnapshot.length; i++) {
       const channelSnap = channelsSnapshot[i]
@@ -190,17 +187,10 @@ export default class ProjectRepo {
         channel.duration = channelSnap.duration
         channel.ease = channelSnap.ease
         channel.on = false
-        if (debug) {
-          console.log("setting ", i, channel, channelSnap)
-        }
       }
     }
-    
-    experience.controls.setAllTimelines()
 
-    if (debug) {
-      console.log(experience.channels[0])
-    }
+    experience.controls.setAllTimelines()
   }
 
   // ============================================================
