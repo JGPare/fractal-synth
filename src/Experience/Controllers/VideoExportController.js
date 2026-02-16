@@ -23,6 +23,7 @@ export default class VideoExportController extends BaseController {
     this.armVideoBtn = document.getElementById('arm-video-btn')
     this.exportVideoDuration = document.getElementById('export-video-duration')
     this.exportVideoStatus = document.getElementById('export-video-status')
+    this.cancelVideoBtn = document.getElementById('cancel-video-btn')
   }
 
   linkExportControls() {
@@ -35,6 +36,10 @@ export default class VideoExportController extends BaseController {
       this.armVideoBtn.classList.toggle('default-button', !this.videoArmed)
       this.armVideoBtn.classList.toggle('selected-button', this.videoArmed)
       this.exportVideoStatus.textContent = this.videoArmed ? 'Armed' : ''
+    })
+
+    this.cancelVideoBtn.addEventListener('click', () => {
+      this.cancelVideoExport()
     })
   }
 
@@ -52,6 +57,9 @@ export default class VideoExportController extends BaseController {
 
     this.videoExportAbortController = new AbortController()
 
+    // Show cancel button during export
+    this.cancelVideoBtn.style.display = 'inline-block'
+
     try {
       await ProjectRepo.exportVideo(
         this.projectList.currentProjectName,
@@ -68,6 +76,8 @@ export default class VideoExportController extends BaseController {
       if (e.name !== 'AbortError') console.error('Video export error:', e)
     }
 
+    // Hide cancel button when export completes or is cancelled
+    this.cancelVideoBtn.style.display = 'none'
     this.exportVideoStatus.textContent = ''
     this.videoExportAbortController = null
   }
@@ -80,7 +90,12 @@ export default class VideoExportController extends BaseController {
       this.videoExportAbortController.abort()
       this.videoExportAbortController = null
     }
-    this.exportVideoStatus.textContent = ''
+    this.cancelVideoBtn.style.display = 'none'
+    this.exportVideoStatus.textContent = 'Cancelled'
+    // Clear the cancelled message after a moment
+    setTimeout(() => {
+      this.exportVideoStatus.textContent = ''
+    }, 2000)
   }
 
   /**
