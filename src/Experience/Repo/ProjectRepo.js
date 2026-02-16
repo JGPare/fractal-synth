@@ -2,7 +2,6 @@ import Experience from "../Experience.js"
 import Project from "../Project.js"
 import ProjectList from "../ProjectList.js"
 import Shader from "../Shaders/Shader.js"
-import Controls from "../Controls.js"
 import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
 import { Output, Mp4OutputFormat, BufferTarget, StreamTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
