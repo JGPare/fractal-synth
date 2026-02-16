@@ -87,6 +87,11 @@ export default class ControlsManager extends EventEmitter {
       this.shaderControls.clearChannelInputs(index)
     })
 
+    // Channel → Timeline: When channel offset changes, rebuild timeline
+    this.channel.on('offsetChanged', (index) => {
+      this.setTimeline(index)
+    })
+
     // Project → Experience: When mode changes
     this.project.on('modeChanged', (modeIndex) => {
       this.experience.setShader(modeIndex)
@@ -152,7 +157,7 @@ export default class ControlsManager extends EventEmitter {
     for (const input of numInputs) {
       if (input.channelIndex == index && input.startVal != input.endVal) {
         inputSet = true
-        timeline.setFromToFromNumInput(input, index)
+        timeline.setFromToFromNumInput(input, index, channel.offset)
         this.shaderControls.setInputElementActive(input)
       }
     }

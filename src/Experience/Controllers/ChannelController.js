@@ -23,6 +23,7 @@ export default class ChannelController extends BaseController {
     const channelsContainer = document.querySelector('#channels')
     this.channelNumberContainers = channelsContainer.querySelectorAll('div.channel-number-container')
     this.channelEases = document.querySelectorAll('select.channel-ease')
+    this.channelOffsets = document.querySelectorAll('input.channel-offset')
     this.channelProgressSliders = document.querySelectorAll('input.timeline-slider')
     this.channelClearBtns = document.querySelectorAll('button.channel-clear-btn')
   }
@@ -39,6 +40,7 @@ export default class ChannelController extends BaseController {
       const channelCheckbox = this.channelCheckboxes[i]
       const channelDuration = this.channelDurations[i]
       const channelEase = this.channelEases[i]
+      const channelOffset = this.channelOffsets[i]
       const channelProgressSlider = this.channelProgressSliders[i]
       const channelClearBtn = this.channelClearBtns[i]
 
@@ -50,6 +52,11 @@ export default class ChannelController extends BaseController {
       channelEase.addEventListener('change', (event) => {
         channel.ease = channelEase.value
         this.timeline.setEase(channel.ease, "inOut", i)
+      })
+
+      channelOffset.addEventListener('change', (event) => {
+        channel.offset = parseFloat(channelOffset.value)
+        this.trigger('offsetChanged', [i])
       })
 
       channelCheckbox.addEventListener('change', (event) => {
@@ -99,10 +106,12 @@ export default class ChannelController extends BaseController {
       const channelCheckbox = this.channelCheckboxes[i]
       const channelDuration = this.channelDurations[i]
       const channelEase = this.channelEases[i]
+      const channelOffset = this.channelOffsets[i]
 
       channelCheckbox.checked = channel.on
       channelDuration.value = channel.duration
       channelEase.value = channel.ease
+      channelOffset.value = channel.offset
     }
   }
 

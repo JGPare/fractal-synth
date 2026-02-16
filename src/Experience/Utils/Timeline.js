@@ -310,12 +310,13 @@ export default class Timeline extends EventEmitter {
   /**
    * @param {NumberInput} numInput
    * @param {number} timelineIndex
+   * @param {number} offset - Channel offset in seconds
    */
-  setFromToFromNumInput(numInput, timelineIndex) {
+  setFromToFromNumInput(numInput, timelineIndex, offset = 0) {
     this.fromTo(numInput.uFloatPar,
       { "value": numInput.startVal },
       { "value": numInput.endVal },
-      0,
+      offset,
       numInput.eId,
       timelineIndex
     )

@@ -6,6 +6,7 @@ export default class Channel {
     // ease string passed to gsap
     this.ease = params.ease
     this.duration = params.duration
+    this.offset = params.offset || 0
     this.on = params.on
     // active is has animated pars
     this.active = false
@@ -21,5 +22,9 @@ export default class Channel {
 
   setEase(ease, params = {}) {
     this.ease = ease
+  }
+
+  setOffset(offset) {
+    this.offset = offset
   }
 }

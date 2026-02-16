@@ -150,6 +150,7 @@ export default class ProjectRepo {
       channelSnapshot.push({
         duration: channel.duration,
         ease: channel.ease,
+        offset: channel.offset,
         on: channel.on
       })
     }
@@ -186,6 +187,7 @@ export default class ProjectRepo {
       if (channel && channelSnap) {
         channel.duration = channelSnap.duration
         channel.ease = channelSnap.ease
+        channel.offset = channelSnap.offset || 0
         channel.on = false
       }
     }
