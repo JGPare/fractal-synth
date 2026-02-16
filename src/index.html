@@ -39,6 +39,13 @@
         <button class="menu-item" id="menu-clear-animations">Clear all Animations</button>
       </div>
     </div>
+    <div class="menu-dropdown">
+      <button class="menu-dropdown-btn">Help</button>
+      <div class="menu-dropdown-content">
+        <button class="menu-item" id="menu-tutorial">Tutorial</button>
+        <button class="menu-item" id="menu-hotkeys">Hotkeys</button>
+      </div>
+    </div>
     <button class="menu-settings-btn" id="settings-btn" aria-label="Settings">&#9881;</button>
   </nav>
   <div id="main-grid">
@@ -381,6 +388,119 @@
             <option value="4k">4K (3840×2160)</option>
           </select>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- TUTORIAL MODAL -->
+  <div id="tutorial-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" id="tutorial-close-btn">&times;</button>
+        <span class="modal-title">Tutorial</span>
+      </div>
+      <div class="modal-content" style="padding: 20px;">
+        <!-- Tutorial Pages -->
+        <div class="tutorial-page" id="tutorial-page-1">
+          <h2 class="sub-header-text" style="margin-bottom: 10px;">Page 1: Parameter Inputs</h2>
+
+          <!-- Example Input with Tooltips -->
+          <div style="position: relative; margin: 20px auto; padding: 40px 20px; background: rgba(0,0,0,0.2); border-radius: 8px; max-width: 400px;">
+            <div style="position: relative;">
+              <label class="label-text" style="display: block; margin-bottom: 10px;">Iterations</label>
+
+              <div class="number-input-grid" style="position: relative;">
+                <!-- Channel Number Input -->
+                <input type="number" min="0" max="5" step="1" value="1"
+                  class="control-ease channel-color control-number-ease" data-channel="0" id="tutorial-channel">
+                <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 5px;">
+                  <span class="tooltip-number">1</span>
+                </span>
+
+                <!-- Start Button -->
+                <button class="set-value-btn" title="Set start value">▼</button>
+                <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50px;">
+                  <span class="tooltip-number">2</span>
+                </span>
+
+                <!-- Slider -->
+                <input type="range" min="0" max="100" step="1" value="50" class="control-slider channel-color">
+                <span class="tutorial-tooltip" style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%);">
+                  <span class="tooltip-number">3</span>
+                </span>
+
+                <!-- End Button -->
+                <button class="set-value-btn" title="Set end value">▼</button>
+                <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; right: 50px;">
+                  <span class="tooltip-number">4</span>
+                </span>
+
+                <!-- Value Input -->
+                <input type="number" step="1" value="50" class="control-number control-number-ease">
+                <span class="tutorial-tooltip" style="position: absolute; top: -35px; right: 5px;">
+                  <span class="tooltip-number">5</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanations -->
+          <div style="margin-top: 15px;">
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">1</span>
+              <div>
+                <strong>Channel Assignment</strong> - Assigns this parameter to an animation channel (0 = not animated, 1-5 = channel number). When assigned, the parameter will animate between start and end values.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">2</span>
+              <div>
+                <strong>Start Value Button</strong> - Click to set the current value as the animation start point. The parameter will begin at this value when the animation plays.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">3</span>
+              <div>
+                <strong>Value Slider</strong> - Drag to adjust the parameter value in real-time.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">4</span>
+              <div>
+                <strong>End Value Button</strong> - Click to set the current value as the animation end point. The parameter will reach this value when the animation completes.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">5</span>
+              <div>
+                <strong>Numeric Input</strong> - Type exact values for precise control. Synced with the slider for real-time visual feedback.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tutorial-page" id="tutorial-page-2" hidden>
+          <h2 class="sub-header-text">Page 2: Animation Channels</h2>
+          <p class="label-text">Channel content coming soon...</p>
+        </div>
+
+        <!-- Navigation -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <button class="timeline-button default-button" id="tutorial-prev-btn" disabled>← Previous</button>
+          <span class="label-text" id="tutorial-page-indicator">Page 1 of 2</span>
+          <button class="timeline-button default-button" id="tutorial-next-btn">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- HOTKEYS MODAL -->
+  <div id="hotkeys-modal" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close-btn" id="hotkeys-close-btn">&times;</button>
+        <span class="modal-title">Keyboard Shortcuts</span>
+      </div>
+      <div class="modal-content">
+        <p class="label-text">Hotkeys content coming soon...</p>
       </div>
     </div>
   </div>

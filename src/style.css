@@ -1343,3 +1343,85 @@ select:disabled {
 .w-50 {
   width: 50%;
 }
+/* ============================================================================
+   TUTORIAL STYLES
+   ============================================================================ */
+
+.tutorial-tooltip {
+  display: inline-block;
+  position: relative;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.tooltip-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+/* Tooltip arrow pointing down (default) */
+.tooltip-number::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--accent-color);
+}
+
+/* Tooltip arrow pointing up (for bottom tooltips) */
+.tooltip-bottom .tooltip-number::after {
+  bottom: auto;
+  top: -6px;
+  border-top: none;
+  border-bottom: 6px solid var(--accent-color);
+}
+
+.tutorial-explanation {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  align-items: flex-start;
+}
+
+.tutorial-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tutorial-explanation > div {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.tutorial-explanation strong {
+  color: var(--accent-color);
+  display: block;
+  margin-bottom: 4px;
+}

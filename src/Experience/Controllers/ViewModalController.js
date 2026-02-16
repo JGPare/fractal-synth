@@ -7,10 +7,13 @@ import BaseController from './BaseController'
 export default class ViewModalController extends BaseController {
   constructor() {
     super()
+    this.currentTutorialPage = 1
+    this.totalTutorialPages = 2
     this.getElements()
     this.linkExpandButton()
     this.linkLoaderClose()
     this.linkSettings()
+    this.linkHelpMenu()
   }
 
   getElements() {
@@ -24,6 +27,19 @@ export default class ViewModalController extends BaseController {
     this.settingsBtn = document.getElementById('settings-btn')
     this.settingsElement = document.getElementById('settings')
     this.settingsCloseBtn = document.getElementById('settings-close-btn')
+
+    // Help menu modals
+    this.menuTutorial = document.getElementById('menu-tutorial')
+    this.menuHotkeys = document.getElementById('menu-hotkeys')
+    this.tutorialModal = document.getElementById('tutorial-modal')
+    this.tutorialCloseBtn = document.getElementById('tutorial-close-btn')
+    this.hotkeysModal = document.getElementById('hotkeys-modal')
+    this.hotkeysCloseBtn = document.getElementById('hotkeys-close-btn')
+
+    // Tutorial navigation
+    this.tutorialPrevBtn = document.getElementById('tutorial-prev-btn')
+    this.tutorialNextBtn = document.getElementById('tutorial-next-btn')
+    this.tutorialPageIndicator = document.getElementById('tutorial-page-indicator')
   }
 
   linkExpandButton() {
@@ -114,6 +130,12 @@ export default class ViewModalController extends BaseController {
       if (e.key === 'Escape' && !this.settingsElement.hidden) {
         this.closeSettingsView()
       }
+      if (e.key === 'Escape' && !this.tutorialModal.hidden) {
+        this.closeTutorialModal()
+      }
+      if (e.key === 'Escape' && !this.hotkeysModal.hidden) {
+        this.closeHotkeysModal()
+      }
       if (e.key === 'Escape' && this.videoExportController) {
         this.videoExportController.cancelVideoExport()
       }
@@ -142,6 +164,97 @@ export default class ViewModalController extends BaseController {
   closeLoadView() {
     this.viewerElement.hidden = false
     this.loaderElement.hidden = true
+    this.canvas.hidden = false
+  }
+
+  linkHelpMenu() {
+    // Tutorial modal
+    this.menuTutorial.addEventListener('click', () => {
+      this.openTutorialModal()
+    })
+
+    this.tutorialCloseBtn.addEventListener('click', () => {
+      this.closeTutorialModal()
+    })
+
+    this.tutorialModal.addEventListener('click', (e) => {
+      if (e.target === this.tutorialModal) {
+        this.closeTutorialModal()
+      }
+    })
+
+    // Tutorial navigation
+    this.tutorialPrevBtn.addEventListener('click', () => {
+      this.goToTutorialPage(this.currentTutorialPage - 1)
+    })
+
+    this.tutorialNextBtn.addEventListener('click', () => {
+      this.goToTutorialPage(this.currentTutorialPage + 1)
+    })
+
+    // Hotkeys modal
+    this.menuHotkeys.addEventListener('click', () => {
+      this.openHotkeysModal()
+    })
+
+    this.hotkeysCloseBtn.addEventListener('click', () => {
+      this.closeHotkeysModal()
+    })
+
+    this.hotkeysModal.addEventListener('click', (e) => {
+      if (e.target === this.hotkeysModal) {
+        this.closeHotkeysModal()
+      }
+    })
+  }
+
+  openTutorialModal() {
+    this.currentTutorialPage = 1
+    this.goToTutorialPage(1)
+    this.viewerElement.hidden = true
+    this.tutorialModal.hidden = false
+    this.canvas.hidden = true
+  }
+
+  closeTutorialModal() {
+    this.viewerElement.hidden = false
+    this.tutorialModal.hidden = true
+    this.canvas.hidden = false
+  }
+
+  goToTutorialPage(pageNumber) {
+    if (pageNumber < 1 || pageNumber > this.totalTutorialPages) return
+
+    // Hide all pages
+    for (let i = 1; i <= this.totalTutorialPages; i++) {
+      const page = document.getElementById(`tutorial-page-${i}`)
+      if (page) page.hidden = true
+    }
+
+    // Show current page
+    const currentPage = document.getElementById(`tutorial-page-${pageNumber}`)
+    if (currentPage) currentPage.hidden = false
+
+    // Update state
+    this.currentTutorialPage = pageNumber
+
+    // Update navigation buttons
+    this.tutorialPrevBtn.disabled = pageNumber === 1
+    this.tutorialNextBtn.disabled = pageNumber === this.totalTutorialPages
+
+    // Update page indicator
+    this.tutorialPageIndicator.textContent = `Page ${pageNumber} of ${this.totalTutorialPages}`
+  }
+
+  openHotkeysModal() {
+    this.viewerElement.hidden = true
+    this.hotkeysModal.hidden = false
+    this.canvas.hidden = true
+  }
+
+  closeHotkeysModal() {
+    this.viewerElement.hidden = false
+    this.hotkeysModal.hidden = true
     this.canvas.hidden = false
   }
 }
