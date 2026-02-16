@@ -479,8 +479,210 @@
         </div>
 
         <div class="tutorial-page" id="tutorial-page-2" hidden>
-          <h2 class="sub-header-text">Page 2: Animation Channels</h2>
-          <p class="label-text">Channel content coming soon...</p>
+          <h2 class="sub-header-text" style="margin-bottom: 10px;">Page 2: Animation Channels</h2>
+
+          <!-- Example Channel with Tooltips -->
+          <div style="position: relative; margin: 20px auto; padding: 40px 50px 40px 20px; background: rgba(0,0,0,0.2); border-radius: 8px; max-width: 550px;">
+            <div style="position: relative;">
+              <!-- Channel Header -->
+              <div class="channel-columns" style="margin-bottom: 10px;">
+                <div class="channel-number-container">
+                  <p class="">#</p>
+                </div>
+                <div class="channel-checkbox-container">
+                  <p class="">Arm</p>
+                </div>
+                <div class="channel-duration-container">
+                  <p class="">Duration</p>
+                </div>
+                <div class="channel-ease-container">
+                  <p class="">Ease</p>
+                </div>
+                <div class="channel-offset-container">
+                  <p class="">Offset</p>
+                </div>
+                <div class="channel-clear-btn-container">
+                </div>
+              </div>
+
+              <!-- Timeline Slider -->
+              <div class="timeline-slider-container" style="position: relative; margin-bottom: 0;">
+                <input type="range" min="0" max="1" step="0.0001" value="0.5"
+                  class="timeline-slider timeline-slider-default" data-channel="1">
+                <span class="tutorial-tooltip" style="position: absolute; top: 50%; right: -40px; transform: translateY(-50%);">
+                  <span class="tooltip-number">1</span>
+                </span>
+              </div>
+
+              <!-- Channel Row -->
+              <div class="channel-columns" style="position: relative;">
+                <div class="channel-number-container channel-color" data-channel="1" style="position: relative;">
+                  <p class="">1</p>
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">2</span>
+                  </span>
+                </div>
+                <div class="channel-checkbox-container" style="position: relative;">
+                  <input type="checkbox" class="channel-checkbox" checked>
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">3</span>
+                  </span>
+                </div>
+                <div class="channel-duration-container" style="position: relative;">
+                  <input type="number" min="1" max="180" step="1" value="15" class="channel-number-input channel-duration">
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">4</span>
+                  </span>
+                </div>
+                <div class="channel-ease-container" style="position: relative;">
+                  <select class="channel-select-input select-sm w-100 channel-ease">
+                    <option value="sine" selected>Sin</option>
+                    <option value="none">Linear</option>
+                    <option value="power1">Power1</option>
+                  </select>
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">5</span>
+                  </span>
+                </div>
+                <div class="channel-offset-container" style="position: relative;">
+                  <input type="number" min="0" max="180" step="1" value="0" class="channel-number-input">
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">6</span>
+                  </span>
+                </div>
+                <div class="channel-clear-btn-container" style="position: relative;">
+                  <button class="channel-clear-btn w-100">Clear</button>
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">7</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline Controls -->
+            <div style="margin-top: 50px; position: relative;">
+              <div id="timeline-button-container" style="position: relative;">
+                <button class="timeline-button default-button" style="position: relative;">
+                  ⏮
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">8</span>
+                  </span>
+                </button>
+                <button class="timeline-button default-button" style="position: relative;">
+                  ▶
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">9</span>
+                  </span>
+                </button>
+                <button class="timeline-button default-button" style="position: relative;">
+                  ⏸
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">10</span>
+                  </span>
+                </button>
+                <button class="timeline-button default-button" style="position: relative;">
+                  ⏭
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">11</span>
+                  </span>
+                </button>
+                <button class="timeline-button default-button" style="position: relative;">
+                  📷
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">12</span>
+                  </span>
+                </button>
+                <button class="timeline-button default-button" style="position: relative;">
+                  ⏺
+                  <span class="tutorial-tooltip tooltip-bottom" style="position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%);">
+                    <span class="tooltip-number">13</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanations -->
+          <div style="margin-top: 15px;">
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">1</span>
+              <div>
+                <strong>Timeline Slider</strong> - Shows the current playback position. Drag to seek through the animation. When the channel is playing, this slider animates automatically.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">2</span>
+              <div>
+                <strong>Channel Number</strong> - Identifies which channel this is (1-5). The color matches the color used in parameter inputs when assigned to this channel.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">3</span>
+              <div>
+                <strong>Arm Checkbox</strong> - Arms this channel for animation. When armed and you press play, parameters assigned to this channel will animate.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">4</span>
+              <div>
+                <strong>Duration</strong> - How long (in seconds) it takes to animate from start to end. The animation will yoyo back and forth continuously.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">5</span>
+              <div>
+                <strong>Easing Function</strong> - Controls the animation curve. Sin creates smooth waves, Linear is constant speed, Power/Circ create acceleration effects, Custom allows drawing your own curve.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">6</span>
+              <div>
+                <strong>Offset</strong> - Phase shift in seconds. Allows staggering multiple channels so they don't all animate in sync.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">7</span>
+              <div>
+                <strong>Clear Button</strong> - Removes all parameter assignments for this channel and resets it to default state.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">8</span>
+              <div>
+                <strong>Seek to Start [,]</strong> - Jumps all armed channels to their starting position. Keyboard shortcut: comma key.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">9</span>
+              <div>
+                <strong>Play [Space]</strong> - Starts animation playback for all armed channels. Keyboard shortcut: spacebar.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">10</span>
+              <div>
+                <strong>Pause [Space]</strong> - Pauses animation playback. Keyboard shortcut: spacebar.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">11</span>
+              <div>
+                <strong>Seek to End [.]</strong> - Jumps all armed channels to their ending position. Keyboard shortcut: period key.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">12</span>
+              <div>
+                <strong>Screenshot</strong> - Captures the current frame as a PNG image and downloads it to your computer.
+              </div>
+            </div>
+            <div class="tutorial-explanation">
+              <span class="tutorial-number">13</span>
+              <div>
+                <strong>Arm Video Export</strong> - Arms video recording. When armed, press Play to start recording an MP4 video of your animation.
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Navigation -->
