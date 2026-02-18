@@ -250,28 +250,19 @@ float phoenix(vec2 uv, int maxIters) {
 
 float sphinx(vec2 uv, int maxIters) {
 
- vec2 c = vec2(uCposX, uCposY);
+  vec2 c1 = vec2(uCposX, uCposY);
+  vec2 c2 = vec2(uCposX2, uCposY2);
   int i;
   vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
 
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
-    zn = complexPow(zn, uPower) + c;
+    // zn = ((complexPow(zn, uPower) - (1./log(zn) + c2) + c))/(c+1./float(i));
+    zn = abs(complexPow(zn, uPower) + c1) - 1./log(abs(complexPow(zn,uPower2)/5. + c2));
     mZ = dot(zn, zn);
   }
 
-  vec2 newUv = uv * zn;
-  float iter2Float = exp(6.8 * uIters2);
-  int maxIters2 = int(iter2Float);
-
-  zn = newUv;
-  mZ = dot(zn, zn);
-
-  for (i = 0; mZ < 4.0 && i < maxIters2; i++) {
-    zn = complexPow(zn, uPower) + c;
-    mZ = dot(zn, zn);
-  }
   return float(i) + velocityDistort(mZ - 4.0);
 }
 

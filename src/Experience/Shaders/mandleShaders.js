@@ -99,7 +99,7 @@ mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 julia.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 doubleJulia.addGroup("Core", [iters, iters2, power, power2, posX, posY, zoom, rotation])
 phoenix.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
-sphinx.addGroup("Core", [iters, iters2, power, posX, posY, zoom, rotation])
+sphinx.addGroup("Core", [iters, power, power2, posX, posY, zoom, rotation])
 neuton.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 burningShip.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
 
@@ -146,7 +146,7 @@ const cPosY2 = new NumberInput({
 julia.addGroup("Point", [cPosX, cPosY])
 doubleJulia.addGroup("Point", [cPosX, cPosY, cPosX2, cPosY2])
 phoenix.addGroup("Point", [cPosX, cPosY])
-sphinx.addGroup("Point", [cPosX, cPosY])
+sphinx.addGroup("Point", [cPosX, cPosY, cPosX2, cPosY2])
 neuton.addGroup("Point", [cPosX, cPosY])
 
 const velocityDirection = new NumberInput({
