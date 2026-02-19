@@ -401,25 +401,44 @@ vec3 getLinearWavesColor(vec2 uv) {
 }
 
 vec3 getFibonacciColor(vec2 uv) {
-   
-  float iterFloat = exp(6.8 * uIters);
-  int iterations = int(iterFloat);
-  float iterFrac = fract(iterFloat);
+  const float PHI = 1.61803398874989484820;
+  const float GOLDEN_ANGLE = 2.39996322972865332; // radians: 2*PI*(1 - 1/PHI)
 
-  float escape1 = phoenix(uv, iterations);
-  float escape2 = doubleJulia(uv, iterations);
+  uv = warpUv(uv, uSinMag, vec2(uSinFreqX, uSinFreqY), vec2(0., 0.));
 
-  float escape = mix(escape1, escape2, 0.5);
+  int numCircles = int(uIters * 120.) + 16;
+  float scale = uPower * 1.5 + 0.1;
 
-  vec3 mixedColor = getMixedColor(escape, iterations);
-  if (iterations < 50) {
-    float escapeCeil = getEscape(uv, iterations + 1);
-    vec3 mixedColorCeil = getMixedColor(escapeCeil, iterations + 1);
-    mixedColor = mix(mixedColor, mixedColorCeil, iterFrac);
+  float accumVal = 0.0;
+
+  for (int i = 0; i < numCircles; i++) {
+
+      float fi = float(i);
+
+      // Fibonacci spiral: radius grows with sqrt(i), angle steps by golden angle
+      float r = sqrt(fi + 1.0) * 2.8;
+      float angle = fi * GOLDEN_ANGLE + uCposX * PI;
+
+      vec2 center = vec2(cos(angle), sin(angle)) * r;
+
+      // Circle size decreases for outer ones, creating layered feel
+      float circleRadius = (1.0 / sqrt(fi + 1.0)) * scale * 10.18 + 0.01;
+
+      float dist = length(uv - center);
+
+      // Smooth circle contribution with ripple falloff
+      float circle = 1.0 - smoothstep(0.0, circleRadius, dist);
+      // Add a ripple ring effect
+      float ripple = sin(dist / circleRadius * PI * 2.0) * 0.5 + 0.5;
+      ripple *= exp(-dist / (circleRadius * 2.0));
+
+      accumVal += circle + ripple * 0.5;
   }
 
-  return mixedColor;
+  accumVal = accumVal * 0.1 + uCposY;
 
+  vec3 mixedColor = getMixedColor(accumVal, 1);
+  return mixedColor;
 }
 
 vec3 getWavesFractalColor(vec2 uv) {

@@ -176,7 +176,7 @@ export default class ShaderControlsController extends BaseController {
       slider.setAttribute("data-channel", input.channelIndex + 1)
       startBtn.disabled = input.channelIndex < 0
       endBtn.disabled = input.channelIndex < 0
-      this.emit('timelineUpdateRequested', prevIndex)
+      this.trigger('timelineUpdateRequested', prevIndex)
       this.clearInputAnimation(input)
     })
 
