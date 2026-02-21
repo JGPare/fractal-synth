@@ -146,6 +146,8 @@ export default class ShaderControlsController extends BaseController {
 
     startBtn.addEventListener('click', () => {
       input.startVal = input.value
+      console.log(input);
+      
       this.trigger('timelineUpdateRequested', [input.channelIndex])
       this.setInputElementActive(input)
     })
@@ -176,7 +178,8 @@ export default class ShaderControlsController extends BaseController {
       slider.setAttribute("data-channel", input.channelIndex + 1)
       startBtn.disabled = input.channelIndex < 0
       endBtn.disabled = input.channelIndex < 0
-      this.trigger('timelineUpdateRequested', prevIndex)
+      
+      this.trigger('timelineUpdateRequested', [prevIndex])
       this.clearInputAnimation(input)
     })
 

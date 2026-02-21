@@ -149,7 +149,7 @@ export default class ControlsManager extends EventEmitter {
     let inputSet = false
     const channel = this.experience.channels[index]
     const timeline = this.experience.timeline
-
+    
     timeline.renew(index)
 
     const numInputs = shader.getNumInputs()

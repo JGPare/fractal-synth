@@ -89,7 +89,7 @@ export default class Timeline extends EventEmitter {
     }
     this.tlParams.defaults.ease = ease
     this.tls[i].getChildren().forEach(tween => {
-      if (tween.vars) {
+      if (tween.vars) {        
         tween.vars.ease = ease
         tween.invalidate()
       }
@@ -241,6 +241,7 @@ export default class Timeline extends EventEmitter {
    */
   renew(index) {
     const tl = this.tls[index]
+    
     tl.clear()
     tl.pause()
   }
