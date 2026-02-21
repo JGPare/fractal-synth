@@ -59,8 +59,8 @@ export default class PaletteController extends BaseController {
     this.paletteInput.addEventListener('change', () => {
       const paletteOption = this.paletteSelect.options[this.paletteSelect.selectedIndex]
       this.paletteIndex = this.paletteSelect.selectedIndex
-      if (this.shader) {
-        this.shader.paletteIndex = this.paletteSelect.selectedIndex
+      if (this.experience.shader) {
+        this.experience.shader.paletteIndex = this.paletteSelect.selectedIndex
       }
       paletteOption.value = this.paletteInput.value
       paletteOption.innerHTML = this.paletteInput.value
@@ -82,8 +82,8 @@ export default class PaletteController extends BaseController {
 
   setPaletteInputFromSelect() {
     this.paletteIndex = this.paletteSelect.selectedIndex
-    if (this.shader) {
-      this.shader.paletteIndex = this.paletteIndex
+    if (this.experience.shader) {
+      this.experience.shader.paletteIndex = this.paletteIndex
     }
     this.paletteInput.value = this.paletteSelect.value
   }
@@ -129,9 +129,7 @@ export default class PaletteController extends BaseController {
     })
   }
 
-  setNumberOfColors() {
-    console.log(this.numberOfColors);
-    
+  setNumberOfColors() {    
     this.shaderUniforms.uPaletteLen.value = this.numberOfColors
     this.palette.displayLength = this.numberOfColors
     this.numberOfColorsSlider.value = this.numberOfColors
