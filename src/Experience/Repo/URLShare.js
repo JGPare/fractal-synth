@@ -96,6 +96,7 @@ export default class URLShare {
         offset: ch[2]
       }))
       ProjectRepo.setChannelsFromSnapshot(experience, channelSnapshot)
+      experience.controls.channel.setChannelUIFromShader()
 
       return true
     } catch (e) {
