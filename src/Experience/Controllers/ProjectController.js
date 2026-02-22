@@ -1,5 +1,6 @@
 import BaseController from './BaseController'
 import ProjectRepo from '../Repo/ProjectRepo'
+import URLShare from '../Repo/URLShare'
 
 /**
  * ProjectController - Manages project operations and file I/O
@@ -26,6 +27,7 @@ export default class ProjectController extends BaseController {
     this.menuDelete = document.getElementById('menu-delete')
     this.menuImport = document.getElementById('menu-import')
     this.menuExport = document.getElementById('menu-export')
+    this.menuShare = document.getElementById('menu-share')
     this.menuResetShader = document.getElementById('menu-reset-shader')
     this.menuClearAnimations = document.getElementById('menu-clear-animations')
   }
@@ -84,6 +86,14 @@ export default class ProjectController extends BaseController {
 
     this.menuExport.addEventListener('click', () => {
       ProjectRepo.exportProject(this.projectList.currentProjectName, this.experience)
+    })
+
+    this.menuShare.addEventListener('click', async () => {
+      URLShare.encode(this.experience)
+      await URLShare.copyShareURL()
+      const orig = this.menuShare.textContent
+      this.menuShare.textContent = 'Copied!'
+      setTimeout(() => { this.menuShare.textContent = orig }, 1500)
     })
 
     this.menuImport.addEventListener('click', () => {

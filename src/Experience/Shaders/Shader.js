@@ -199,6 +199,21 @@ export default class Shader {
   }
 
   /**
+   * @param {Object} inputByEId - map of eId → { value, channelIndex, startVal, endVal }
+   */
+  setFromSnapshotByEId(inputByEId) {
+    for (const input of this.getNumInputs()) {
+      const snap = inputByEId[input.eId]
+      if (snap) {
+        input.value = snap.value
+        input.channelIndex = snap.channelIndex ?? 0
+        input.startVal = snap.startVal ?? 0
+        input.endVal = snap.endVal ?? 0
+      }
+    }
+  }
+
+  /**
    * @param {string} inputName
    * @param {Object} inputSnap
    */

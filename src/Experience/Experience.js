@@ -11,6 +11,7 @@ import Palettes from './Utils/Palettes.js'
 import ShaderMaterial from './ShaderMaterial.js'
 import Timeline from './Utils/Timeline.js'
 import ProjectRepo from './Repo/ProjectRepo.js'
+import URLShare from './Repo/URLShare.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
 import Settings from './Utils/Settings.js'
@@ -178,7 +179,13 @@ export default class Experience {
   onLoad() {
     this.renderer.onLoad()
     ProjectRepo.loadProjectList(this)
-    ProjectRepo.loadLastProject(this)
+    if (URLShare.hasShareHash()) {
+      if (!URLShare.decode(this)) {
+        ProjectRepo.loadLastProject(this)
+      }
+    } else {
+      ProjectRepo.loadLastProject(this)
+    }
   }
 
   onBeforeUnload() {
