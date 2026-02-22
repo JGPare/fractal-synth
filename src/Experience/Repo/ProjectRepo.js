@@ -188,7 +188,7 @@ export default class ProjectRepo {
         channel.duration = channelSnap.duration
         channel.ease = channelSnap.ease
         channel.offset = channelSnap.offset || 0
-        channel.on = false
+        channel.on = channelSnap.on ?? false
       }
     }
 

@@ -35,7 +35,7 @@ export default class URLShare {
       input.endVal
     ])
 
-    const channelSnap = channels.map(ch => [ch.duration, ch.ease, ch.offset])
+    const channelSnap = channels.map(ch => [ch.duration, ch.ease, ch.offset, ch.on])
 
     const payload = { v: 1, s: shader.eShader, p, i: inputs, c: channelSnap }
     if (pc) payload.pc = pc
@@ -93,7 +93,8 @@ export default class URLShare {
       const channelSnapshot = payload.c.map(ch => ({
         duration: ch[0],
         ease: ch[1],
-        offset: ch[2]
+        offset: ch[2],
+        on: ch[3] ?? false
       }))
       ProjectRepo.setChannelsFromSnapshot(experience, channelSnapshot)
       experience.controls.channel.setChannelUIFromShader()
