@@ -71,8 +71,8 @@ export default class ProjectList {
         found = true
         projectID = project.id
       }
-      else{
-        projectID = Math.max(projectID,project.id)
+      else if (!found) {
+        projectID = Math.max(projectID, project.id)
       }
     })
     if (!found) {
