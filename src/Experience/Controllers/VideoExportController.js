@@ -21,7 +21,6 @@ export default class VideoExportController extends BaseController {
   getElements() {
     this.exportImageBtn = document.getElementById('export-image-btn')
     this.armVideoBtn = document.getElementById('arm-video-btn')
-    this.exportVideoDuration = document.getElementById('export-video-duration')
     this.exportVideoStatus = document.getElementById('export-video-status')
     this.cancelVideoBtn = document.getElementById('cancel-video-btn')
   }
@@ -52,9 +51,6 @@ export default class VideoExportController extends BaseController {
     this.armVideoBtn.classList.remove('selected-button')
     this.exportVideoStatus.textContent = ''
 
-    const duration = parseFloat(this.exportVideoDuration.value)
-    if (!duration || duration <= 0) return
-
     this.videoExportAbortController = new AbortController()
 
     // Show cancel button during export
@@ -64,7 +60,6 @@ export default class VideoExportController extends BaseController {
       await ProjectRepo.exportVideo(
         this.projectList.currentProjectName,
         this.experience,
-        duration,
         this.experience.settings.exportFps,
         (progress) => {
           const pct = Math.round(progress * 100)

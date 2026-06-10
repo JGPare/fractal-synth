@@ -7,8 +7,7 @@ const mirrorFoldsX = new NumberInput({
   value: 1,
   min: 1,
   max: 16,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const mirrorFoldsY = new NumberInput({
@@ -17,8 +16,7 @@ const mirrorFoldsY = new NumberInput({
   value: 1,
   min: 1,
   max: 16,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const mirrorOffsetX = new NumberInput({
@@ -27,8 +25,7 @@ const mirrorOffsetX = new NumberInput({
   value: 0,
   min: -1,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const mirrorOffsetY = new NumberInput({
@@ -37,8 +34,7 @@ const mirrorOffsetY = new NumberInput({
   value: 0,
   min: -1,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 
@@ -48,8 +44,7 @@ const colorOffset = new NumberInput({
   value: 0,
   min: 0,
   max: 10,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 const hueRotation = new NumberInput({
@@ -58,8 +53,7 @@ const hueRotation = new NumberInput({
   value: 0,
   min: -4,
   max: 4,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 
@@ -69,8 +63,7 @@ const colorScale = new NumberInput({
   value: 1,
   min: 0.1,
   max: 5,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 

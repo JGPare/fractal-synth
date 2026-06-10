@@ -119,34 +119,6 @@ export default class Shader {
   }
 
   // ============================================================
-  // ANIMATION VALUES
-  // ============================================================
-
-  /**
-   * @param {number} channelIndex
-   */
-  setStartValFromUniforms(channelIndex) {
-    const numInputs = this.getNumInputs()
-    for (let i = 0; i < numInputs.length; i++) {
-      if (numInputs[i].channelIndex == channelIndex) {
-        numInputs[i].startVal = numInputs[i].getValue()
-      }
-    }
-  }
-
-  /**
-   * @param {number} channelIndex
-   */
-  setEndValFromUniforms(channelIndex) {
-    const numInputs = this.getNumInputs()
-    for (let i = 0; i < numInputs.length; i++) {
-      if (numInputs[i].channelIndex == channelIndex) {
-        numInputs[i].endVal = numInputs[i].getValue()
-      }
-    }
-  }
-
-  // ============================================================
   // SERIALIZATION
   // ============================================================
 
@@ -199,16 +171,13 @@ export default class Shader {
   }
 
   /**
-   * @param {Object} inputByEId - map of eId → { value, channelIndex, startVal, endVal }
+   * @param {Object} inputByEId - map of eId → { value }
    */
   setFromSnapshotByEId(inputByEId) {
     for (const input of this.getNumInputs()) {
       const snap = inputByEId[input.eId]
       if (snap) {
         input.value = snap.value
-        input.channelIndex = snap.channelIndex ?? 0
-        input.startVal = snap.startVal ?? 0
-        input.endVal = snap.endVal ?? 0
       }
     }
   }
@@ -247,10 +216,7 @@ export default class Shader {
           value: input.value,
           min: input.min,
           max: input.max,
-          step: input.step,
-          channelIndex: input.channelIndex,
-          startVal: input.startVal,
-          endVal: input.endVal
+          step: input.step
         })
 
         newShader.groups[groupName].push(clonedInput)

@@ -19,8 +19,7 @@ const iters = new NumberInput({
   value: 10,
   min: -100,
   max: 100,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 const power = new NumberInput({
@@ -29,8 +28,7 @@ const power = new NumberInput({
   value: 10,
   min: -50,
   max: 50,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 // wave
@@ -41,8 +39,7 @@ const scale1 = new NumberInput({
   value: 0.025,
   min: -3,
   max: 3,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const scale2 = new NumberInput({
@@ -51,8 +48,7 @@ const scale2 = new NumberInput({
   value: 0.05,
   min: -3,
   max: 3,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 
@@ -62,8 +58,7 @@ const posX = new NumberInput({
   value: 0.1,
   min: -1,
   max: 1,
-  step: 0.00001,
-  channelIndex: -1
+  step: 0.00001
 })
 
 const posY = new NumberInput({
@@ -72,8 +67,7 @@ const posY = new NumberInput({
   value: 0.5,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const zoom = new NumberInput({
@@ -82,8 +76,7 @@ const zoom = new NumberInput({
   value: 20,
   min: 0,
   max: 1,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 const rotation = new NumberInput({
@@ -92,8 +85,7 @@ const rotation = new NumberInput({
   value: 0,
   min: -Math.PI * 2,
   max: Math.PI * 2,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 noise.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
@@ -107,8 +99,7 @@ const cPosX = new NumberInput({
   value: 2,
   min: -5,
   max: 5,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosY = new NumberInput({
@@ -117,8 +108,7 @@ const cPosY = new NumberInput({
   value: 0.5,
   min: -5,
   max: 5,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 noise.addGroup("Point", [cPosX, cPosY])
@@ -132,8 +122,7 @@ const velocityDirection = new NumberInput({
   value: 0,
   min: -5,
   max: 5,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const velocityAmount = new NumberInput({
@@ -142,8 +131,7 @@ const velocityAmount = new NumberInput({
   value: -1,
   min: 0,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 noise.addGroup("Velocity", [velocityDirection, velocityAmount])
@@ -154,8 +142,7 @@ const sinMag = new NumberInput({
   value: 0,
   min: 0,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const sinXCoeff = new NumberInput({
@@ -164,8 +151,7 @@ const sinXCoeff = new NumberInput({
   value: 0,
   min: -5,
   max: 5,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const sinYCoeff = new NumberInput({
@@ -174,8 +160,7 @@ const sinYCoeff = new NumberInput({
   value: 0,
   min: -5,
   max: 5,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 noise.addGroup("Sin", [sinMag, sinXCoeff, sinYCoeff])

@@ -20,10 +20,8 @@ export default class BaseController extends EventEmitter {
     this.time = this.experience.time
     this.mouse = this.experience.mouse
     this.shaderMaterial = this.experience.shaderMaterial
-    this.timeline = this.experience.timeline
+    this.animation = this.experience.animation
     this.keyboard = this.experience.keyboard
-    this.curveEditor = this.experience.curveEditor
-    this.channels = this.experience.channels
     this.projectList = this.experience.projectList
     this.project = this.experience.project
     this.shader = this.experience.shader

@@ -21,8 +21,7 @@ const iters = new NumberInput({
   value: 0.6,
   min: 0.1,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const iters2 = new NumberInput({
@@ -31,8 +30,7 @@ const iters2 = new NumberInput({
   value: 0.5,
   min: 0.1,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const power = new NumberInput({
@@ -41,8 +39,7 @@ const power = new NumberInput({
   value: 2,
   min: -30,
   max: 30,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const power2 = new NumberInput({
@@ -51,8 +48,7 @@ const power2 = new NumberInput({
   value: 2,
   min: -30,
   max: 30,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const posX = new NumberInput({
@@ -61,8 +57,7 @@ const posX = new NumberInput({
   value: -0.5,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const posY = new NumberInput({
@@ -71,8 +66,7 @@ const posY = new NumberInput({
   value: 0,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const zoom = new NumberInput({
@@ -81,8 +75,7 @@ const zoom = new NumberInput({
   value: 2.2,
   min: 0,
   max: 1,
-  step: 0.01,
-  channelIndex: -1
+  step: 0.01
 })
 
 const rotation = new NumberInput({
@@ -91,8 +84,7 @@ const rotation = new NumberInput({
   value: 0,
   min: -Math.PI * 2,
   max: Math.PI * 2,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 // SPHINX
@@ -103,8 +95,7 @@ const itersSphinx = new NumberInput({
   value: 0.2,
   min: 0.1,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const powerSphinx = new NumberInput({
@@ -113,8 +104,7 @@ const powerSphinx = new NumberInput({
   value: 2,
   min: -30,
   max: 30,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const power2Sphinx = new NumberInput({
@@ -123,8 +113,7 @@ const power2Sphinx = new NumberInput({
   value: -5,
   min: -30,
   max: 30,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 mandle.addGroup("Core", [iters, power, posX, posY, zoom, rotation])
@@ -141,8 +130,7 @@ const cPosX = new NumberInput({
   value: -0.75,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosY = new NumberInput({
@@ -151,8 +139,7 @@ const cPosY = new NumberInput({
   value: 0.25,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosX2 = new NumberInput({
@@ -161,8 +148,7 @@ const cPosX2 = new NumberInput({
   value: -0.75,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosY2 = new NumberInput({
@@ -171,8 +157,7 @@ const cPosY2 = new NumberInput({
   value: 0.25,
   min: -2,
   max: 2,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 // Sphinx
@@ -183,8 +168,7 @@ const cPosXSphinx = new NumberInput({
   value: 0.21,
   min: -4,
   max: 4,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosYSphinx = new NumberInput({
@@ -193,8 +177,7 @@ const cPosYSphinx = new NumberInput({
   value: 1.05,
   min: -4,
   max: 4,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosX2Sphinx = new NumberInput({
@@ -203,8 +186,7 @@ const cPosX2Sphinx = new NumberInput({
   value: -1.6,
   min: -4,
   max: 4,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 const cPosY2Sphinx = new NumberInput({
@@ -213,8 +195,7 @@ const cPosY2Sphinx = new NumberInput({
   value: -1.7,
   min: -4,
   max: 4,
-  step: 0.0001,
-  channelIndex: -1
+  step: 0.0001
 })
 
 julia.addGroup("Point", [cPosX, cPosY])
@@ -229,8 +210,7 @@ const velocityDirection = new NumberInput({
   value: 0,
   min: -1,
   max: 1,
-  step: 1,
-  channelIndex: -1
+  step: 1
 })
 
 const velocityAmount = new NumberInput({
@@ -239,8 +219,7 @@ const velocityAmount = new NumberInput({
   value: 0.5,
   min: 0,
   max: 5,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 mandle.addGroup("Velocity", [velocityDirection, velocityAmount])
@@ -257,8 +236,7 @@ const sinMag = new NumberInput({
   value: 0,
   min: 0,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const sinJuliaXCoeff = new NumberInput({
@@ -267,8 +245,7 @@ const sinJuliaXCoeff = new NumberInput({
   value: 0,
   min: 0,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 const sinJuliaYCoeff = new NumberInput({
@@ -277,8 +254,7 @@ const sinJuliaYCoeff = new NumberInput({
   value: 0,
   min: 0.001,
   max: 1,
-  step: 0.001,
-  channelIndex: -1
+  step: 0.001
 })
 
 julia.addGroup("Sin Offsets", [sinMag, sinJuliaXCoeff, sinJuliaYCoeff])

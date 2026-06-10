@@ -7,8 +7,7 @@ import VideoExportController from './Controllers/VideoExportController'
 import ViewModalController from './Controllers/ViewModalController'
 import PaletteController from './Controllers/PaletteController'
 import ProjectController from './Controllers/ProjectController'
-import TimelineController from './Controllers/TimelineController'
-import ChannelController from './Controllers/ChannelController'
+import KeyframeTimelineController from './Controllers/KeyframeTimelineController'
 import ShaderControlsController from './Controllers/ShaderControlsController'
 
 /**
@@ -40,8 +39,7 @@ export default class ControlsManager extends EventEmitter {
     this.project = new ProjectController()
 
     // Coordinating controllers
-    this.timeline = new TimelineController()
-    this.channel = new ChannelController()
+    this.keyframeTimeline = new KeyframeTimelineController()
     this.shaderControls = new ShaderControlsController()
   }
 
@@ -49,9 +47,24 @@ export default class ControlsManager extends EventEmitter {
    * Wire event handlers between controllers
    */
   wireControllers() {
-    // ShaderControls → Timeline: When timeline update is requested
-    this.shaderControls.on('timelineUpdateRequested', (channelIndex) => {
-      this.setTimeline(channelIndex)
+    const animation = this.experience.animation
+
+    // ShaderControls → Animation: ◇ button adds/updates a keyframe at the playhead
+    this.shaderControls.on('keyframeRequested', (input) => {
+      animation.addOrUpdateKeyframe(input.eId, animation.playhead, Number(input.value))
+    })
+
+    // ShaderControls → Animation: auto-key - editing a slider while paused
+    // updates an existing keyframe at the playhead
+    this.shaderControls.on('parameterEdited', (input) => {
+      if (animation.playing) return
+      const track = animation.getTrack(input.eId)
+      if (!track) return
+      const index = track.indexOfKeyAt(animation.playhead, animation.keyEpsilon)
+      if (index >= 0) {
+        track.keys[index].v = Number(input.value)
+        animation.trigger('tracksChanged')
+      }
     })
 
     // ShaderControls → Project: When mode index changes
@@ -64,32 +77,37 @@ export default class ControlsManager extends EventEmitter {
       this.palette.setPaletteFromIndex(shader.paletteIndex)
     })
 
-    // Timeline → ShaderControls: When seek is completed, update UI
-    this.timeline.on('seekCompleted', () => {
-      this.shaderControls.setUIfromShader()
-      this.channel.setChannelUIFromShader()
+    // Animation → UI: playhead moved (playback or scrub)
+    animation.on('timeChanged', () => {
+      this.keyframeTimeline.updatePlayhead()
+      this.shaderControls.syncSlidersToShader()
+      this.shaderControls.refreshKeyButtons()
     })
 
-    // Timeline → VideoExport: When play starts, check if video armed
-    this.timeline.on('playStarted', () => {
-      if (this.videoExport.isVideoArmed()) {
+    // Animation → UI: keyframes added/removed/moved
+    animation.on('tracksChanged', () => {
+      this.keyframeTimeline.rebuild()
+      this.shaderControls.refreshKeyButtons()
+    })
+
+    // Animation → UI + VideoExport: play state changed
+    animation.on('playStateChanged', (playing) => {
+      this.keyframeTimeline.updatePlayButton(playing)
+      if (playing && this.videoExport.isVideoArmed()) {
         this.videoExport.startVideoExport()
       }
     })
 
-    // Timeline → Channel: When timeline is set
-    this.timeline.on('timelineSet', (index) => {
-      this.handleTimelineSet(index)
+    // Animation → UI: duration changed
+    animation.on('durationChanged', () => {
+      this.keyframeTimeline.updateRuler()
+      this.keyframeTimeline.updateDurationInput()
+      this.keyframeTimeline.rebuild()
     })
 
-    // Channel → ShaderControls: When channel inputs need clearing
-    this.channel.on('clearChannelInputsRequested', (index) => {
-      this.shaderControls.clearChannelInputs(index)
-    })
-
-    // Channel → Timeline: When channel offset changes, rebuild timeline
-    this.channel.on('offsetChanged', (index) => {
-      this.setTimeline(index)
+    // Animation → UI: loop mode changed
+    animation.on('modeChanged', (mode) => {
+      this.keyframeTimeline.updateModeButton(mode)
     })
 
     // Project → Experience: When mode changes
@@ -116,9 +134,9 @@ export default class ControlsManager extends EventEmitter {
       this.experience.updateFromShader()
     })
 
-    // Project → Channel: When clear animations is requested
+    // Project → Animation: When clear animations is requested
     this.project.on('clearAnimationsRequested', () => {
-      this.channel.clearAllChannelAnimations()
+      animation.clear()
     })
 
     // ViewModal → VideoExport: Setup escape handler
@@ -130,55 +148,6 @@ export default class ControlsManager extends EventEmitter {
    */
   finalizeSetup() {
     this.updateFromShader()
-    const paperCanvas = document.getElementById('paper-canvas')
-    if (paperCanvas) {
-      paperCanvas.hidden = true // Hide paper canvas initially
-    }
-  }
-
-  /**
-   * Handle timeline set logic
-   * @param {number} index - Channel index
-   */
-  handleTimelineSet(index) {
-    const shader = this.experience.shader
-    if (!shader || index < 0) {
-      return
-    }
-
-    let inputSet = false
-    const channel = this.experience.channels[index]
-    const timeline = this.experience.timeline
-    
-    timeline.renew(index)
-
-    const numInputs = shader.getNumInputs()
-
-    for (const input of numInputs) {
-      if (input.channelIndex == index && input.startVal != input.endVal) {
-        inputSet = true
-        timeline.setFromToFromNumInput(input, index, channel.offset)
-        this.shaderControls.setInputElementActive(input)
-      }
-    }
-
-    if (inputSet) {
-      this.channel.setChannelAsActive(index)
-      const progressSlider = this.channel.getChannelProgressSlider(index)
-      timeline.fromToTimeline(progressSlider, index)
-      timeline.setDuration(channel.duration, index)
-      timeline.setEase(channel.ease, "inOut", index)
-    } else {
-      this.channel.setChannelAsInactive(index)
-    }
-  }
-
-  /**
-   * Set a specific timeline
-   * @param {number} index - Channel index
-   */
-  setTimeline(index) {
-    this.timeline.setTimeline(index)
   }
 
   /**
@@ -187,9 +156,8 @@ export default class ControlsManager extends EventEmitter {
    */
   updateFromShader() {
     this.shaderControls.updateFromShader()
-    this.timeline.setAllTimelines()
-    this.channel.turnOnActiveChannels()
-    this.channel.setChannelUIFromShader()
+    this.keyframeTimeline.rebuild()
+    this.shaderControls.refreshKeyButtons()
   }
 
   /**
@@ -199,14 +167,6 @@ export default class ControlsManager extends EventEmitter {
   setProject() {
     this.project.setProject()
     this.updateFromShader()
-  }
-
-  /**
-   * PUBLIC API - Set all timelines
-   * Called by ProjectRepo when loading projects
-   */
-  setAllTimelines() {
-    this.timeline.setAllTimelines()
   }
 
   /**

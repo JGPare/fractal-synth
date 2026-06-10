@@ -9,17 +9,15 @@ import Controls from './ControlsManager.js'
 import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
 import ShaderMaterial from './ShaderMaterial.js'
-import Timeline from './Utils/Timeline.js'
+import AnimationTimeline from './Animation/AnimationTimeline.js'
 import ProjectRepo from './Repo/ProjectRepo.js'
 import URLShare from './Repo/URLShare.js'
 import StatsPanel from './Utils/StatsPanel.js'
 import Keyboard from './Utils/Keyboard.js'
 import Settings from './Utils/Settings.js'
-import CurveEditor from './CurveEditor.js'
 import Project from './Project.js'
 import ShaderUtility from './Shaders/ShaderUtility.js'
 import { eShaders } from './Common/eNums.js'
-import Channel from './Channel.js'
 import ProjectList from './ProjectList.js'
 
 THREE.ColorManagement.enabled = true
@@ -55,7 +53,7 @@ export default class Experience {
   initComponents() {
     this.projectList = new ProjectList()
     this.keyboard = new Keyboard()
-    this.timeline = new Timeline(this)
+    this.animation = new AnimationTimeline(this)
     this.debug = new Debug()
     this.sizes = new Sizes()
     this.time = new Time()
@@ -67,8 +65,6 @@ export default class Experience {
     this.mouse = new Mouse()
     this.shaderMaterial = new ShaderMaterial()
     this.screen = new Screen()
-    this.curveEditor = new CurveEditor("paper-canvas", "paper-output", this)
-    this.channels = Array.from({ length: 5 }, () => new Channel({ name: "Sin", ease: "sine", duration: 25, on: false }))
     this.controls = new Controls()
     this.shader = null
     if (debug){
@@ -131,11 +127,6 @@ export default class Experience {
     this.keyboard.addMapping("Space", "togglePlay")
     this.keyboard.addMapping("Comma", "seekStart")
     this.keyboard.addMapping("Period", "seekEnd")
-    this.keyboard.addMapping("Ctrl+Digit1", "toggleArm1")
-    this.keyboard.addMapping("Ctrl+Digit2", "toggleArm2")
-    this.keyboard.addMapping("Ctrl+Digit3", "toggleArm3")
-    this.keyboard.addMapping("Ctrl+Digit4", "toggleArm4")
-    this.keyboard.addMapping("Ctrl+Digit5", "toggleArm5")
   }
 
   // ============================================================
@@ -149,6 +140,7 @@ export default class Experience {
   }
 
   update() {
+    this.animation.update(this.time.delta)
     this.renderer.update()
     this.screen.update()
     if (debug){

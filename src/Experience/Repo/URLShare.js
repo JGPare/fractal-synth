@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import Palette from '../Utils/Palette.js'
-import ProjectRepo from './ProjectRepo.js'
 
 export default class URLShare {
   // ============================================================
@@ -13,7 +12,7 @@ export default class URLShare {
    */
   static encode(experience) {
     const shader = experience.shader
-    const channels = experience.channels
+    const animation = experience.animation
     const paletteIndex = shader.paletteIndex
     const palette = experience.palettes.getPaletteByIndex(paletteIndex)
 
@@ -29,15 +28,18 @@ export default class URLShare {
 
     const inputs = shader.getNumInputs().map(input => [
       input.eId,
-      input.value,
-      input.channelIndex,
-      input.startVal,
-      input.endVal
+      input.value
     ])
 
-    const channelSnap = channels.map(ch => [ch.duration, ch.ease, ch.offset, ch.on])
+    // Keyframe timeline: a: { d: duration, m: 0 loop | 1 pingpong, k: [[eId, [[t,v,s],...]], ...] }
+    const timelineSnap = animation.getSnapshot()
+    const a = {
+      d: timelineSnap.duration,
+      m: timelineSnap.mode === 'pingpong' ? 1 : 0,
+      k: timelineSnap.tracks.map(track => [track.eId, track.keys])
+    }
 
-    const payload = { v: 1, s: shader.eShader, p, i: inputs, c: channelSnap }
+    const payload = { v: 2, s: shader.eShader, p, i: inputs, a }
     if (pc) payload.pc = pc
 
     window.location.hash = 'share=' + URLShare._toBase64url(JSON.stringify(payload))
@@ -55,7 +57,9 @@ export default class URLShare {
       const b64 = window.location.hash.slice('#share='.length)
       const payload = JSON.parse(URLShare._fromBase64url(b64))
 
-      if (payload.v !== 1) return false
+      // v1 links restore shader/inputs/palette only (channel animation
+      // data from the old system is ignored); v2 restores the timeline too
+      if (payload.v !== 1 && payload.v !== 2) return false
 
       experience.setShader(payload.s)
       const shader = experience.shader
@@ -64,10 +68,7 @@ export default class URLShare {
       const inputByEId = {}
       for (const tuple of payload.i) {
         inputByEId[tuple[0]] = {
-          value: tuple[1],
-          channelIndex: tuple[2],
-          startVal: tuple[3],
-          endVal: tuple[4]
+          value: tuple[1]
         }
       }
       shader.setFromSnapshotByEId(inputByEId)
@@ -89,15 +90,16 @@ export default class URLShare {
 
       experience.updateFromShader()
 
-      // Restore channel settings
-      const channelSnapshot = payload.c.map(ch => ({
-        duration: ch[0],
-        ease: ch[1],
-        offset: ch[2],
-        on: ch[3] ?? false
-      }))
-      ProjectRepo.setChannelsFromSnapshot(experience, channelSnapshot)
-      experience.controls.channel.setChannelUIFromShader()
+      // Restore keyframe timeline (v2 only; v1 links get an empty timeline)
+      if (payload.v === 2 && payload.a) {
+        experience.animation.setFromSnapshot({
+          duration: payload.a.d,
+          mode: payload.a.m === 1 ? 'pingpong' : 'loop',
+          tracks: (payload.a.k ?? []).map(entry => ({ eId: entry[0], keys: entry[1] }))
+        })
+      } else {
+        experience.animation.setFromSnapshot(null)
+      }
 
       return true
     } catch (e) {

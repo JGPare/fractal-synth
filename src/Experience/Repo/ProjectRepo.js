@@ -2,7 +2,6 @@ import Experience from "../Experience.js"
 import Project from "../Project.js"
 import ProjectList from "../ProjectList.js"
 import Shader from "../Shaders/Shader.js"
-import Channel from "../Channel.js"
 import { eShaders } from "../Common/eNums.js"
 import { Output, Mp4OutputFormat, BufferTarget, StreamTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
 
@@ -26,7 +25,7 @@ export default class ProjectRepo {
       console.log(experience.shader)
     }
     projectSnapshot.shader = this.getShaderSnapshot(experience.shader)
-    projectSnapshot.channels = this.getChannelSnapshot(experience.channels)
+    projectSnapshot.timeline = experience.animation.getSnapshot()
     const thumbnail = experience.screen.captureImage('image/jpeg', 0.05)
     const actualId = experience.projectList.updateOrAddProject(id, name, thumbnail)
     projectSnapshot.id = actualId
@@ -76,9 +75,10 @@ export default class ProjectRepo {
     if (projectSnapshot) {
 
       experience.projectList.setCurrentProject(projectSnapshot.id)
-      
+
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
-      this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
+      // Old project formats have no timeline - setFromSnapshot clears it
+      experience.animation.setFromSnapshot(projectSnapshot.timeline)
 
       experience.controls.setProject()
     }
@@ -139,25 +139,6 @@ export default class ProjectRepo {
     return shaderSnapshot
   }
 
-  /**
-   * @param {Channel[]} channels
-   * @returns {Object[]}
-   */
-  static getChannelSnapshot(channels) {
-    const channelSnapshot = []
-
-    for (const channel of channels) {
-      channelSnapshot.push({
-        duration: channel.duration,
-        ease: channel.ease,
-        offset: channel.offset,
-        on: channel.on
-      })
-    }
-
-    return channelSnapshot
-  }
-
   // ============================================================
   // SNAPSHOT SETTERS
   // ============================================================
@@ -174,27 +155,6 @@ export default class ProjectRepo {
     experience.updateFromShader()
   }
 
-  /**
-   * @param {Experience} experience
-   * @param {Object[]} channelsSnapshot
-   */
-  static setChannelsFromSnapshot(experience, channelsSnapshot) {
-    if (!channelsSnapshot) return
-
-    for (let i = 0; i < channelsSnapshot.length; i++) {
-      const channelSnap = channelsSnapshot[i]
-      const channel = experience.channels[i]
-      if (channel && channelSnap) {
-        channel.duration = channelSnap.duration
-        channel.ease = channelSnap.ease
-        channel.offset = channelSnap.offset || 0
-        channel.on = channelSnap.on ?? false
-      }
-    }
-
-    experience.controls.setAllTimelines()
-  }
-
   // ============================================================
   // EXPORT/IMPORT OPERATIONS
   // ============================================================
@@ -208,7 +168,7 @@ export default class ProjectRepo {
     const projectSnapshot = {
       name: name,
       shader: this.getShaderSnapshot(experience.shader),
-      channels: this.getChannelSnapshot(experience.channels)
+      timeline: experience.animation.getSnapshot()
     }
 
     const json = JSON.stringify(projectSnapshot, null, 2)
@@ -239,7 +199,7 @@ export default class ProjectRepo {
 
     if (projectSnapshot) {
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
-      this.setChannelsFromSnapshot(experience, projectSnapshot.channels)
+      experience.animation.setFromSnapshot(projectSnapshot.timeline)
 
       const name = projectSnapshot.name || file.name.replace('.json', '')
       experience.projectList.setDefaultProject()
@@ -269,29 +229,29 @@ export default class ProjectRepo {
 
   /**
    * Export animation as MP4 video using WebCodecs + mp4-muxer
+   * Renders exactly one timeline cycle (two passes for ping-pong) so
+   * the resulting video loops seamlessly
    * @param {string} name
    * @param {Experience} experience
-   * @param {number} duration - seconds
    * @param {number} fps
    * @param {function} onProgress - callback(0..1)
    * @param {AbortSignal} signal - for cancellation
    */
-  static async exportVideo(name, experience, duration, fps = 30, onProgress, signal) {
-    const timeline = experience.timeline
-    const channels = experience.channels
+  static async exportVideo(name, experience, fps = 30, onProgress, signal) {
+    const animation = experience.animation
     const canvas = experience.canvas
 
-    // Save current timeline state
-    const savedProgress = []
-    const savedPaused = []
-    for (let i = 0; i < channels.length; i++) {
-      const tl = timeline.tls[i]
-      savedProgress.push(tl.progress())
-      savedPaused.push(tl.paused())
-      tl.pause()
+    // Save current playback state
+    const savedState = {
+      playhead: animation.playhead,
+      playing: animation.playing,
+      direction: animation.direction
     }
+    animation.pause()
 
-    const totalFrames = Math.round(duration * fps)
+    const duration = animation.duration
+    const cycleDuration = animation.mode === 'pingpong' ? duration * 2 : duration
+    const totalFrames = Math.round(cycleDuration * fps)
 
     const resolutions = {
       '720p':  { width: 1280, height: 720 },
@@ -362,23 +322,11 @@ export default class ProjectRepo {
 
         const time = i / fps
 
-        // Seek armed timelines to the current time using progress to avoid timeScale issues
-        for (let ch = 0; ch < channels.length; ch++) {
-          // Only animate channels that are armed (channel.on === true)
-          if (!channels[ch].on) continue
-
-          const tl = timeline.tls[ch]
-          const chDuration = parseFloat(channels[ch].duration)
-          if (chDuration > 0 && tl.duration() > 0) {
-            // Compute position within a full yoyo cycle (forward + reverse)
-            const cycleLen = chDuration * 2
-            const cycleTime = time % cycleLen
-            const progress = cycleTime < chDuration
-              ? cycleTime / chDuration
-              : 2 - cycleTime / chDuration
-            tl.progress(progress)
-          }
-        }
+        // Seek the timeline; the second half of a ping-pong cycle plays back in reverse
+        const playhead = (animation.mode === 'pingpong' && time > duration)
+          ? 2 * duration - time
+          : time % (duration + 1e-9)
+        animation.setTime(playhead)
 
         // Render the frame
         experience.renderer.update()
@@ -425,12 +373,12 @@ export default class ProjectRepo {
       experience.renderer.instance.setPixelRatio(experience.sizes.pixelRatio)
       experience.screen.shaderUniforms.uAspect.value = experience.sizes.aspect
 
-      // Restore timeline state
-      for (let i = 0; i < channels.length; i++) {
-        const tl = timeline.tls[i]
-        tl.progress(savedProgress[i])
-        if (!savedPaused[i]) tl.play()
-      }
+      // Restore playback state
+      animation.playhead = savedState.playhead
+      animation.direction = savedState.direction
+      animation.apply()
+      animation.trigger('timeChanged', [animation.playhead])
+      if (savedState.playing) animation.play()
 
       if (encoder.state !== 'closed') encoder.close()
     }

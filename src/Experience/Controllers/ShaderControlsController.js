@@ -1,5 +1,4 @@
 import BaseController from './BaseController'
-import NumberInput from '../Inputs/NumberInput'
 
 /**
  * ShaderControlsController - Manages dynamic shader input UI generation
@@ -14,7 +13,6 @@ export default class ShaderControlsController extends BaseController {
 
   getElements() {
     this.leftInputsContainer = document.getElementById('left-inputs')
-    this.paperCanvas = document.getElementById('paper-canvas')
   }
 
   /**
@@ -81,7 +79,7 @@ export default class ShaderControlsController extends BaseController {
   }
 
   /**
-   * Add a number input control with channel selector
+   * Add a number input control with keyframe button
    * @param {NumberInput} input - Input to create control for
    * @param {HTMLElement} parentElement - Container element
    */
@@ -99,17 +97,12 @@ export default class ShaderControlsController extends BaseController {
     const grid = document.createElement("div")
     grid.setAttribute("class", "number-input-grid")
 
-    const easeChannel = document.createElement("input")
-    easeChannel.setAttribute("type", "number")
-    easeChannel.setAttribute("min", "0")
-    easeChannel.setAttribute("max", "5")
-    easeChannel.setAttribute("step", "1")
-    easeChannel.setAttribute("value", "0")
-    easeChannel.setAttribute("class", "control-ease channel-color")
-    easeChannel.setAttribute("data-channel", input.channelIndex + 1)
-    easeChannel.setAttribute("id", inputId + "-ease-channel")
-
-    input.elements["easeChannel"] = easeChannel
+    const keyBtn = document.createElement("button")
+    keyBtn.setAttribute("class", "keyframe-btn")
+    keyBtn.setAttribute("title", "Add / update keyframe at playhead")
+    keyBtn.setAttribute("id", inputId + "-key-btn")
+    keyBtn.textContent = "◇"
+    input.elements["keyBtn"] = keyBtn
 
     const slider = document.createElement("input")
     slider.setAttribute("type", "range")
@@ -117,10 +110,8 @@ export default class ShaderControlsController extends BaseController {
     slider.setAttribute("max", input.max)
     slider.setAttribute("step", input.step)
     slider.setAttribute("value", input.value)
-    slider.setAttribute("class", "control-slider channel-color")
-    slider.setAttribute("data-channel", input.channelIndex + 1)
+    slider.setAttribute("class", "control-slider")
     slider.setAttribute("id", inputId + "-slider")
-
     input.elements["slider"] = slider
 
     const value = document.createElement("input")
@@ -131,81 +122,28 @@ export default class ShaderControlsController extends BaseController {
     value.value = slider.value
     input.elements["value"] = value
 
-    // Start/End buttons (disabled when no channel assigned)
-    const startBtn = document.createElement("button")
-    startBtn.setAttribute("class", "set-value-btn")
-    startBtn.setAttribute("title", "Set start value")
-    startBtn.textContent = "▼"
-    startBtn.disabled = input.channelIndex < 0
-
-    const endBtn = document.createElement("button")
-    endBtn.setAttribute("class", "set-value-btn")
-    endBtn.setAttribute("title", "Set end value")
-    endBtn.textContent = "▼"
-    endBtn.disabled = input.channelIndex < 0
-
-    startBtn.addEventListener('click', () => {
-      input.startVal = input.value
-      console.log(input);
-      
-      this.trigger('timelineUpdateRequested', [input.channelIndex])
-      this.setInputElementActive(input)
+    keyBtn.addEventListener('click', () => {
+      this.trigger('keyframeRequested', [input])
     })
 
-    endBtn.addEventListener('click', () => {
-      input.endVal = input.value
-      this.trigger('timelineUpdateRequested', [input.channelIndex])
-      this.setInputElementActive(input)
-    })
-
-    // Slider and value input handlers
     slider.addEventListener('input', () => {
       if (value.value > slider.max) value.value = slider.max
       if (value.value < slider.min) value.value = slider.min
       value.value = slider.value
       input.setValue(slider.value)
+      this.trigger('parameterEdited', [input])
     })
 
     value.addEventListener('change', () => {
       slider.value = value.value
       input.setValue(slider.value)
+      this.trigger('parameterEdited', [input])
     })
 
-    easeChannel.addEventListener('change', () => {
-      const prevIndex = input.channelIndex
-      input.setChannelIndex(easeChannel.value - 1)
-      easeChannel.setAttribute("data-channel", input.channelIndex + 1)
-      slider.setAttribute("data-channel", input.channelIndex + 1)
-      startBtn.disabled = input.channelIndex < 0
-      endBtn.disabled = input.channelIndex < 0
-      
-      this.trigger('timelineUpdateRequested', [prevIndex])
-      this.clearInputAnimation(input)
-    })
-
-    easeChannel.value = input.channelIndex + 1
-
-    // Header row
-    const headerRow = document.createElement("div")
-    headerRow.setAttribute("class", "number-input-header")
-
-    const channelHeader = document.createElement("span")
-    channelHeader.textContent = "#"
-    channelHeader.setAttribute("class", "number-input-header-item")
-
-    const labelWrapper = document.createElement("span")
-    labelWrapper.setAttribute("class", "number-input-label-wrapper")
-    labelWrapper.appendChild(label)
-
-    headerRow.appendChild(channelHeader)
-    headerRow.appendChild(labelWrapper)
-
-    container.appendChild(headerRow)
+    container.appendChild(label)
     container.appendChild(grid)
-    grid.appendChild(easeChannel)
-    grid.appendChild(startBtn)
+    grid.appendChild(keyBtn)
     grid.appendChild(slider)
-    grid.appendChild(endBtn)
     grid.appendChild(value)
 
     parentElement.appendChild(container)
@@ -234,43 +172,39 @@ export default class ShaderControlsController extends BaseController {
   }
 
   /**
-   * Set input element as visually active
-   * @param {NumberInput} input - Input to activate
+   * Reflect keyframe state on the ◇ buttons:
+   * .has-track when the parameter is animated, .on-key when a keyframe
+   * exists at the playhead
    */
-  setInputElementActive(input) {
-    const easeChannel = input.elements.easeChannel
-    easeChannel.classList.remove("channel-color")
-    easeChannel.classList.add("channel-color-active")
+  refreshKeyButtons() {
+    const shader = this.experience.shader
+    if (!shader) return
+    for (const input of shader.getNumInputs()) {
+      const keyBtn = input.elements.keyBtn
+      if (!keyBtn) continue
+      const hasTrack = Boolean(this.animation.getTrack(input.eId))
+      const onKey = hasTrack && this.animation.hasKeyAtPlayhead(input.eId)
+      keyBtn.classList.toggle('has-track', hasTrack)
+      keyBtn.classList.toggle('on-key', onKey)
+      keyBtn.textContent = onKey ? '◆' : '◇'
+    }
   }
 
   /**
-   * Set input element as visually inactive
-   * @param {NumberInput} input - Input to deactivate
+   * Sync slider/number DOM elements of animated parameters to the
+   * current shader uniform values (so sliders follow the animation)
    */
-  setInputElementInactive(input) {
-    const easeChannel = input.elements.easeChannel
-    easeChannel.classList.add("channel-color")
-    easeChannel.classList.remove("channel-color-active")
-  }
-
-  /**
-   * Clear animation for a specific input
-   * @param {NumberInput} input - Input to clear
-   */
-  clearInputAnimation(input) {
-    input.startVal = input.endVal = input.getValue()
-    this.setInputElementInactive(input)
-  }
-
-  /**
-   * Clear inputs for a specific channel
-   * @param {number} index - Channel index
-   */
-  clearChannelInputs(index) {
-    const numInputs = this.shader.getNumInputs()
-    for (const input of numInputs) {
-      if (input.channelIndex == index) {
-        this.clearInputAnimation(input)
+  syncSlidersToShader() {
+    const shader = this.experience.shader
+    if (!shader) return
+    for (const input of shader.getNumInputs()) {
+      if (!this.animation.getTrack(input.eId)) continue
+      input.setFromShader()
+      if (input.elements.slider && document.activeElement !== input.elements.slider) {
+        input.elements.slider.value = input.value
+      }
+      if (input.elements.value && document.activeElement !== input.elements.value) {
+        input.elements.value.value = Math.round(input.value * 10000) / 10000
       }
     }
   }

@@ -11,26 +11,20 @@ export default class NumberInput {
    * @param {number} config.min
    * @param {number} config.max
    * @param {number} config.step
-   * @param {number} config.channelIndex
-   * @param {number} config.startVal
-   * @param {number} config.endVal
    */
-  constructor({ eId, name, value = 0, min = 0, max = 1, step = 0.1, channelIndex = 0, startVal = 0, endVal = 0 }) {
+  constructor({ eId, name, value = 0, min = 0, max = 1, step = 0.1 }) {
     this.eId = eId
     this.name = new String(name)
     this.value = value
     this.min = min
     this.max = max
     this.step = step
-    this.channelIndex = channelIndex
-    this.startVal = startVal
-    this.endVal = endVal
 
     this.output = null
     this.type = "number"
     this.uFloatPar = null
     this.elements = {
-      easeChannel: null,
+      keyBtn: null,
       value: null,
       slider: null,
     }
@@ -45,9 +39,6 @@ export default class NumberInput {
     this.min = inputSnap.min
     this.max = inputSnap.max
     this.step = inputSnap.step
-    this.channelIndex = inputSnap.channelIndex ?? 0
-    this.startVal = inputSnap.startVal ?? 0
-    this.endVal = inputSnap.endVal ?? 0
   }
 
   /**
@@ -61,10 +52,7 @@ export default class NumberInput {
       value: this.value,
       min: this.min,
       max: this.max,
-      step: this.step,
-      channelIndex: this.channelIndex,
-      startVal: this.startVal,
-      endVal: this.endVal
+      step: this.step
     }
   }
 
@@ -85,21 +73,6 @@ export default class NumberInput {
    */
   getValue() {
     return this.uFloatPar[this.eId]
-  }
-
-  setStart() {
-    this.startVal = this.value
-  }
-
-  setEnd() {
-    this.endVal = this.value
-  }
-
-  /**
-   * @param {number} index
-   */
-  setChannelIndex(index) {
-    this.channelIndex = Number(index)
   }
 
   /**

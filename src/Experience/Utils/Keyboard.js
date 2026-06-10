@@ -15,6 +15,7 @@ export default class Keyboard extends EventEmitter {
     this.keyMap = {}
 
     parentElement.addEventListener('keydown', (event) => {
+      if (Keyboard.isTypingTarget(event.target)) return
       if (!this.heldKeys.has(event.code)) {
         this.heldKeys.add(event.code)
         const fullKey = this.buildKeyString(event)
@@ -28,6 +29,7 @@ export default class Keyboard extends EventEmitter {
 
     parentElement.addEventListener('keyup', (event) => {
       this.heldKeys.delete(event.code)
+      if (Keyboard.isTypingTarget(event.target)) return
       const fullKey = this.buildKeyString(event)
       const eventKey = `keyup:${fullKey}`
       this.trigger(eventKey)
@@ -48,6 +50,16 @@ export default class Keyboard extends EventEmitter {
    */
   addMapping(key, eventName, type = "keydown") {
     this.keyMap[type + ":" + key] = eventName
+  }
+
+  /**
+   * Mapped shortcuts are skipped while typing in form fields
+   * @param {EventTarget} target
+   * @returns {boolean}
+   */
+  static isTypingTarget(target) {
+    const tag = target?.tagName
+    return tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA'
   }
 
   /**
