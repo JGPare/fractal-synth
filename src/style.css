@@ -12,9 +12,9 @@
   --number-ease-box-width: 2.5rem;
 
   /* Grid Layout */
-  --view-grid: 57%;
+  --view-grid: 64%;
   --ui-grid-l: 18%;
-  --ui-grid-r: 25%;
+  --ui-grid-r: 18%;
   --number-slider-grid: 58%;
   --number-value-grid: 15%;
   --slider-grid: 80%;

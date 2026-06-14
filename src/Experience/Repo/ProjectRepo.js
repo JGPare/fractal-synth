@@ -52,6 +52,7 @@ export default class ProjectRepo {
    */
   static newProject(experience)
   {
+    experience.animation.clear()
     experience.setShader(eShaders.mandle)
     experience.updateFromShader()
     experience.projectList.setDefaultProject()
