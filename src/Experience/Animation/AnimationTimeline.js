@@ -192,11 +192,22 @@ export default class AnimationTimeline extends EventEmitter {
   /**
    * Evaluate all tracks at the playhead and write to shader uniforms
    */
+  /**
+   * @param {number} eId
+   */
+  toggleMute(eId) {
+    const track = this.getTrack(eId)
+    if (!track) return
+    track.muted = !track.muted
+    this.apply()
+    this.trigger('tracksChanged')
+  }
+
   apply() {
     const shader = this.experience.shader
     if (!shader) return
     for (const [eId, track] of this.tracks) {
-      if (track.length === 0) continue
+      if (track.length === 0 || track.muted) continue
       let v = track.evaluate(this.playhead)
       // Hermite interpolation can overshoot between keys - clamp to the
       // parameter's range so e.g. iterations never go negative

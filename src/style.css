@@ -810,14 +810,45 @@ input[type="range"]::-webkit-slider-runnable-track {
 .tp-track-label {
   display: flex;
   align-items: center;
+  gap: 0.2rem;
   padding: 0 0.4rem;
   font-size: 0.75rem;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   background-color: var(--clr-bg-main);
   border-right: 1px solid var(--clr-border);
   border-left: 3px solid var(--ch-clr, var(--clr-default-input));
+}
+
+.tp-track-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.tp-mute-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--ch-clr, var(--clr-default-input));
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.tp-mute-btn:hover {
+  opacity: 1;
+}
+
+.tp-track-row.muted .tp-track {
+  opacity: 0.25;
+}
+
+.tp-track-row.muted .tp-track-name {
+  opacity: 0.45;
 }
 
 .tp-track {

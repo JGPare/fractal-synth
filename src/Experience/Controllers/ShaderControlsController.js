@@ -87,7 +87,7 @@ export default class ShaderControlsController extends BaseController {
     const inputId = input.getId()
 
     const container = document.createElement("div")
-    container.setAttribute("class", "label-text")
+    container.setAttribute("class", "slider-container")
 
     const label = document.createElement("label")
     label.textContent = input.name

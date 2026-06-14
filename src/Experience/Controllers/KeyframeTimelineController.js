@@ -207,8 +207,24 @@ export default class KeyframeTimelineController extends BaseController {
 
       const label = document.createElement('div')
       label.className = 'tp-track-label'
-      label.textContent = this.getTrackName(track.eId)
       label.title = this.getTrackName(track.eId)
+      if (track.muted) row.classList.add('muted')
+
+      const muteBtn = document.createElement('button')
+      muteBtn.className = 'tp-mute-btn'
+      muteBtn.textContent = track.muted ? '○' : '●'
+      muteBtn.title = track.muted ? 'Unmute track' : 'Mute track'
+      muteBtn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        this.animation.toggleMute(track.eId)
+      })
+
+      const labelText = document.createElement('span')
+      labelText.className = 'tp-track-name'
+      labelText.textContent = this.getTrackName(track.eId)
+
+      label.appendChild(muteBtn)
+      label.appendChild(labelText)
 
       const lane = document.createElement('div')
       lane.className = 'tp-track'

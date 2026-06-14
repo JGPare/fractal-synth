@@ -12,6 +12,7 @@ export default class KeyframeTrack {
   constructor(eId) {
     this.eId = eId
     this.keys = []
+    this.muted = false
   }
 
   // ============================================================
@@ -142,7 +143,7 @@ export default class KeyframeTrack {
    * @returns {Object} { eId, keys: [[t, v, s], ...] }
    */
   getSnapshot() {
-    return {
+    const snap = {
       eId: this.eId,
       keys: this.keys.map(k => [
         Math.round(k.t * 1000) / 1000,
@@ -150,6 +151,8 @@ export default class KeyframeTrack {
         Math.round(k.s * 100) / 100
       ])
     }
+    if (this.muted) snap.muted = true
+    return snap
   }
 
   /**
@@ -164,6 +167,7 @@ export default class KeyframeTrack {
       }
       track.sortKeys()
     }
+    track.muted = snap.muted ?? false
     return track
   }
 }
