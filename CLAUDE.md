@@ -8,7 +8,9 @@ keyframe animation, palette customization, and PNG/MP4 export.
 
 - **Rendering**: Three.js — a single fullscreen plane whose fragment shader
   (`src/Experience/Shaders/glsl/fragment.glsl`) does all the fractal math.
-  Preprocessor defines select the fractal mode; 25 float params arrive via a
+  One `ShaderMaterial` is reused for all modes; the runtime `uMode` int uniform
+  selects the fractal via a `switch` (the `#define`d names like `MANDLE` are just
+  enum constants, not compile-time mode selection). 25 float params arrive via a
   `uFloatPar` Float32Array uniform plus `uTime`, `uMode`, `uAspect`, `uPalette`.
 - **UI**: vanilla DOM + CSS (no framework). Lil-GUI only for debug.
 - **Animation**: custom keyframe engine in `src/Experience/Animation/` (no GSAP).

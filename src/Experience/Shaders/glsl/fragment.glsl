@@ -73,7 +73,35 @@ vec2 warpUv(vec2 uv, float mag, vec2 freq, vec2 offset) {
   return uv;
 }
 
+vec2 warpDefault(vec2 uv, float mag) {
+  return warpUv(uv, mag * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0.));
+}
+
+vec2 complexMul(vec2 a, vec2 b) {
+  return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
 vec2 complexPow(vec2 z, float n) {
+  // uPower is an integer slider, so the common cases are small whole exponents.
+  // Avoid the transcendental polar form (atan/pow/cos/sin) when we can.
+  int ni = int(n);
+  if (float(ni) == n) {
+    int k = abs(ni);
+    if (k <= 8) {
+      if (k == 0) return vec2(1.0, 0.0);
+      vec2 result = z;
+      for (int j = 1; j < 8; j++) {
+        if (j >= k) break;
+        result = complexMul(result, z);
+      }
+      // negative exponent: reciprocal of z^k
+      if (ni < 0) {
+        float d = dot(result, result);
+        result = vec2(result.x, -result.y) / max(d, 1e-20);
+      }
+      return result;
+    }
+  }
   float theta = atan(z.y, z.x);
   float r = length(z);
   return pow(r, n) * vec2(cos(theta * n), sin(theta * n));
@@ -86,6 +114,15 @@ vec4 permute(vec4 x) {
 float velocityDistort(float velocity) {
   float minVel = min(velocity, float(uPaletteLen * 10));
   return minVel * uVelDir * uVelMag;
+}
+
+// Continuous (smooth) iteration count for escape-time fractals. Removes integer
+// banding so a single loop pass looks as smooth as the old two-pass blend.
+// Only meaningful for escaped pixels (mZ >= 4). bailout^2 = 4 -> bailout = 2.
+float smoothEscape(int i, float mZ, float power) {
+  // log_power( log(|z|) / log(bailout) ), with |z| = sqrt(mZ), bailout = 2
+  float nu = log(0.5 * log(max(mZ, 4.0)) / log(2.0)) / log(max(abs(power), 1.0001));
+  return float(i) + 1.0 - nu;
 }
 
 float cnoise(vec2 P) {
@@ -123,35 +160,34 @@ float cnoise(vec2 P) {
 
 float mandle(vec2 uv, int maxIters) {
   int i;
-  vec2 zn = vec2(uv.x, uv.y);
+  vec2 zn = uv;
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
-  float mZprev;
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(zn, uPower) + z0;
-    mZprev = mZ;
     mZ = dot(zn, zn);
   }
-  return float(i) + velocityDistort(mZ - 4.0);
+  float escape = mZ >= 4.0 ? smoothEscape(i, mZ, uPower) : float(i);
+  return escape + velocityDistort(mZ - 4.0);
 }
 
 float julia(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
-  vec2 zn = warpUv(uv, 0.001 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 zn = warpDefault(uv, 0.001);
   float mZ = dot(zn, zn);
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(zn, uPower) + c;
     mZ = dot(zn, zn);
   }
-  return float(i) + velocityDistort(mZ - 4.0);
+  float escape = mZ >= 4.0 ? smoothEscape(i, mZ, uPower) : float(i);
+  return escape + velocityDistort(mZ - 4.0);
 }
 
 float doubleJulia(vec2 uv, int maxIters) {
   vec2 c = vec2(uCposX, uCposY);
   int i;
-  vec2 zn = warpUv(uv, 0.01 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
-  vec2 z0 = zn;
+  vec2 zn = warpDefault(uv, 0.01);
   float mZ = dot(zn, zn);
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(zn, uPower) + c;
@@ -167,38 +203,40 @@ float doubleJulia(vec2 uv, int maxIters) {
     zn = complexPow(zn, uPower2) + c2;
     mZ = dot(zn, zn);
   }
-  return float(i) + velocityDistort(mZ - 4.0);
+  float escape = mZ >= 4.0 ? smoothEscape(i, mZ, uPower2) : float(i);
+  return escape + velocityDistort(mZ - 4.0);
 }
 
 float burningShip(vec2 uv, int maxIters) {
   int i;
-  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 zn = warpDefault(uv, 0.1);
   vec2 z0 = zn;
   float mZ = dot(zn, zn);
-  float mZprev;
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
     zn = complexPow(abs(vec2(zn.x, -zn.y)), uPower) + z0;
-    mZprev = mZ;
     mZ = dot(zn, zn);
   }
-  return float(i) + velocityDistort(mZ - 4.0);
+  float escape = mZ >= 4.0 ? smoothEscape(i, mZ, uPower) : float(i);
+  return escape + velocityDistort(mZ - 4.0);
 }
 
 
 float neuton(vec2 uv, int maxIters) {
   int i;
-  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
+  vec2 zn = warpDefault(uv, 0.1);
   float n = uPower;
   float tolerance = 0.000001;
+  vec2 c = vec2(uCposX, uCposY);
 
   for (i = 0; i < maxIters; i++) {
     // Newton's method: z = z - f(z) / f'(z)
     // For f(z) = z^n - 1, f'(z) = n * z^(n-1)
     vec2 zn_pow = complexPow(zn, n);           // z^n
-    vec2 zn_pow_m1 = complexPow(zn, n - 1.0);  // z^(n-1)
+    // z^(n-1) = z^n / z  (avoids a second complexPow)
+    float znMag = dot(zn, zn);
+    vec2 zn_pow_m1 = complexMul(zn_pow, vec2(zn.x, -zn.y)) / max(znMag, 1e-20);
 
     // f(z) = z^n - c (using c parameter for offset)
-    vec2 c = vec2(uCposX, uCposY);
     vec2 f = zn_pow - c;
 
     // f'(z) = n * z^(n-1)
@@ -253,8 +291,7 @@ float sphinx(vec2 uv, int maxIters) {
   vec2 c1 = vec2(uCposX, uCposY);
   vec2 c2 = vec2(uCposX2, uCposY2);
   int i;
-  vec2 zn = warpUv(uv, 0.1 * uSinMag, vec2(uSinFreqY * 10000., uSinFreqX * 10000.), vec2(0., 0.));
-  vec2 z0 = zn;
+  vec2 zn = warpDefault(uv, 0.1);
   float mZ = dot(zn, zn);
 
   for (i = 0; mZ < 4.0 && i < maxIters; i++) {
@@ -263,7 +300,8 @@ float sphinx(vec2 uv, int maxIters) {
     mZ = dot(zn, zn);
   }
 
-  return float(i) + velocityDistort(mZ - 4.0);
+  float escape = mZ >= 4.0 ? smoothEscape(i, mZ, uPower) : float(i);
+  return escape + velocityDistort(mZ - 4.0);
 }
 
 float myNoise(vec2 uv) {
@@ -284,7 +322,7 @@ vec2 mirrorUv(vec2 uv) {
 }
 
 float getEscape(vec2 uv, int iterations) {
-  float escape;
+  float escape = 0.0;
   switch (uMode) {
     case MANDLE:
       escape = mandle(uv, iterations);
@@ -312,7 +350,7 @@ float getEscape(vec2 uv, int iterations) {
 }
 
 float getNoiseMag(vec2 uv) {
-  float mag;
+  float mag = 0.0;
   switch (uMode) {
     case NOISE:
       mag = myNoise(uv);
@@ -343,6 +381,11 @@ vec2 getScaledUV(vec2 uv, vec2 focus) {
 }
 
 vec3 getEscapeFractalColor(vec2 uv) {
+  // Blend an N-iteration render with an (N+1)-iteration one by the fractional part
+  // of the iteration slider, so animating the iteration count morphs smoothly
+  // (critical at low counts, e.g. 1 -> 2 iterations). The second pass is skipped
+  // above 200 iters where the difference is imperceptible. smoothEscape inside the
+  // per-mode functions additionally removes color banding within each pass.
   float iterFloat = exp(6.8 * uIters);
   int iterations = int(iterFloat);
   float iterFrac = fract(iterFloat);
@@ -442,7 +485,7 @@ vec3 getFibonacciColor(vec2 uv) {
 }
 
 vec3 getWavesFractalColor(vec2 uv) {
-  vec3 mixedColor;
+  vec3 mixedColor = vec3(0.0);
   switch (uMode) {
     case CIRCULAR_WAVES:
       mixedColor = getCircularWavesColor(uv);
