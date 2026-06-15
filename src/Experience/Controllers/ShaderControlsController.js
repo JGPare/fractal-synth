@@ -86,8 +86,10 @@ export default class ShaderControlsController extends BaseController {
   addNumberControl(input, parentElement) {
     const inputId = input.getId()
 
+    // Soft-card number control: top row is label | value | reset | gear | keyframe,
+    // slider underneath. Gear expands the card to reveal min/max Set & Reset.
     const container = document.createElement("div")
-    container.setAttribute("class", "slider-container")
+    container.setAttribute("class", "slider-container nc-card")
 
     const label = document.createElement("label")
     label.textContent = input.name
@@ -122,10 +124,31 @@ export default class ShaderControlsController extends BaseController {
     value.value = slider.value
     input.elements["value"] = value
 
+    // Reset button — revert the parameter to its previous value (toggles).
+    // Disabled until an edit has produced a previous value worth reverting to.
+    const back = document.createElement("button")
+    back.setAttribute("class", "nc-back")
+    back.setAttribute("title", "Revert to previous value")
+    back.textContent = "↺"
+    back.disabled = true
+
+    // Config gear — expands the card to reveal min/max Set & Reset
+    const gear = document.createElement("button")
+    gear.setAttribute("class", "nc-gear")
+    gear.setAttribute("title", "Edit range (min / max)")
+    gear.textContent = "⚙"
+
+    // --- previous-value history for the back button ----------------------
+    let prevValue = input.value   // restorable value
+    let editAnchor = input.value  // value captured at the start of an edit
+    const anchor = () => { editAnchor = input.value }
+    const commitPrev = () => { prevValue = editAnchor; back.disabled = false }
+
     keyBtn.addEventListener('click', () => {
       this.trigger('keyframeRequested', [input])
     })
 
+    slider.addEventListener('pointerdown', anchor)
     slider.addEventListener('input', () => {
       if (value.value > slider.max) value.value = slider.max
       if (value.value < slider.min) value.value = slider.min
@@ -133,15 +156,72 @@ export default class ShaderControlsController extends BaseController {
       input.setValue(slider.value)
       this.trigger('parameterEdited', [input])
     })
+    slider.addEventListener('change', commitPrev)
 
+    value.addEventListener('focus', anchor)
     value.addEventListener('change', () => {
       slider.value = value.value
       input.setValue(slider.value)
+      commitPrev()
       this.trigger('parameterEdited', [input])
     })
 
+    back.addEventListener('click', () => {
+      const current = input.value
+      input.setValue(prevValue)
+      slider.value = input.value
+      value.value = input.value
+      prevValue = current   // so the back button toggles between the two
+      this.trigger('parameterEdited', [input])
+    })
+
+    // --- min/max editor (revealed when the gear expands the card) --------
+    const origMin = input.min
+    const origMax = input.max
+
+    const config = document.createElement("div")
+    config.setAttribute("class", "nc-config")
+
+    const makeBound = (boundLabel, setBound, origBound) => {
+      const cell = document.createElement("div")
+      cell.setAttribute("class", "nc-bound")
+
+      const cellLabel = document.createElement("span")
+      cellLabel.setAttribute("class", "nc-bound-label")
+      cellLabel.textContent = boundLabel
+
+      const setBtn = document.createElement("button")
+      setBtn.setAttribute("class", "nc-bound-btn")
+      setBtn.setAttribute("title", `Set ${boundLabel.toLowerCase()} to current value`)
+      setBtn.textContent = "Set"
+      setBtn.addEventListener('click', () => setBound(input.value))
+
+      const resetBtn = document.createElement("button")
+      resetBtn.setAttribute("class", "nc-bound-btn nc-bound-reset")
+      resetBtn.setAttribute("title", `Reset ${boundLabel.toLowerCase()} to default`)
+      resetBtn.textContent = "Reset"
+      resetBtn.addEventListener('click', () => setBound(origBound))
+
+      cell.append(cellLabel, setBtn, resetBtn)
+      return cell
+    }
+
+    config.appendChild(makeBound("Min",
+      (n) => { input.min = n; slider.setAttribute("min", n) }, origMin))
+    config.appendChild(makeBound("Max",
+      (n) => { input.max = n; slider.setAttribute("max", n) }, origMax))
+
+    gear.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const expanded = container.classList.toggle('expanded')
+      gear.classList.toggle('active', expanded)
+    })
+
     container.appendChild(label)
+    container.appendChild(back)
+    container.appendChild(gear)
     container.appendChild(grid)
+    container.appendChild(config)
     grid.appendChild(keyBtn)
     grid.appendChild(slider)
     grid.appendChild(value)

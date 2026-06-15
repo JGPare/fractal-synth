@@ -5,6 +5,7 @@
 :root {
   /* Sizing */
   --slider-height: 0.9rem;
+  --font-small: 0.85rem;
   --font-height1: 1rem;
   --font-height2: 2rem;
   --font-height3: 1.2rem;
@@ -34,8 +35,8 @@
   /* Colors */
   --clr-bg-main: #2f2f2f;
   --clr-bg-secondary: #3b3b3b;
-  --clr-bg-input-light:#d3d3d3;
-  --clr-bg-input-dark: #d3d3d355;
+  --clr-bg-input-light:#51565e;
+  --clr-bg-input-dark: #51565e88;
   --clr-font-main: #b5c9d8;
   --clr-text-input: #17385e;
   --clr-default-input: #768daa;
@@ -65,6 +66,7 @@
 @media (max-width: 1100px) {
   :root {
     --slider-height: 0.7rem;
+    --font-small: 0.65rem;
     --font-height1: 0.7rem;
     --font-height2: 16px;
     --view-grid: 40%;
@@ -138,7 +140,7 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:hover {
-  background-color: #d3d3d399;
+  background-color: var(--clr-default-input);
 }
 
 input[type="checkbox"]:checked {
@@ -181,9 +183,9 @@ input[type="color"]::-webkit-color-swatch {
 
 /* RANGE SLIDERS */
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 15px;
-  background: #ccc;
-  border-radius: 16px;
+  height: var(--slider-height);
+  background: var(--clr-bg-input-light);
+  border-radius: 5px;
 }
 
 /* ============================================================================
@@ -992,10 +994,10 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 .control-button {
   padding: 0.2rem;
-  border-radius: 0.2rem;
-  border-width: 0;
+  border-radius: 5px;
+  border: 1px solid var(--clr-border);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .control-button:disabled,
@@ -1007,12 +1009,13 @@ select:disabled {
 }
 
 .default-button {
-  background-color: #d3d3d3cc;
-  color: var(--clr-text-input);
+  background-color: var(--clr-bg-input-dark);
+  color: var(--clr-font-main);
 }
 
 .default-button:hover:not(:disabled) {
-  background-color: #d3d3d399;
+  background-color: var(--clr-default-input);
+  color: #16202c;
 }
 
 .selected-button {
@@ -1031,14 +1034,15 @@ select:disabled {
   align-items: center;
   padding: 0.05rem;
   margin: 0.05rem;
-  border-radius: 0.2rem;
-  border-width: 0;
+  border-radius: 5px;
+  border: 1px solid var(--clr-border);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .timeline-button.active {
   background-color: var(--clr-selected-input);
+  color: #16202c;
 }
 
 #export-video-status {
@@ -1081,15 +1085,24 @@ select:disabled {
 
 /* SELECT INPUTS */
 .control-select {
-  border-radius: 0.5rem;
-  background-color: #d3d3d3cc;
-  color: var(--clr-text-input);
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 5px;
+  border: 1px solid var(--clr-border);
+  background-color: var(--clr-bg-input-dark);
+  color: var(--clr-font-main);
+  /* custom caret so the dropdown arrow isn't a light OS widget on a dark field */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23b5c9d8' stroke-width='1.5'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.7rem;
+  padding-right: 1.6rem;
 }
 
 .control-select:focus {
-  outline-width: 2px;
-  outline-color: var(--clr-font-main);
-  outline-style: solid;
+  outline-width: 1px;
+  outline-color: var(--clr-border-focus);
+  outline-style: groove;
 }
 
 .select-sm {
@@ -1107,7 +1120,7 @@ select:disabled {
 /* NUMBER INPUTS */
 .control-number {
   border-radius: 5px;
-  border-width: 0;
+  border: 1px solid var(--clr-border);
   text-align: center;
   background-color: var(--clr-bg-input-dark);
 }
@@ -1140,7 +1153,7 @@ select:disabled {
 /* TEXT INPUTS */
 .control-text {
   border-radius: 5px;
-  border-width: 0;
+  border: 1px solid var(--clr-border);
   padding: 0.2rem;
   width: 100%;
   background-color: var(--clr-bg-input-dark);
@@ -1150,7 +1163,7 @@ select:disabled {
 }
 
 .control-text:focus {
-  outline-width: 2px;
+  outline-width: 1px;
   outline-color: var(--clr-border-focus);
   outline-style: groove;
 }
@@ -1211,13 +1224,13 @@ select:disabled {
   border-radius: 5px;
   background: var(--clr-bg-input-light);
   outline: none;
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .control-slider:focus {
-  outline-width: 2px;
-  outline-color: var(--clr-highlight-input);
-  outline-style: solid;
+  outline-width: 1px;
+  outline-color: var(--clr-border-focus);
+  outline-style: groove;
 }
 
 .control-slider::-webkit-slider-thumb {
@@ -1226,7 +1239,7 @@ select:disabled {
   width: var(--slider-height);
   height: var(--slider-height);
   border-radius: 50%;
-  background: var(--clr-default-input);
+  background: var(--clr-selected-input);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -1235,7 +1248,7 @@ select:disabled {
   width: var(--slider-height);
   height: var(--slider-height);
   border-radius: 50%;
-  background: var(--clr-default-input);
+  background: var(--clr-selected-input);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -1454,3 +1467,164 @@ select:disabled {
   display: block;
   margin-bottom: 4px;
 }
+
+/* ============================================================================
+   NUMBER CONTROL CARD
+   Soft-card control. Top row: label | value | reset | gear | keyframe.
+   Slider underneath. Gear expands the card to reveal a min/max Set & Reset row.
+   Built in ShaderControlsController.addNumberControl(); the dark slider track +
+   orange thumb come from the shared .control-slider rules above.
+   ============================================================================ */
+
+.nc-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto auto;
+  grid-template-areas:
+    "label  .      value  back   gear   key"
+    "slider slider slider slider slider slider";
+  align-items: center;
+  gap: 0.4rem 0.4rem;
+  margin: 0.45rem 0.15rem;
+  padding: 0.5rem 0.6rem 0.55rem;
+  border: 1px solid var(--clr-border);
+  border-radius: 9px;
+  background: linear-gradient(180deg, #ffffff0a, #ffffff03);
+}
+/* let the existing slider/keyframe/value wrapper participate in the card grid */
+.nc-card .number-input-grid { display: contents; }
+
+.nc-card .label-text {
+  grid-area: label;
+  margin: 0;
+  padding: 0;
+  align-self: center;
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  color: var(--clr-font-main);
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nc-card .control-number {
+  grid-area: value;
+  width: 3.6rem;
+  min-width: 0;
+  height: var(--slider-height);
+  margin: 0 0.55rem 0 0;
+  justify-self: end;
+  font-family: inherit;
+  font-size: var(--font-small);
+  font-weight: 300;
+  text-align: right;
+  color: var(--clr-font-main);
+  opacity: 0.7;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+}
+
+/* slider colors/geometry come from the shared .control-slider rules — only layout here */
+.nc-card .control-slider {
+  grid-area: slider;
+  width: 100%;
+  margin: 0;
+}
+
+/* Reset, gear, keyframe — matched icon buttons on the top row */
+.nc-card .nc-back,
+.nc-card .nc-gear,
+.nc-card .keyframe-btn {
+  width: 1.2rem;
+  height: 1.2rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--clr-font-main);
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.nc-card .nc-back  { grid-area: back; }
+.nc-card .nc-gear  { grid-area: gear; }
+.nc-card .keyframe-btn { grid-area: key; }
+
+.nc-card .nc-back:hover,
+.nc-card .nc-gear:hover,
+.nc-card .keyframe-btn:hover {
+  opacity: 1;
+  background: var(--clr-default-input);
+  color: #16202c;
+}
+
+/* Reset is inert until there's a previous value to revert to */
+.nc-card .nc-back:disabled {
+  opacity: 0.2;
+  cursor: default;
+  background: transparent;
+  color: var(--clr-font-main);
+}
+.nc-card .nc-gear.active {
+  opacity: 1;
+  color: var(--clr-selected-input);
+  background: color-mix(in srgb, var(--clr-selected-input), transparent 80%);
+}
+/* preserve the keyframe state colors from the timeline system */
+.nc-card .keyframe-btn.has-track { color: var(--clr-channel-focused-1); opacity: 1; }
+.nc-card .keyframe-btn.on-key {
+  color: var(--clr-selected-input);
+  background: color-mix(in srgb, var(--clr-selected-input), transparent 80%);
+  opacity: 1;
+}
+
+/* Inline expand: min/max Set & Reset on one line */
+.nc-config {
+  grid-column: 1 / -1;
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.15rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--clr-border);
+}
+.nc-card.expanded .nc-config { display: flex; }
+
+.nc-bound {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.nc-bound-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--clr-font-main);
+  opacity: 0.8;
+}
+.nc-bound-btn {
+  height: 1.2rem;
+  padding: 0 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--clr-default-input);
+  color: #16202c;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.nc-bound-btn:hover { background: var(--clr-selected-input); }
+.nc-bound-reset {
+  background: var(--clr-bg-input-dark);
+  color: var(--clr-font-main);
+}
+.nc-bound-reset:hover { background: var(--clr-default-input); color: #16202c; }
