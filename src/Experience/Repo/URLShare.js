@@ -32,14 +32,24 @@ export default class URLShare {
     ])
 
     // Keyframe timeline: a: { d: duration, m: 0 loop | 1 pingpong, k: [[eId, [[t,v,s],...]], ...] }
+    // plus music settings (mm/bpm/bars/bpb/g) in v3. Tracks may include
+    // modulator center/range lanes (string ids) - they serialize fine.
     const timelineSnap = animation.getSnapshot()
     const a = {
       d: timelineSnap.duration,
       m: timelineSnap.mode === 'pingpong' ? 1 : 0,
+      mm: timelineSnap.musicMode ? 1 : 0,
+      bpm: timelineSnap.bpm,
+      bars: timelineSnap.bars,
+      bpb: timelineSnap.beatsPerBar,
+      g: timelineSnap.gridDivision,
       k: timelineSnap.tracks.map(track => [track.eId, track.keys])
     }
 
-    const payload = { v: 2, s: shader.eShader, p, i: inputs, a }
+    // Modulators (the audio track itself is not shareable via URL)
+    const mo = experience.modulatorManager.getSnapshot()
+
+    const payload = { v: 3, s: shader.eShader, p, i: inputs, a, mo }
     if (pc) payload.pc = pc
 
     window.location.hash = 'share=' + URLShare._toBase64url(JSON.stringify(payload))
@@ -58,8 +68,9 @@ export default class URLShare {
       const payload = JSON.parse(URLShare._fromBase64url(b64))
 
       // v1 links restore shader/inputs/palette only (channel animation
-      // data from the old system is ignored); v2 restores the timeline too
-      if (payload.v !== 1 && payload.v !== 2) return false
+      // data from the old system is ignored); v2 restores the timeline;
+      // v3 adds music settings + modulators
+      if (![1, 2, 3].includes(payload.v)) return false
 
       experience.setShader(payload.s)
       const shader = experience.shader
@@ -90,15 +101,28 @@ export default class URLShare {
 
       experience.updateFromShader()
 
-      // Restore keyframe timeline (v2 only; v1 links get an empty timeline)
-      if (payload.v === 2 && payload.a) {
+      // Restore keyframe timeline (v2+; v1 links get an empty timeline)
+      if (payload.v >= 2 && payload.a) {
+        const a = payload.a
         experience.animation.setFromSnapshot({
-          duration: payload.a.d,
-          mode: payload.a.m === 1 ? 'pingpong' : 'loop',
-          tracks: (payload.a.k ?? []).map(entry => ({ eId: entry[0], keys: entry[1] }))
+          duration: a.d,
+          mode: a.m === 1 ? 'pingpong' : 'loop',
+          musicMode: a.mm === 1,
+          bpm: a.bpm,
+          bars: a.bars,
+          beatsPerBar: a.bpb,
+          gridDivision: a.g,
+          tracks: (a.k ?? []).map(entry => ({ eId: entry[0], keys: entry[1] }))
         })
       } else {
         experience.animation.setFromSnapshot(null)
+      }
+
+      // Restore modulators (v3); audio is never embedded in a share link
+      experience.modulatorManager.setFromSnapshot(payload.mo ?? null)
+      experience.audioEngine.clear()
+      if (experience.controls?.modulators) {
+        experience.controls.modulators.onAudioRestored()
       }
 
       return true

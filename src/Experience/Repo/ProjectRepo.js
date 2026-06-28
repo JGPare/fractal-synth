@@ -3,7 +3,8 @@ import Project from "../Project.js"
 import ProjectList from "../ProjectList.js"
 import Shader from "../Shaders/Shader.js"
 import { eShaders } from "../Common/eNums.js"
-import { Output, Mp4OutputFormat, BufferTarget, StreamTarget, EncodedVideoPacketSource, EncodedPacket } from 'mediabunny'
+import AudioStore from "../Audio/AudioStore.js"
+import { Output, Mp4OutputFormat, BufferTarget, StreamTarget, EncodedVideoPacketSource, EncodedPacket, AudioBufferSource } from 'mediabunny'
 
 const debug = false
 
@@ -26,6 +27,7 @@ export default class ProjectRepo {
     }
     projectSnapshot.shader = this.getShaderSnapshot(experience.shader)
     projectSnapshot.timeline = experience.animation.getSnapshot()
+    projectSnapshot.modulators = experience.modulatorManager.getSnapshot()
     const thumbnail = experience.screen.captureImage('image/jpeg', 0.05)
     const actualId = experience.projectList.updateOrAddProject(id, name, thumbnail)
     projectSnapshot.id = actualId
@@ -35,9 +37,21 @@ export default class ProjectRepo {
       console.log("snapshot:", projectSnapshot)
     }
 
+    // Flag whether this project has an audio track (the blob lives in
+    // IndexedDB, not the JSON snapshot)
+    projectSnapshot.hasAudio = experience.audioEngine.hasAudio()
+
     localStorage.setItem("project" + projectSnapshot.id, JSON.stringify(projectSnapshot))
     localStorage.setItem("lastProject", actualId)
     this.saveProjectList(experience.projectList)
+
+    // Persist the audio blob (best-effort, async) or clear a stale one
+    if (experience.audioEngine.hasAudio()) {
+      AudioStore.put(actualId, experience.audioEngine.fileBlob, experience.audioEngine.fileName)
+        .catch(err => console.warn('Audio persist failed:', err))
+    } else {
+      AudioStore.remove(actualId).catch(() => {})
+    }
   }
 
   /**
@@ -53,6 +67,10 @@ export default class ProjectRepo {
   static newProject(experience)
   {
     experience.animation.clear()
+    experience.modulatorManager.clear()
+    experience.audioEngine.beginLoad() // invalidate any in-flight audio restore
+    experience.audioEngine.clear()
+    experience.controls?.modulators?.onAudioRestored()
     experience.setShader(eShaders.mandle)
     experience.updateFromShader()
     experience.projectList.setDefaultProject()
@@ -80,9 +98,39 @@ export default class ProjectRepo {
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
       // Old project formats have no timeline - setFromSnapshot clears it
       experience.animation.setFromSnapshot(projectSnapshot.timeline)
+      // Modulators restore before setProject() so their cards rebuild
+      experience.modulatorManager.setFromSnapshot(projectSnapshot.modulators)
+
+      // Restore the audio track from IndexedDB (async, best-effort)
+      this.restoreAudio(experience, projectSnapshot)
 
       experience.controls.setProject()
     }
+  }
+
+  /**
+   * Re-load and decode a project's persisted audio track, then refresh the
+   * modulator panel so dB followers come alive.
+   * @param {Experience} experience
+   * @param {Object} projectSnapshot
+   */
+  static restoreAudio(experience, projectSnapshot) {
+    const audio = experience.audioEngine
+    // Claim a load token; a later project switch / manual upload bumps it and
+    // makes this restore bail at the next await, so a slow decode can never
+    // clobber the now-current project's audio.
+    const token = audio.beginLoad()
+    audio.clear()
+    if (!projectSnapshot.hasAudio) return
+    AudioStore.get(projectSnapshot.id)
+      .then(async (rec) => {
+        if (audio.isStale(token) || !rec || !rec.blob) return
+        const file = new File([rec.blob], rec.name || 'track', { type: rec.blob.type })
+        await audio.load(file)
+        if (audio.isStale(token)) return
+        experience.controls?.modulators?.onAudioRestored()
+      })
+      .catch(err => console.warn('Audio restore failed:', err))
   }
 
   /**
@@ -121,6 +169,8 @@ export default class ProjectRepo {
    */
   static deleteProject(id) {
     localStorage.removeItem("project"+id)
+    // Drop the project's persisted audio blob too (best-effort)
+    AudioStore.remove(id).catch(() => {})
   }
 
   static deleteAllStorage() {
@@ -169,7 +219,9 @@ export default class ProjectRepo {
     const projectSnapshot = {
       name: name,
       shader: this.getShaderSnapshot(experience.shader),
-      timeline: experience.animation.getSnapshot()
+      timeline: experience.animation.getSnapshot(),
+      modulators: experience.modulatorManager.getSnapshot()
+      // Note: the audio track itself is not embedded in the JSON export
     }
 
     const json = JSON.stringify(projectSnapshot, null, 2)
@@ -201,6 +253,11 @@ export default class ProjectRepo {
     if (projectSnapshot) {
       this.setShaderFromSnapshot(experience, projectSnapshot.shader)
       experience.animation.setFromSnapshot(projectSnapshot.timeline)
+      experience.modulatorManager.setFromSnapshot(projectSnapshot.modulators)
+      // Imported JSON carries no audio - clear any previously loaded track
+      experience.audioEngine.beginLoad() // invalidate any in-flight audio restore
+      experience.audioEngine.clear()
+      experience.controls?.modulators?.onAudioRestored()
 
       const name = projectSnapshot.name || file.name.replace('.json', '')
       experience.projectList.setDefaultProject()
@@ -226,6 +283,31 @@ export default class ProjectRepo {
     a.download = `${name}.png`
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  /**
+   * Build an AudioBuffer of exactly `outDuration` seconds by looping the
+   * source track's [0, windowDuration] window - mirroring how live playback
+   * loops the track within the timeline window.
+   * @param {AudioBuffer} src
+   * @param {AudioContext} ctx
+   * @param {number} outDuration - seconds (one export cycle)
+   * @param {number} windowDuration - seconds (timeline duration)
+   * @returns {AudioBuffer}
+   */
+  static buildExportAudioBuffer(src, ctx, outDuration, windowDuration) {
+    const sr = src.sampleRate
+    const outLen = Math.max(1, Math.round(outDuration * sr))
+    const winLen = Math.min(src.length, Math.max(1, Math.round(windowDuration * sr)))
+    const out = ctx.createBuffer(src.numberOfChannels, outLen, sr)
+    for (let c = 0; c < src.numberOfChannels; c++) {
+      const srcData = src.getChannelData(c)
+      const outData = out.getChannelData(c)
+      for (let i = 0; i < outLen; i++) {
+        outData[i] = srcData[i % winLen]
+      }
+    }
+    return out
   }
 
   /**
@@ -288,6 +370,17 @@ export default class ProjectRepo {
     })
     const videoSource = new EncodedVideoPacketSource('avc')
     output.addVideoTrack(videoSource, { frameRate: fps })
+
+    // Mux the uploaded track as an AAC audio track so the export has sound.
+    // The clip covers exactly one timeline cycle, looping the track's
+    // [0, duration] window to match how playback loops.
+    const audioEngine = experience.audioEngine
+    let audioSource = null
+    if (audioEngine && audioEngine.hasAudio()) {
+      audioSource = new AudioBufferSource({ codec: 'aac', bitrate: 192_000 })
+      output.addAudioTrack(audioSource)
+    }
+
     await output.start()
 
     let encoderError = null
@@ -316,6 +409,7 @@ export default class ProjectRepo {
       framerate: fps
     })
 
+    let finalized = false
     try {
       for (let i = 0; i < totalFrames; i++) {
         if (signal && signal.aborted) throw new DOMException('Export cancelled', 'AbortError')
@@ -352,8 +446,18 @@ export default class ProjectRepo {
         if (i % 5 === 0) await new Promise(r => setTimeout(r, 0))
       }
 
+      // Encode the audio clip (loops the track to fill the cycle)
+      if (audioSource) {
+        const clip = this.buildExportAudioBuffer(
+          audioEngine.buffer, audioEngine.ctx, cycleDuration, duration
+        )
+        await audioSource.add(clip)
+        audioSource.close()
+      }
+
       await encoder.flush()
       await output.finalize()
+      finalized = true
 
       if (writableStream) {
         await writableStream.close()
@@ -382,6 +486,16 @@ export default class ProjectRepo {
       if (savedState.playing) animation.play()
 
       if (encoder.state !== 'closed') encoder.close()
+
+      // On an aborted/errored export, the success path above never ran - close
+      // the audio source and release the file handle so they don't leak and a
+      // partial .mp4 isn't left locked open.
+      if (!finalized) {
+        try { audioSource && audioSource.close() } catch (e) { /* already closed */ }
+        if (writableStream) {
+          try { await writableStream.abort() } catch (e) { /* already closed */ }
+        }
+      }
     }
   }
 }

@@ -643,6 +643,119 @@ input[type="range"]::-webkit-slider-runnable-track {
   grid-area: controls;
 }
 
+#modulator-panel {
+  margin-top: 0.75rem;
+}
+
+#modulator-panel .button-container {
+  margin-bottom: 0.25rem;
+}
+
+#modulator-add-row {
+  display: flex;
+  gap: 0.25rem;
+}
+
+#modulator-list {
+  margin-top: 0.4rem;
+}
+
+.mod-card {
+  border: 1px solid var(--clr-border);
+  border-left: 3px solid var(--clr-default-input);
+  border-radius: 4px;
+  padding: 0.35rem 0.4rem;
+  margin-bottom: 0.5rem;
+  background-color: color-mix(in srgb, var(--clr-bg-main), black 8%);
+}
+
+.mod-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.mod-card-title {
+  font-weight: 700;
+  font-size: 0.7rem;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.mod-card-head .mod-target {
+  flex: 1;
+  min-width: 0;
+  height: 1.3rem;
+}
+
+.mod-enable,
+.mod-remove {
+  background: none;
+  border: none;
+  color: var(--clr-font-main);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0 0.15rem;
+  flex-shrink: 0;
+}
+
+.mod-remove:hover { color: #e07a7a; }
+
+.mod-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.mod-field {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.mod-field-label,
+.mod-amount-label {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.mod-field .control-select {
+  flex: 1;
+  min-width: 0;
+  height: 1.3rem;
+}
+
+.mod-amount-label {
+  width: 2.8rem;
+}
+
+.mod-amount-row .control-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.mod-amount-row .control-number {
+  width: 2.8rem;
+  flex-shrink: 0;
+}
+
+.mod-hint {
+  font-size: 0.6rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+#audio-file-name {
+  opacity: 0.8;
+  word-break: break-word;
+}
+
 /* ============================================================================
    LAYOUT - CONTAINERS
    ============================================================================ */
@@ -802,6 +915,26 @@ input[type="range"]::-webkit-slider-runnable-track {
   opacity: 0.7;
   pointer-events: none;
   white-space: nowrap;
+}
+
+/* Beat ticks between bar lines in music mode: shorter, fainter, no label */
+.tp-tick-minor {
+  height: 45%;
+  opacity: 0.35;
+}
+
+/* Music-mode toolbar controls */
+#music-controls .control-select {
+  height: 1.4rem;
+  /* keep room on the right for the custom caret (base .control-select reserves
+     padding-right for it) so the selected text doesn't sit under the arrow */
+  padding: 0 1.5rem 0 0.4rem;
+  min-width: 4rem;
+  vertical-align: middle;
+}
+
+#music-controls .tp-duration-input {
+  width: 2.8rem;
 }
 
 .tp-track-row {

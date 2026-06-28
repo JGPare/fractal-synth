@@ -9,6 +9,7 @@ import PaletteController from './Controllers/PaletteController'
 import ProjectController from './Controllers/ProjectController'
 import KeyframeTimelineController from './Controllers/KeyframeTimelineController'
 import ShaderControlsController from './Controllers/ShaderControlsController'
+import ModulatorController from './Controllers/ModulatorController'
 
 /**
  * ControlsManager - Root orchestrator for all UI controllers
@@ -41,6 +42,7 @@ export default class ControlsManager extends EventEmitter {
     // Coordinating controllers
     this.keyframeTimeline = new KeyframeTimelineController()
     this.shaderControls = new ShaderControlsController()
+    this.modulators = new ModulatorController()
   }
 
   /**
@@ -82,6 +84,7 @@ export default class ControlsManager extends EventEmitter {
       this.keyframeTimeline.updatePlayhead()
       this.shaderControls.syncSlidersToShader()
       this.shaderControls.refreshKeyButtons()
+      this.modulators.syncCards()
     })
 
     // Animation → UI: keyframes added/removed/moved
@@ -93,9 +96,34 @@ export default class ControlsManager extends EventEmitter {
     // Animation → UI + VideoExport: play state changed
     animation.on('playStateChanged', (playing) => {
       this.keyframeTimeline.updatePlayButton(playing)
-      if (playing && this.videoExport.isVideoArmed()) {
+      // Capture the armed flag first: startVideoExport() clears it synchronously
+      // (before its file-save dialog), so re-reading isVideoArmed() below would
+      // see false and wrongly start audio during export.
+      const exporting = playing && this.videoExport.isVideoArmed()
+      if (exporting) {
         this.videoExport.startVideoExport()
       }
+      // Audio playback follows the transport (skip when exporting -
+      // export drives the playhead far faster than realtime; Phase E muxes
+      // the track in separately)
+      const audio = this.experience.audioEngine
+      if (audio.hasAudio() && !exporting) {
+        if (playing) audio.play(animation.playhead, animation.duration)
+        else audio.stop()
+      }
+    })
+
+    // Animation → Audio: manual reposition (scrub / seek) while playing.
+    // 'seeked' fires on every pointermove during a scrub, so rebuild the audio
+    // source only when the jump is meaningful - otherwise rapid scrubbing
+    // recreates the source 60×/s (clicks + node churn).
+    this._lastAudioSeek = -1
+    animation.on('seeked', (playhead) => {
+      const audio = this.experience.audioEngine
+      if (!audio.hasAudio() || !audio.playing) return
+      if (Math.abs(playhead - this._lastAudioSeek) < 0.05) return
+      this._lastAudioSeek = playhead
+      audio.seek(playhead, animation.duration)
     })
 
     // Animation → UI: duration changed
@@ -108,6 +136,11 @@ export default class ControlsManager extends EventEmitter {
     // Animation → UI: loop mode changed
     animation.on('modeChanged', (mode) => {
       this.keyframeTimeline.updateModeButton(mode)
+    })
+
+    // Animation → UI: music mode / tempo settings changed
+    animation.on('musicSettingsChanged', () => {
+      this.keyframeTimeline.updateMusicUI()
     })
 
     // Project → Experience: When mode changes
@@ -137,6 +170,8 @@ export default class ControlsManager extends EventEmitter {
     // Project → Animation: When clear animations is requested
     this.project.on('clearAnimationsRequested', () => {
       animation.clear()
+      this.experience.modulatorManager.clear()
+      this.modulators.rebuild()
     })
 
     // ViewModal → VideoExport: Setup escape handler
@@ -158,6 +193,7 @@ export default class ControlsManager extends EventEmitter {
     this.shaderControls.updateFromShader()
     this.keyframeTimeline.rebuild()
     this.shaderControls.refreshKeyButtons()
+    this.modulators.rebuild()
   }
 
   /**

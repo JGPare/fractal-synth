@@ -22,8 +22,7 @@ export default class KeyframeTimelineController extends BaseController {
     this.linkTimelineArea()
     this.linkPropsPanel()
     this.linkKeyboardEvents()
-    this.updateRuler()
-    this.updatePlayhead()
+    this.updateMusicUI()
     this.select(null)
   }
 
@@ -34,6 +33,14 @@ export default class KeyframeTimelineController extends BaseController {
     this.loopModeBtn = document.getElementById('loop-mode-btn')
     this.durationInput = document.getElementById('timeline-duration')
     this.timeReadout = document.getElementById('timeline-time-readout')
+
+    this.musicModeBtn = document.getElementById('music-mode-btn')
+    this.durationControls = document.getElementById('duration-controls')
+    this.musicControls = document.getElementById('music-controls')
+    this.bpmInput = document.getElementById('music-bpm')
+    this.barsInput = document.getElementById('music-bars')
+    this.sigInput = document.getElementById('music-sig')
+    this.gridSelect = document.getElementById('music-grid')
 
     this.scroll = document.getElementById('tp-scroll')
     this.scrollContent = document.getElementById('tp-scroll-content')
@@ -84,6 +91,48 @@ export default class KeyframeTimelineController extends BaseController {
       this.animation.setDuration(this.durationInput.value)
       this.durationInput.value = this.animation.duration
     })
+
+    this.musicModeBtn.addEventListener('click', () => {
+      this.animation.setMusicMode(!this.animation.musicMode)
+      this.musicModeBtn.blur()
+    })
+
+    this.bpmInput.addEventListener('change', () => {
+      this.animation.setBpm(this.bpmInput.value)
+      this.bpmInput.value = this.animation.bpm
+    })
+
+    this.barsInput.addEventListener('change', () => {
+      this.animation.setBars(this.barsInput.value)
+      this.barsInput.value = this.animation.bars
+    })
+
+    this.sigInput.addEventListener('change', () => {
+      this.animation.setBeatsPerBar(this.sigInput.value)
+      this.sigInput.value = this.animation.beatsPerBar
+    })
+
+    this.gridSelect.addEventListener('change', () => {
+      this.animation.setGridDivision(this.gridSelect.value)
+    })
+  }
+
+  /**
+   * Sync the music-mode toolbar (button state, input values, visibility)
+   * to the animation state, and refresh the ruler.
+   */
+  updateMusicUI() {
+    const on = this.animation.musicMode
+    this.musicModeBtn.classList.toggle('active', on)
+    this.durationControls.style.display = on ? 'none' : ''
+    this.musicControls.style.display = on ? '' : 'none'
+    this.bpmInput.value = this.animation.bpm
+    this.barsInput.value = this.animation.bars
+    this.sigInput.value = this.animation.beatsPerBar
+    this.gridSelect.value = this.animation.gridDivision
+    this.durationInput.value = this.animation.duration
+    this.updateRuler()
+    this.updatePlayhead()
   }
 
   linkKeyboardEvents() {
@@ -142,10 +191,16 @@ export default class KeyframeTimelineController extends BaseController {
     const rect = this.ruler.getBoundingClientRect()
     if (rect.width <= 0) return 0
     const frac = (clientX - rect.left) / rect.width
-    return Math.min(Math.max(0, frac), 1) * this.animation.duration
+    const t = Math.min(Math.max(0, frac), 1) * this.animation.duration
+    // Snap to the tempo grid in music mode (no-op otherwise)
+    return this.animation.snapTime(t)
   }
 
   updateRuler() {
+    if (this.animation.musicMode) {
+      this.updateRulerMusic()
+      return
+    }
     const duration = this.animation.duration
     const width = this.ruler.getBoundingClientRect().width || 800
 
@@ -170,13 +225,68 @@ export default class KeyframeTimelineController extends BaseController {
     }
   }
 
+  /**
+   * Tempo-aware ruler: labelled ticks at each bar plus minor ticks at the
+   * current snap-grid resolution (bar / 1/2 / 1/4 / 1/16), so the visible grid
+   * matches where keyframes will snap. Grid ticks are thinned out when they
+   * would be closer than ~5px.
+   */
+  updateRulerMusic() {
+    const anim = this.animation
+    const duration = anim.duration
+    const width = this.ruler.getBoundingClientRect().width || 800
+    const pxPerSec = width / duration
+    const secPerBar = anim.secondsPerBeat * anim.beatsPerBar
+
+    this.ruler.innerHTML = ''
+
+    // Labelled bar lines
+    const totalBars = Math.ceil(anim.bars)
+    for (let bar = 0; bar < totalBars; bar++) {
+      const tBar = bar * secPerBar
+      if (tBar > duration + 1e-6) break
+      const tick = document.createElement('span')
+      tick.className = 'tp-tick'
+      tick.style.left = (tBar / duration * 100) + '%'
+      tick.textContent = String(bar + 1)
+      this.ruler.appendChild(tick)
+    }
+
+    // Minor grid lines at the snap-grid division, skipping ones on a bar line
+    const gridStep = anim.gridStepSeconds()
+    if (gridStep > 0 && gridStep * pxPerSec >= 5) {
+      for (let t = gridStep; t < duration - 1e-6; t += gridStep) {
+        const r = t / secPerBar
+        if (Math.abs(r - Math.round(r)) < 1e-6) continue // coincides with a bar
+        const minor = document.createElement('span')
+        minor.className = 'tp-tick tp-tick-minor'
+        minor.style.left = (t / duration * 100) + '%'
+        this.ruler.appendChild(minor)
+      }
+    }
+  }
+
   updatePlayhead() {
     const frac = this.animation.duration > 0
       ? this.animation.playhead / this.animation.duration
       : 0
     this.playhead.style.left =
       `calc(var(--tp-label-w) + ${frac} * (100% - var(--tp-label-w)))`
-    this.timeReadout.textContent = this.animation.playhead.toFixed(2) + 's'
+    this.timeReadout.textContent = this.formatTime(this.animation.playhead)
+  }
+
+  /**
+   * @param {number} t seconds
+   * @returns {string} "bar.beat" in music mode, "X.XXs" otherwise
+   */
+  formatTime(t) {
+    if (!this.animation.musicMode) return t.toFixed(2) + 's'
+    // Nudge by a tiny epsilon so float drift at a bar boundary (e.g. 3.9999)
+    // doesn't read as "bar.4" instead of the next bar
+    const beats = this.animation.beatsAt(t) + 1e-6
+    const bar = Math.floor(beats / this.animation.beatsPerBar) + 1
+    const beat = Math.floor(beats % this.animation.beatsPerBar) + 1
+    return `${bar}.${beat}`
   }
 
   // ============================================================
@@ -187,7 +297,29 @@ export default class KeyframeTimelineController extends BaseController {
    * @param {number} eId
    * @returns {string}
    */
+  /**
+   * @param {number|string} eId
+   * @returns {boolean} true if this is a modulator track with no live
+   * modulator or whose target parameter is absent from the current shader
+   */
+  isOrphanModulatorTrack(eId) {
+    if (typeof eId !== 'string' || !eId.startsWith('mod:')) return false
+    const mod = this.experience.modulatorManager?.get(Number(eId.split(':')[1]))
+    if (!mod) return true
+    return !this.experience.shader?.getInput(mod.targetEId)
+  }
+
   getTrackName(eId) {
+    // Modulator center/range tracks: 'mod:<id>:center' -> "LFO·Zoom center"
+    if (typeof eId === 'string' && eId.startsWith('mod:')) {
+      const [, idStr, prop] = eId.split(':')
+      const mod = this.experience.modulatorManager?.get(Number(idStr))
+      if (!mod) return `Mod ${prop}`
+      const target = this.experience.shader?.getInput(mod.targetEId)
+      const targetName = target ? String(target.name) : `Param ${mod.targetEId}`
+      const typeLabel = mod.type === 'lfo' ? 'LFO' : 'dB'
+      return `${typeLabel}·${targetName} ${prop}`
+    }
     const input = this.experience.shader?.getInput(eId)
     return input ? String(input.name) : (eIdNames[eId] ?? `Param ${eId}`)
   }
@@ -197,7 +329,14 @@ export default class KeyframeTimelineController extends BaseController {
    */
   rebuild() {
     this.rows.innerHTML = ''
+    // Hide modulator lanes whose modulator/target no longer exists in the
+    // current shader (e.g. after a fractal-mode switch) - the keyframes are
+    // kept in the data so the lane reappears when the target is back.
     const tracks = Array.from(this.animation.tracks.values())
+      .filter(track => !this.isOrphanModulatorTrack(track.eId))
+    // Remember the rendered order so select() can map an eId to its lane index
+    // (rendered tracks are a subset of animation.tracks once orphans are hidden)
+    this._laneOrder = tracks.map(track => track.eId)
     this.emptyHint.hidden = tracks.length > 0
 
     tracks.forEach((track, order) => {
@@ -265,6 +404,18 @@ export default class KeyframeTimelineController extends BaseController {
 
     elem.addEventListener('pointerdown', (event) => {
       event.stopPropagation()
+      // Ctrl/Cmd-drag duplicates the keyframe and drags the copy, leaving the
+      // original in place (standard editor gesture)
+      if (event.ctrlKey || event.metaKey) {
+        const copy = { t: key.t, v: key.v, s: key.s }
+        track.keys.push(copy)
+        track.sortKeys()
+        const copyElem = this.buildKeyElement(track, copy)
+        elem.parentElement.appendChild(copyElem)
+        this.select(track.eId, copy)
+        this.startKeyDrag(copyElem, track, copy, event, true)
+        return
+      }
       this.select(track.eId, key)
       this.startKeyDrag(elem, track, key, event)
     })
@@ -296,9 +447,11 @@ export default class KeyframeTimelineController extends BaseController {
   }
 
   /**
-   * Drag a keyframe horizontally to retime it
+   * Drag a keyframe horizontally to retime it. When `isCopy` is set, the key is
+   * a freshly-duplicated copy: if the pointer never moves, discard it so a bare
+   * Ctrl-click doesn't leave a stray duplicate.
    */
-  startKeyDrag(elem, track, key, event) {
+  startKeyDrag(elem, track, key, event, isCopy = false) {
     elem.setPointerCapture(event.pointerId)
     let moved = false
 
@@ -315,7 +468,12 @@ export default class KeyframeTimelineController extends BaseController {
       elem.removeEventListener('pointermove', onMove)
       elem.removeEventListener('pointerup', onUp)
       elem.removeEventListener('pointercancel', onUp)
-      if (moved) {
+      if (!moved && isCopy) {
+        // Ctrl-clicked without dragging - drop the unmoved duplicate
+        const idx = track.keys.indexOf(key)
+        if (idx >= 0) track.removeKeyframe(idx)
+      }
+      if (moved || isCopy) {
         // Full rebuild after the drag so key ordering and the key
         // button states stay in sync
         this.animation.trigger('tracksChanged')
@@ -389,7 +547,9 @@ export default class KeyframeTimelineController extends BaseController {
    * @param {Object|null} key
    */
   select(eId, key = null) {
-    this.selected = (eId === null || !key) ? null : { eId: Number(eId), key }
+    // eId may be numeric (shader param) or a string (modulator track) - keep
+    // its type so it matches the Map keys in animation.tracks
+    this.selected = (eId == null || !key) ? null : { eId, key }
 
     for (const elem of this.rows.querySelectorAll('.tp-key.selected')) {
       elem.classList.remove('selected')
@@ -399,7 +559,8 @@ export default class KeyframeTimelineController extends BaseController {
       const track = this.animation.getTrack(this.selected.eId)
       if (track) {
         const lanes = this.rows.querySelectorAll('.tp-track')
-        const trackOrder = Array.from(this.animation.tracks.keys()).indexOf(this.selected.eId)
+        const order = this._laneOrder || Array.from(this.animation.tracks.keys())
+        const trackOrder = order.indexOf(this.selected.eId)
         const lane = lanes[trackOrder]
         const index = track.keys.indexOf(this.selected.key)
         if (lane && lane.children[index]) {
@@ -440,7 +601,7 @@ export default class KeyframeTimelineController extends BaseController {
       if (!track) return
       const index = track.keys.indexOf(this.selected.key)
       if (index < 0) return
-      track.moveKeyframe(index, Number(this.propTime.value))
+      track.moveKeyframe(index, this.animation.snapTime(Number(this.propTime.value)))
       this.animation.apply()
       this.animation.trigger('tracksChanged')
     })

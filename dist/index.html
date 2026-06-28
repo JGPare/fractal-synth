@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap" rel="stylesheet">
   
-  <script type="module" crossorigin src="./assets/index-04b89e46.js"></script>
-  <link rel="stylesheet" href="./assets/index-50443f34.css">
+  <script type="module" crossorigin src="./assets/index-f1d211da.js"></script>
+  <link rel="stylesheet" href="./assets/index-919e338d.css">
 </head>
 
 <body>
@@ -126,6 +126,29 @@
         <div id="colors-container">
           <!-- inserted via JS here -->
         </div>
+        <!-- MODULATORS (music mode) -->
+        <div id="modulator-panel">
+          <p class="sub-header-text"> Audio </p>
+          <div class="bottom-outline"></div>
+          <div class="slider-container">
+            <div class="button-container">
+              <button class="control-button default-button" id="audio-upload-btn">Upload Track</button>
+            </div>
+            <p class="label-text" id="audio-file-name">No track loaded</p>
+            <div class="slider-container" id="audio-bpm-row" style="display: none;">
+              <p class="label-text">Detected BPM: <span id="audio-detected-bpm">–</span></p>
+              <button class="control-button default-button" id="audio-apply-bpm">Use for BPM</button>
+            </div>
+          </div>
+          <p class="sub-header-text"> Modulators </p>
+          <div class="bottom-outline"></div>
+          <div class="button-container" id="modulator-add-row">
+            <!-- Phase C: + LFO / + dB Follower buttons inserted here -->
+          </div>
+          <div id="modulator-list">
+            <!-- modulator cards inserted via JS -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -140,9 +163,31 @@
         data-tooltip="Seek to End [.]">⏭</button>
       <button class="timeline-button default-button tooltip-enabled" id="loop-mode-btn"
         data-tooltip="Loop / Ping-Pong">⟳</button>
-      <label for="timeline-duration" class="label-text tp-toolbar-label">Duration</label>
-      <input type="number" min="0.5" max="600" step="0.5" value="15" class="control-number tp-duration-input"
-        id="timeline-duration" title="Timeline duration (seconds)">
+      <button class="timeline-button default-button tooltip-enabled" id="music-mode-btn"
+        data-tooltip="Music Mode (bars / BPM grid)">♪</button>
+      <span id="duration-controls">
+        <label for="timeline-duration" class="label-text tp-toolbar-label">Duration</label>
+        <input type="number" min="0.5" max="600" step="0.5" value="15" class="control-number tp-duration-input"
+          id="timeline-duration" title="Timeline duration (seconds)">
+      </span>
+      <span id="music-controls" style="display: none;">
+        <label for="music-bpm" class="label-text tp-toolbar-label">BPM</label>
+        <input type="number" min="1" max="999" step="1" value="120" class="control-number tp-duration-input"
+          id="music-bpm" title="Beats per minute">
+        <label for="music-bars" class="label-text tp-toolbar-label">Bars</label>
+        <input type="number" min="1" max="999" step="1" value="8" class="control-number tp-duration-input"
+          id="music-bars" title="Number of bars">
+        <label for="music-sig" class="label-text tp-toolbar-label">/Bar</label>
+        <input type="number" min="1" max="16" step="1" value="4" class="control-number tp-duration-input"
+          id="music-sig" title="Beats per bar">
+        <label for="music-grid" class="label-text tp-toolbar-label">Grid</label>
+        <select class="control-select" id="music-grid" title="Snap grid">
+          <option value="bar">Bar</option>
+          <option value="1/2">1/2</option>
+          <option value="1/4" selected>1/4</option>
+          <option value="1/16">1/16</option>
+        </select>
+      </span>
       <span class="label-text tp-time-readout" id="timeline-time-readout">0.00s</span>
       <span class="tp-toolbar-spacer"></span>
       <button class="timeline-button default-button tooltip-enabled" id="export-image-btn"
@@ -172,12 +217,18 @@
         <p class="sub-header-text tp-prop-name" id="tp-prop-name">Keyframe</p>
         <div class="bottom-outline"></div>
         <div class="tp-props-body" id="tp-props-body" hidden>
-          <label class="label-text" for="tp-prop-time">Time (s)</label>
-          <input type="number" step="0.01" min="0" class="control-number tp-prop-input" id="tp-prop-time">
-          <label class="label-text" for="tp-prop-value">Value</label>
-          <input type="number" step="any" class="control-number tp-prop-input" id="tp-prop-value">
-          <label class="label-text" for="tp-prop-sharpness">Sharpness</label>
-          <input type="range" min="0" max="1" step="0.01" value="0" class="control-slider" id="tp-prop-sharpness">
+          <div class="tp-prop-row">
+            <label class="label-text" for="tp-prop-time">Time</label>
+            <input type="number" step="0.01" min="0" class="control-number tp-prop-input" id="tp-prop-time">
+          </div>
+          <div class="tp-prop-row">
+            <label class="label-text" for="tp-prop-value">Value</label>
+            <input type="number" step="any" class="control-number tp-prop-input" id="tp-prop-value">
+          </div>
+          <div class="tp-prop-row">
+            <label class="label-text" for="tp-prop-sharpness">Sharp</label>
+            <input type="range" min="0" max="1" step="0.01" value="0" class="control-slider" id="tp-prop-sharpness">
+          </div>
           <button class="control-button default-button tp-prop-delete" id="tp-prop-delete">Delete</button>
         </div>
         <p class="label-text tp-props-empty" id="tp-props-empty">No keyframe selected</p>

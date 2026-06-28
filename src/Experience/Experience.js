@@ -10,6 +10,8 @@ import Screen from './Screen.js'
 import Palettes from './Utils/Palettes.js'
 import ShaderMaterial from './ShaderMaterial.js'
 import AnimationTimeline from './Animation/AnimationTimeline.js'
+import ModulatorManager from './Animation/ModulatorManager.js'
+import AudioEngine from './Audio/AudioEngine.js'
 import ProjectRepo from './Repo/ProjectRepo.js'
 import URLShare from './Repo/URLShare.js'
 import StatsPanel from './Utils/StatsPanel.js'
@@ -54,6 +56,8 @@ export default class Experience {
     this.projectList = new ProjectList()
     this.keyboard = new Keyboard()
     this.animation = new AnimationTimeline(this)
+    this.modulatorManager = new ModulatorManager(this)
+    this.audioEngine = new AudioEngine()
     this.debug = new Debug()
     this.sizes = new Sizes()
     this.time = new Time()
