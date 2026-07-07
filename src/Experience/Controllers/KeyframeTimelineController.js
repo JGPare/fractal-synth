@@ -428,6 +428,12 @@ export default class KeyframeTimelineController extends BaseController {
 
     elem.addEventListener('pointerdown', (event) => {
       event.stopPropagation()
+      // Shift-drag adjusts the key's sharpness instead of moving it
+      if (event.shiftKey) {
+        this.select(track.eId, key)
+        this.startSharpnessDrag(elem, track, key, event)
+        return
+      }
       // Ctrl/Cmd-drag duplicates the keyframe and drags the copy, leaving the
       // original in place (standard editor gesture)
       if (event.ctrlKey || event.metaKey) {
@@ -737,6 +743,34 @@ export default class KeyframeTimelineController extends BaseController {
         // button states stay in sync
         this.animation.trigger('tracksChanged')
       }
+    }
+
+    elem.addEventListener('pointermove', onMove)
+    elem.addEventListener('pointerup', onUp)
+    elem.addEventListener('pointercancel', onUp)
+  }
+
+  /**
+   * Shift-drag a keyframe vertically to adjust its sharpness: up sharpens
+   * toward linear (s=1), down smooths (s=0). The key itself stays put.
+   */
+  startSharpnessDrag(elem, track, key, event) {
+    elem.setPointerCapture(event.pointerId)
+    const startS = key.s
+    const startY = event.clientY
+
+    const onMove = (moveEvent) => {
+      const s = startS + (startY - moveEvent.clientY) / 100
+      key.s = Math.min(Math.max(s, 0), 1)
+      this.animation.apply()
+      this.redrawCurve(track.eId)
+      this.refreshPropsPanel()
+    }
+
+    const onUp = () => {
+      elem.removeEventListener('pointermove', onMove)
+      elem.removeEventListener('pointerup', onUp)
+      elem.removeEventListener('pointercancel', onUp)
     }
 
     elem.addEventListener('pointermove', onMove)
