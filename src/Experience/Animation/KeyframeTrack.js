@@ -13,6 +13,7 @@ export default class KeyframeTrack {
     this.eId = eId
     this.keys = []
     this.muted = false
+    this.expanded = false
   }
 
   // ============================================================
@@ -152,6 +153,7 @@ export default class KeyframeTrack {
       ])
     }
     if (this.muted) snap.muted = true
+    if (this.expanded) snap.expanded = true
     return snap
   }
 
@@ -168,6 +170,7 @@ export default class KeyframeTrack {
       track.sortKeys()
     }
     track.muted = snap.muted ?? false
+    track.expanded = snap.expanded ?? false
     return track
   }
 }

@@ -17,6 +17,7 @@ export default class KeyframeTimelineController extends BaseController {
   constructor() {
     super()
     this.selected = null // { eId, key } - key is the keyframe object reference
+    this._laneEls = new Map() // eId -> { lane, inner, svg, range } for expanded lanes
     this.getElements()
     this.linkTransport()
     this.linkTimelineArea()
@@ -329,6 +330,9 @@ export default class KeyframeTimelineController extends BaseController {
    */
   rebuild() {
     this.rows.innerHTML = ''
+    // Per-expanded-lane registry (eId -> { lane, inner, svg, range }) so
+    // drags can redraw a single curve without a full rebuild
+    this._laneEls = new Map()
     // Hide modulator lanes whose modulator/target no longer exists in the
     // current shader (e.g. after a fractal-mode switch) - the keyframes are
     // kept in the data so the lane reappears when the target is back.
@@ -349,6 +353,15 @@ export default class KeyframeTimelineController extends BaseController {
       label.title = this.getTrackName(track.eId)
       if (track.muted) row.classList.add('muted')
 
+      const expandBtn = document.createElement('button')
+      expandBtn.className = 'tp-expand-btn'
+      expandBtn.textContent = track.expanded ? '▾' : '▸'
+      expandBtn.title = track.expanded ? 'Collapse lane' : 'Expand to automation lane'
+      expandBtn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        this.animation.toggleExpanded(track.eId)
+      })
+
       const muteBtn = document.createElement('button')
       muteBtn.className = 'tp-mute-btn'
       muteBtn.textContent = track.muted ? '○' : '●'
@@ -362,6 +375,7 @@ export default class KeyframeTimelineController extends BaseController {
       labelText.className = 'tp-track-name'
       labelText.textContent = this.getTrackName(track.eId)
 
+      label.appendChild(expandBtn)
       label.appendChild(muteBtn)
       label.appendChild(labelText)
 
@@ -369,8 +383,13 @@ export default class KeyframeTimelineController extends BaseController {
       lane.className = 'tp-track'
       this.linkLane(lane, track)
 
-      for (const key of track.keys) {
-        lane.appendChild(this.buildKeyElement(track, key))
+      if (track.expanded) {
+        row.classList.add('expanded')
+        this.buildExpandedLane(lane, track)
+      } else {
+        for (const key of track.keys) {
+          lane.appendChild(this.buildKeyElement(track, key))
+        }
       }
 
       row.appendChild(label)
@@ -392,12 +411,17 @@ export default class KeyframeTimelineController extends BaseController {
   /**
    * @param {import('../Animation/KeyframeTrack.js').default} track
    * @param {Object} key
+   * @param {{min: number, max: number}|null} range - set for expanded lanes;
+   * positions the key vertically by value and enables Y-dragging
    * @returns {HTMLElement}
    */
-  buildKeyElement(track, key) {
+  buildKeyElement(track, key, range = null) {
     const elem = document.createElement('div')
     elem.className = 'tp-key'
     elem.style.left = this.keyLeftPercent(key)
+    if (range) {
+      elem.style.top = this.keyTopPercent(key, range)
+    }
     if (this.selected && this.selected.key === key) {
       elem.classList.add('selected')
     }
@@ -410,14 +434,14 @@ export default class KeyframeTimelineController extends BaseController {
         const copy = { t: key.t, v: key.v, s: key.s }
         track.keys.push(copy)
         track.sortKeys()
-        const copyElem = this.buildKeyElement(track, copy)
+        const copyElem = this.buildKeyElement(track, copy, range)
         elem.parentElement.appendChild(copyElem)
         this.select(track.eId, copy)
-        this.startKeyDrag(copyElem, track, copy, event, true)
+        this.startKeyDrag(copyElem, track, copy, event, true, range)
         return
       }
       this.select(track.eId, key)
-      this.startKeyDrag(elem, track, key, event)
+      this.startKeyDrag(elem, track, key, event, false, range)
     })
 
     elem.addEventListener('contextmenu', (event) => {
@@ -426,7 +450,7 @@ export default class KeyframeTimelineController extends BaseController {
       const index = track.keys.indexOf(key)
       if (index >= 0) {
         if (this.selected && this.selected.key === key) {
-          this.selected = null
+          this.select(null)
         }
         this.animation.removeKeyframe(track.eId, index)
         this.animation.apply()
@@ -446,12 +470,239 @@ export default class KeyframeTimelineController extends BaseController {
     return (frac * 100) + '%'
   }
 
+  // ============================================================
+  // AUTOMATION LANES (expanded tracks)
+  // ============================================================
+
   /**
-   * Drag a keyframe horizontally to retime it. When `isCopy` is set, the key is
-   * a freshly-duplicated copy: if the pointer never moves, discard it so a bare
-   * Ctrl-click doesn't leave a stray duplicate.
+   * Value range for a track's automation lane.
+   * Numeric params use their NumberInput min/max; 'mod:<id>:center' tracks
+   * live in the target parameter's space so they use its range; anything
+   * without an input (mod range tracks, orphaned params) falls back to the
+   * extent of the key values, padded.
+   * @param {import('../Animation/KeyframeTrack.js').default} track
+   * @returns {{min: number, max: number}}
    */
-  startKeyDrag(elem, track, key, event, isCopy = false) {
+  getTrackRange(track) {
+    let min, max
+    const eId = track.eId
+    if (typeof eId === 'string' && eId.startsWith('mod:')) {
+      const [, idStr, prop] = eId.split(':')
+      if (prop === 'center') {
+        const mod = this.experience.modulatorManager?.get(Number(idStr))
+        const input = mod ? this.experience.shader?.getInput(mod.targetEId) : null
+        if (input) {
+          min = input.min
+          max = input.max
+        }
+      }
+    } else {
+      const input = this.experience.shader?.getInput(eId)
+      if (input) {
+        min = input.min
+        max = input.max
+      }
+    }
+
+    if (min === undefined) {
+      // No input to ask - fit the lane around the keys themselves
+      const values = track.keys.map(k => k.v)
+      if (values.length > 0) {
+        min = Math.min(...values)
+        max = Math.max(...values)
+        const pad = Math.max(0.5, (max - min) * 0.1)
+        min -= pad
+        max += pad
+      } else {
+        min = -1
+        max = 1
+      }
+    }
+
+    if (!(max > min)) {
+      // Degenerate (min === max, or NaN) - widen so the mapping stays finite
+      const mid = Number.isFinite(min) ? min : 0
+      min = mid - 0.5
+      max = mid + 0.5
+    }
+    return { min, max }
+  }
+
+  /**
+   * @param {Object} key
+   * @param {{min: number, max: number}} range
+   * @returns {string} css top percentage (high values at the top)
+   */
+  keyTopPercent(key, range) {
+    const frac = (key.v - range.min) / (range.max - range.min)
+    return ((1 - Math.min(Math.max(frac, 0), 1)) * 100) + '%'
+  }
+
+  /**
+   * @param {number} clientY
+   * @param {HTMLElement} inner - the .tp-lane-inner element
+   * @param {{min: number, max: number}} range
+   * @returns {number} value at that pointer height, clamped to the range
+   */
+  valueFromClientY(clientY, inner, range) {
+    const rect = inner.getBoundingClientRect()
+    const frac = rect.height > 0 ? (clientY - rect.top) / rect.height : 0.5
+    const v = range.max - Math.min(Math.max(frac, 0), 1) * (range.max - range.min)
+    return Math.min(Math.max(v, range.min), range.max)
+  }
+
+  /**
+   * Build the automation-lane contents: value curve SVG + breakpoints
+   * @param {HTMLElement} lane
+   * @param {import('../Animation/KeyframeTrack.js').default} track
+   */
+  buildExpandedLane(lane, track) {
+    const range = this.getTrackRange(track)
+
+    const inner = document.createElement('div')
+    inner.className = 'tp-lane-inner'
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('class', 'tp-curve')
+    svg.setAttribute('viewBox', '0 0 1000 100')
+    svg.setAttribute('preserveAspectRatio', 'none')
+    // Delegated so redrawCurve can replace the hit paths mid-drag without
+    // orphaning a listener
+    svg.addEventListener('pointerdown', (event) => {
+      const seg = event.target.dataset?.seg
+      if (seg === undefined) return
+      event.stopPropagation()
+      this.startSegmentDrag(svg, track, Number(seg), event)
+    })
+    inner.appendChild(svg)
+
+    for (const key of track.keys) {
+      inner.appendChild(this.buildKeyElement(track, key, range))
+    }
+
+    lane.appendChild(inner)
+    this._laneEls.set(track.eId, { lane, inner, svg, range })
+    this.redrawCurve(track.eId)
+  }
+
+  /**
+   * Regenerate one expanded lane's curve + segment hit paths. Cheap enough
+   * to call on every drag move; no-op for collapsed tracks.
+   * @param {number|string} eId
+   */
+  redrawCurve(eId) {
+    const laneInfo = this._laneEls.get(eId)
+    const track = this.animation.getTrack(eId)
+    if (!laneInfo || !track || track.keys.length === 0) return
+    const duration = this.animation.duration
+    if (!(duration > 0)) return
+
+    const { svg, range } = laneInfo
+    const span = range.max - range.min
+    const toX = (t) => Math.min(Math.max(t / duration, 0), 1) * 1000
+    const toY = (v) => {
+      const clamped = Math.min(Math.max(v, range.min), range.max)
+      return (1 - (clamped - range.min) / span) * 100
+    }
+
+    // Sample uniformly, plus every exact key time so sharp corners stay crisp
+    const times = []
+    const samples = 240
+    for (let i = 0; i <= samples; i++) {
+      times.push(duration * i / samples)
+    }
+    for (const key of track.keys) {
+      if (key.t <= duration) times.push(key.t)
+    }
+    times.sort((a, b) => a - b)
+
+    const points = times.map(t => `${toX(t)},${toY(track.evaluate(t))}`)
+    const els = []
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+    line.setAttribute('class', 'tp-curve-line')
+    line.setAttribute('d', 'M' + points.join(' L'))
+    els.push(line)
+
+    // One invisible wide stroke per inter-key segment for vertical dragging
+    for (let i = 0; i < track.keys.length - 1; i++) {
+      const t0 = track.keys[i].t
+      const t1 = track.keys[i + 1].t
+      const segPoints = []
+      for (let j = 0; j < times.length; j++) {
+        if (times[j] >= t0 && times[j] <= t1) segPoints.push(points[j])
+      }
+      if (segPoints.length < 2) continue
+      const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+      hit.setAttribute('class', 'tp-curve-hit')
+      hit.setAttribute('d', 'M' + segPoints.join(' L'))
+      hit.dataset.seg = i
+      els.push(hit)
+    }
+
+    svg.replaceChildren(...els)
+  }
+
+  /**
+   * Drag a curve segment vertically, shifting both endpoint values together.
+   * The delta is clamped so neither endpoint leaves the range - the segment
+   * keeps its shape and stops at the lane edge.
+   * @param {SVGElement} svg
+   * @param {import('../Animation/KeyframeTrack.js').default} track
+   * @param {number} segIndex
+   * @param {PointerEvent} event
+   */
+  startSegmentDrag(svg, track, segIndex, event) {
+    const laneInfo = this._laneEls.get(track.eId)
+    const k0 = track.keys[segIndex]
+    const k1 = track.keys[segIndex + 1]
+    if (!laneInfo || !k0 || !k1) return
+
+    // Capture on the svg, not the hit path - redrawCurve replaces the paths
+    // mid-drag
+    svg.setPointerCapture(event.pointerId)
+    const { min, max } = laneInfo.range
+    const v0 = k0.v
+    const v1 = k1.v
+    const startY = event.clientY
+    const innerH = laneInfo.inner.getBoundingClientRect().height || 1
+    let moved = false
+
+    const onMove = (moveEvent) => {
+      moved = true
+      let dv = -(moveEvent.clientY - startY) / innerH * (max - min)
+      dv = Math.min(Math.max(dv, min - Math.min(v0, v1)), max - Math.max(v0, v1))
+      k0.v = v0 + dv
+      k1.v = v1 + dv
+      const keyEls = laneInfo.inner.querySelectorAll('.tp-key')
+      if (keyEls[segIndex]) keyEls[segIndex].style.top = this.keyTopPercent(k0, laneInfo.range)
+      if (keyEls[segIndex + 1]) keyEls[segIndex + 1].style.top = this.keyTopPercent(k1, laneInfo.range)
+      this.redrawCurve(track.eId)
+      this.animation.apply()
+      this.refreshPropsPanel()
+    }
+
+    const onUp = () => {
+      svg.removeEventListener('pointermove', onMove)
+      svg.removeEventListener('pointerup', onUp)
+      svg.removeEventListener('pointercancel', onUp)
+      if (moved) {
+        this.animation.trigger('tracksChanged')
+      }
+    }
+
+    svg.addEventListener('pointermove', onMove)
+    svg.addEventListener('pointerup', onUp)
+    svg.addEventListener('pointercancel', onUp)
+  }
+
+  /**
+   * Drag a keyframe to retime it - and, in an expanded lane (`range` set),
+   * revalue it vertically. When `isCopy` is set, the key is a freshly-duplicated
+   * copy: if the pointer never moves, discard it so a bare Ctrl-click doesn't
+   * leave a stray duplicate.
+   */
+  startKeyDrag(elem, track, key, event, isCopy = false, range = null) {
     elem.setPointerCapture(event.pointerId)
     let moved = false
 
@@ -460,6 +711,14 @@ export default class KeyframeTimelineController extends BaseController {
       const newT = this.timeFromClientX(moveEvent.clientX)
       track.moveKeyframe(track.keys.indexOf(key), newT)
       elem.style.left = this.keyLeftPercent(key)
+      if (range) {
+        const laneInfo = this._laneEls.get(track.eId)
+        if (laneInfo) {
+          key.v = this.valueFromClientY(moveEvent.clientY, laneInfo.inner, range)
+          elem.style.top = this.keyTopPercent(key, range)
+        }
+        this.redrawCurve(track.eId)
+      }
       this.animation.apply()
       this.refreshPropsPanel()
     }
@@ -496,7 +755,15 @@ export default class KeyframeTimelineController extends BaseController {
 
     lane.addEventListener('dblclick', (event) => {
       const t = this.timeFromClientX(event.clientX)
-      const v = track.evaluate(t)
+      let v
+      if (track.expanded) {
+        // Insert at the cursor's height in the lane, not on the curve
+        const laneInfo = this._laneEls.get(track.eId)
+        const range = laneInfo?.range ?? this.getTrackRange(track)
+        v = this.valueFromClientY(event.clientY, laneInfo?.inner ?? lane, range)
+      } else {
+        v = track.evaluate(t)
+      }
       this.animation.addOrUpdateKeyframe(track.eId, t, v)
       const index = track.indexOfKeyAt(t, this.animation.keyEpsilon)
       if (index >= 0) {
@@ -563,8 +830,11 @@ export default class KeyframeTimelineController extends BaseController {
         const trackOrder = order.indexOf(this.selected.eId)
         const lane = lanes[trackOrder]
         const index = track.keys.indexOf(this.selected.key)
-        if (lane && lane.children[index]) {
-          lane.children[index].classList.add('selected')
+        // querySelectorAll rather than children: expanded lanes nest keys
+        // inside .tp-lane-inner after the curve SVG
+        const keyEls = lane ? lane.querySelectorAll('.tp-key') : []
+        if (keyEls[index]) {
+          keyEls[index].classList.add('selected')
         }
       }
     }
@@ -617,6 +887,8 @@ export default class KeyframeTimelineController extends BaseController {
       if (!this.selected) return
       this.selected.key.s = Number(this.propSharpness.value)
       this.animation.apply()
+      // Live curve update when the track is an expanded lane (no-op otherwise)
+      this.redrawCurve(this.selected.eId)
     })
 
     this.propDelete.addEventListener('click', () => {

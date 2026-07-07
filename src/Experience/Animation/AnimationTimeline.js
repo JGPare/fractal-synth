@@ -327,6 +327,18 @@ export default class AnimationTimeline extends EventEmitter {
     this.trigger('tracksChanged')
   }
 
+  /**
+   * Toggle a track between the compact key strip and the tall automation
+   * lane. Pure UI state - playback is unaffected.
+   * @param {number|string} eId
+   */
+  toggleExpanded(eId) {
+    const track = this.getTrack(eId)
+    if (!track) return
+    track.expanded = !track.expanded
+    this.trigger('tracksChanged')
+  }
+
   apply() {
     const shader = this.experience.shader
     if (!shader) return
