@@ -270,19 +270,58 @@ export default class ProjectRepo {
   // IMAGE / VIDEO EXPORT
   // ============================================================
 
+  static exportResolutions = {
+    '720p':  { width: 1280, height: 720 },
+    '1080p': { width: 1920, height: 1080 },
+    '1440p': { width: 2560, height: 1440 },
+    '4k':    { width: 3840, height: 2160 },
+  }
+
   /**
-   * Export the current canvas as a PNG download
+   * Resolve the export resolution from Settings, falling back to the
+   * canvas's current size. 'screen' matches the double-click fullscreen
+   * view: monitor dimensions at the same capped pixel ratio the renderer uses
+   * @param {Experience} experience
+   * @returns {{width: number, height: number}}
+   */
+  static getExportSize(experience) {
+    if (experience.settings.exportResolution === 'screen') {
+      const pr = experience.sizes.pixelRatio
+      return {
+        width: Math.round(window.screen.width * pr),
+        height: Math.round(window.screen.height * pr),
+      }
+    }
+    const res = this.exportResolutions[experience.settings.exportResolution]
+    return res || { width: experience.canvas.width, height: experience.canvas.height }
+  }
+
+  /**
+   * Export the current frame as a PNG download at the Settings export
+   * resolution (resizes the renderer for one frame, then restores it)
    * @param {string} name
    * @param {Experience} experience
    */
   static async exportImage(name, experience) {
-    const blob = await experience.screen.captureBlob('image/png', 1.0)
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${name}.png`
-    a.click()
-    URL.revokeObjectURL(url)
+    const { width, height } = this.getExportSize(experience)
+
+    experience.renderer.instance.setSize(width, height)
+    experience.renderer.instance.setPixelRatio(1)
+    experience.screen.shaderUniforms.uAspect.value = width / height
+
+    try {
+      const blob = await experience.screen.captureBlob('image/png', 1.0)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${name}.png`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      experience.renderer.instance.setSize(experience.sizes.width, experience.sizes.height)
+      experience.renderer.instance.setPixelRatio(experience.sizes.pixelRatio)
+      experience.screen.shaderUniforms.uAspect.value = experience.sizes.aspect
+    }
   }
 
   /**
@@ -336,15 +375,7 @@ export default class ProjectRepo {
     const cycleDuration = animation.mode === 'pingpong' ? duration * 2 : duration
     const totalFrames = Math.round(cycleDuration * fps)
 
-    const resolutions = {
-      '720p':  { width: 1280, height: 720 },
-      '1080p': { width: 1920, height: 1080 },
-      '1440p': { width: 2560, height: 1440 },
-      '4k':    { width: 3840, height: 2160 },
-    }
-    const res = resolutions[experience.settings.exportResolution]
-    const width = res ? res.width : canvas.width
-    const height = res ? res.height : canvas.height
+    const { width, height } = this.getExportSize(experience)
 
     experience.renderer.instance.setSize(width, height)
     experience.renderer.instance.setPixelRatio(1)
